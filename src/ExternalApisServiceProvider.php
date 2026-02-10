@@ -33,6 +33,7 @@ use Seeders\ExternalApis\Connectors\Moz\MozLinksConnector;
 use Seeders\ExternalApis\Connectors\PaperClub\PaperClubConnector;
 use Seeders\ExternalApis\Connectors\Prensalink\PrensalinkConnector;
 use Seeders\ExternalApis\Connectors\ScraperAPI\ScraperAPIConnector;
+use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
 use Seeders\ExternalApis\Connectors\SeRanking\SeRankingConnector;
 use Seeders\ExternalApis\Connectors\TeamleaderOrbit\TeamleaderOrbitConnector;
 use Seeders\ExternalApis\Connectors\TreeNation\TreeNationConnector;
@@ -80,6 +81,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->singleton(MozLinksConnector::class);
         $this->app->singleton(MajesticConnector::class);
         $this->app->singleton(SeRankingConnector::class);
+        $this->app->singleton(SemrushConnector::class);
         $this->app->singleton(AdvancedWebRankingConnector::class);
 
         // Web Scraping & Search
@@ -179,6 +181,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
             MozLinksConnector::class,
             MajesticConnector::class,
             SeRankingConnector::class,
+            SemrushConnector::class,
             AdvancedWebRankingConnector::class,
             ScraperAPIConnector::class,
             GoogleSearchConnector::class,

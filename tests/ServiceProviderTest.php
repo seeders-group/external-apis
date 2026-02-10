@@ -8,6 +8,7 @@ use Seeders\ExternalApis\Connectors\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Connectors\DataForSeo\DataForSeoConnector;
 use Seeders\ExternalApis\Connectors\Hunter\HunterConnector;
 use Seeders\ExternalApis\Connectors\Moz\MozLinksConnector;
+use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
 
 it('registers the ahrefs connector', function () {
     $connector = app(AhrefsConnector::class);
@@ -33,6 +34,12 @@ it('registers the moz connector', function () {
     expect($connector)->toBeInstanceOf(MozLinksConnector::class);
 });
 
+it('registers the semrush connector', function () {
+    $connector = app(SemrushConnector::class);
+
+    expect($connector)->toBeInstanceOf(SemrushConnector::class);
+});
+
 it('registers the openai client', function () {
     $client = app(OpenAIClient::class);
 
@@ -49,4 +56,5 @@ it('loads the configuration', function () {
     expect(config('external-apis.ahrefs.token'))->toBe('test-token');
     expect(config('external-apis.dataforseo.username'))->toBe('test-user');
     expect(config('external-apis.openai.key'))->toBe('test-key');
+    expect(config('external-apis.semrush.api_key'))->toBe('test-semrush-key');
 });
