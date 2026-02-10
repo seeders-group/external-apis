@@ -30,6 +30,9 @@
         "saloonphp/saloon": "^3.0",
         "spatie/laravel-data": "^4.0"
     },
+    "suggest": {
+        "prismphp/prism": "Required for PrismUsageTrackerService multi-provider tracking"
+    },
     "require-dev": {
         "laravel/pint": "^1.13",
         "orchestra/testbench": "^9.0|^10.0",

@@ -7,6 +7,11 @@ namespace Seeders\ExternalApis;
 use Google_Client;
 use Illuminate\Support\ServiceProvider;
 use Seeders\ExternalApis\Clients\DocumentSectionTextGeneratorClient;
+use Seeders\ExternalApis\UsageTracking\Services\AhrefsUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\BudgetAlertService;
+use Seeders\ExternalApis\UsageTracking\Services\DataForSeoUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
 use Seeders\ExternalApis\Clients\DomainPlanningClient;
 use Seeders\ExternalApis\Clients\GeminiClient;
 use Seeders\ExternalApis\Clients\ImageGenerationClient;
@@ -45,6 +50,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
 
         $this->registerConnectors();
         $this->registerClients();
+        $this->registerUsageTracking();
     }
 
     /**
@@ -56,6 +62,10 @@ final class ExternalApisServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/external-apis.php' => config_path('external-apis.php'),
             ], 'external-apis-config');
+
+            $this->publishesMigrations([
+                __DIR__.'/../database/migrations' => database_path('migrations'),
+            ], 'external-apis-migrations');
         }
     }
 
@@ -140,6 +150,22 @@ final class ExternalApisServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register usage tracking services.
+     */
+    private function registerUsageTracking(): void
+    {
+        $this->app->singleton(OpenAIUsageTrackerService::class);
+        $this->app->singleton(AhrefsUsageTrackerService::class);
+        $this->app->singleton(DataForSeoUsageTrackerService::class);
+        $this->app->singleton(BudgetAlertService::class);
+
+        // Only register PrismUsageTrackerService if Prism is installed
+        if (class_exists(\Prism\Prism\Enums\Provider::class)) {
+            $this->app->singleton(PrismUsageTrackerService::class);
+        }
+    }
+
+    /**
      * Get the services provided by the provider.
      *
      * @return array<class-string>
@@ -177,6 +203,13 @@ final class ExternalApisServiceProvider extends ServiceProvider
             DomainPlanningClient::class,
             GeminiClient::class,
             SearchConsoleClient::class,
+
+            // Usage Tracking Services
+            OpenAIUsageTrackerService::class,
+            AhrefsUsageTrackerService::class,
+            DataForSeoUsageTrackerService::class,
+            BudgetAlertService::class,
+            PrismUsageTrackerService::class,
         ];
     }
 }
