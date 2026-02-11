@@ -254,6 +254,14 @@ return [
     'usage_tracking' => [
         'enabled' => true,
 
+        'semrush' => [
+            'unit_rules' => [
+                'backlinks_overview' => 100,
+                'backlinks_comparison_per_target' => 40,
+                'api_units' => 0,
+            ],
+        ],
+
         'pricing' => [
             'openai' => [
                 'models' => [
@@ -301,6 +309,10 @@ return [
             ],
             'ahrefs' => [
                 'cost_per_unit' => 0.01,
+                'unit_type' => 'api_units',
+            ],
+            'semrush' => [
+                'cost_per_unit' => 0.00005,
                 'unit_type' => 'api_units',
             ],
         ],

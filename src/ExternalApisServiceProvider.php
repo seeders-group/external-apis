@@ -12,6 +12,7 @@ use Seeders\ExternalApis\UsageTracking\Services\BudgetAlertService;
 use Seeders\ExternalApis\UsageTracking\Services\DataForSeoUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 use Seeders\ExternalApis\Clients\DomainPlanningClient;
 use Seeders\ExternalApis\Clients\GeminiClient;
 use Seeders\ExternalApis\Clients\ImageGenerationClient;
@@ -71,7 +72,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register all Saloon connectors as singletons.
+     * Register all Saloon connectors.
      */
     private function registerConnectors(): void
     {
@@ -81,7 +82,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->singleton(MozLinksConnector::class);
         $this->app->singleton(MajesticConnector::class);
         $this->app->singleton(SeRankingConnector::class);
-        $this->app->singleton(SemrushConnector::class);
+        $this->app->bind(SemrushConnector::class);
         $this->app->singleton(AdvancedWebRankingConnector::class);
 
         // Web Scraping & Search
@@ -159,6 +160,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->singleton(OpenAIUsageTrackerService::class);
         $this->app->singleton(AhrefsUsageTrackerService::class);
         $this->app->singleton(DataForSeoUsageTrackerService::class);
+        $this->app->singleton(SemrushUsageTrackerService::class);
         $this->app->singleton(BudgetAlertService::class);
 
         // Only register PrismUsageTrackerService if Prism is installed
@@ -211,6 +213,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
             OpenAIUsageTrackerService::class,
             AhrefsUsageTrackerService::class,
             DataForSeoUsageTrackerService::class,
+            SemrushUsageTrackerService::class,
             BudgetAlertService::class,
             PrismUsageTrackerService::class,
         ];

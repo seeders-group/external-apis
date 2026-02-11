@@ -21,6 +21,7 @@ class RecordApiUsage
             $endpoint = $saloonRequest->resolveEndpoint();
 
             $apiLogModel = UsageTracking::$apiLogModel;
+            $consumption = $this->extractConsumption($response);
 
             $apiLogModel::create([
                 'trackable_type' => $request->headers()->get('X-Seeders-Model-Type'),
@@ -29,8 +30,8 @@ class RecordApiUsage
                 'integration' => $this->getIntegrationName($connector),
                 'endpoint' => $endpoint,
                 'status' => $response->status(),
-                'consumption' => $this->extractConsumption($response)['value'],
-                'consumption_type' => $this->extractConsumption($response)['type'],
+                'consumption' => $consumption['value'],
+                'consumption_type' => $consumption['type'],
                 'latency_ms' => $this->getLatencyMs($response),
                 'metadata' => $this->extractMetadata($response),
             ]);
@@ -42,15 +43,26 @@ class RecordApiUsage
 
     protected function extractConsumption(Response $response): array
     {
+        $pendingRequest = $response->getPendingRequest();
+        $expectedConsumption = $pendingRequest->headers()->get('X-Seeders-Expected-Consumption');
+        $expectedConsumptionType = $pendingRequest->headers()->get('X-Seeders-Expected-Consumption-Type');
+
+        if (! is_null($expectedConsumption) && is_numeric($expectedConsumption)) {
+            return [
+                'value' => $response->successful() ? (float) $expectedConsumption : 0.0,
+                'type' => $expectedConsumptionType ?: 'units',
+            ];
+        }
+
         if ($units = $response->header('x-api-units-cost-total-actual')) {
             return ['value' => (float) $units, 'type' => 'units'];
         }
 
-        if ($cost = $response->json('cost')) {
+        if ($cost = $this->safeJson($response, 'cost')) {
             return ['value' => (float) $cost, 'type' => 'dollars'];
         }
 
-        if ($tokens = $response->json('usage.total_tokens')) {
+        if ($tokens = $this->safeJson($response, 'usage.total_tokens')) {
             return ['value' => (float) $tokens, 'type' => 'tokens'];
         }
 
@@ -61,7 +73,7 @@ class RecordApiUsage
     {
         $metadata = [];
 
-        if ($usage = $response->json('usage')) {
+        if ($usage = $this->safeJson($response, 'usage')) {
             $metadata['usage'] = $usage;
         }
 
@@ -73,10 +85,19 @@ class RecordApiUsage
         }
 
         if (! $response->successful()) {
-            $metadata['error'] = $response->json('error') ?? $response->body();
+            $metadata['error'] = $this->safeJson($response, 'error') ?? $response->body();
         }
 
         return empty($metadata) ? null : $metadata;
+    }
+
+    protected function safeJson(Response $response, ?string $key = null): mixed
+    {
+        try {
+            return $response->json($key);
+        } catch (Throwable) {
+            return null;
+        }
     }
 
     protected function getLatencyMs(Response $response): ?int

@@ -80,7 +80,8 @@ $domainRating = $response->json('domain_rating.domain_rating');
 use Seeders\ExternalApis\Connectors\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
 
-$connector = app(SemrushConnector::class);
+// Semrush requires tracking context
+$connector = SemrushConnector::forScope('seo_audit');
 $response = $connector->send(new BacklinksOverviewRequest(
     target: 'example.com',
     targetType: 'root_domain',
@@ -104,7 +105,7 @@ $response = Ahrefs::send(new DomainRatingRequest('example.com'));
 use Seeders\ExternalApis\Facades\Semrush;
 use Seeders\ExternalApis\Connectors\Semrush\Requests\ApiUnitsBalanceRequest;
 
-$response = Semrush::send(new ApiUnitsBalanceRequest);
+$response = Semrush::withScope('seo_audit')->send(new ApiUnitsBalanceRequest);
 $unitsBalance = $response->body();
 ```
 

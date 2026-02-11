@@ -18,6 +18,13 @@ abstract class TestCase extends Orchestra
 
     protected function defineEnvironment($app): void
     {
+        $app['config']->set('database.default', 'testing');
+        $app['config']->set('database.connections.testing', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
         // Set up test environment configuration
         $app['config']->set('external-apis.openai.key', 'test-key');
         $app['config']->set('external-apis.gemini.key', 'test-gemini-key');
