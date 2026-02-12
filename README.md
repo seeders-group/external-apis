@@ -56,6 +56,9 @@ HUNTER_API_KEY=your-key
 MOZ_CLIENT_ID=your-client-id
 MOZ_CLIENT_SECRET=your-client-secret
 
+# Semrush
+SEMRUSH_API_KEY=your-api-key
+
 # And more... see config/external-apis.php for all options
 ```
 
@@ -73,6 +76,22 @@ $response = $connector->send(new DomainRatingRequest('example.com'));
 $domainRating = $response->json('domain_rating.domain_rating');
 ```
 
+```php
+use Seeders\ExternalApis\Connectors\Semrush\Requests\BacklinksOverviewRequest;
+use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
+
+// Semrush requires tracking context
+$connector = SemrushConnector::forScope('seo_audit');
+$response = $connector->send(new BacklinksOverviewRequest(
+    target: 'example.com',
+    targetType: 'root_domain',
+    database: 'us',
+    exportColumns: 'domain,ascore,backlinks',
+));
+
+$rawCsv = $response->body();
+```
+
 ### Using Facades
 
 ```php
@@ -80,6 +99,14 @@ use Seeders\ExternalApis\Facades\Ahrefs;
 use Seeders\ExternalApis\Connectors\Ahrefs\Requests\SiteExplorer\DomainRatingRequest;
 
 $response = Ahrefs::send(new DomainRatingRequest('example.com'));
+```
+
+```php
+use Seeders\ExternalApis\Facades\Semrush;
+use Seeders\ExternalApis\Connectors\Semrush\Requests\ApiUnitsBalanceRequest;
+
+$response = Semrush::withScope('seo_audit')->send(new ApiUnitsBalanceRequest);
+$unitsBalance = $response->body();
 ```
 
 ### Using API Clients
@@ -101,6 +128,7 @@ $response = $client->prompt([
 - **MozLinksConnector** - URL metrics, linking root domains
 - **MajesticConnector** - Trust flow, citation flow
 - **SeRankingConnector** - Rank tracking, keyword management
+- **SemrushConnector** - Backlinks overview, batch comparison, API units balance
 - **AdvancedWebRankingConnector** - Project management, rank tracking
 
 ### Web Scraping & Search

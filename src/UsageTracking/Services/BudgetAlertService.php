@@ -90,7 +90,7 @@ class BudgetAlertService
     {
         $logModel = UsageTracking::$apiUsageLogModel;
 
-        if ($integration === 'ahrefs') {
+        if (in_array($integration, ['ahrefs', 'semrush'], true)) {
             return (float) $logModel::byIntegration($integration)
                 ->thisMonth()
                 ->sum('total_tokens');
