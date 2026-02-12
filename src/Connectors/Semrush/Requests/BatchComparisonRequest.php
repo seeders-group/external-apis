@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Seeders\ExternalApis\Connectors\Semrush\Requests;
 
 use InvalidArgumentException;
+use Psr\Http\Message\RequestInterface;
 use Saloon\Enums\Method;
+use Saloon\Http\PendingRequest;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Seeders\ExternalApis\Connectors\Semrush\Support\SemrushCsvParser;
@@ -60,5 +62,16 @@ class BatchComparisonRequest extends Request
             rows: $parsed['rows'],
             rowCount: $parsed['rowCount'],
         );
+    }
+
+    public function handlePsrRequest(RequestInterface $request, PendingRequest $pendingRequest): RequestInterface
+    {
+        $uri = $request->getUri();
+        $query = $uri->getQuery();
+
+        $query = preg_replace('/targets(?:%5B|\\[)\\d+(?:%5D|\\])=/i', 'targets%5B%5D=', $query) ?? $query;
+        $query = preg_replace('/target_types(?:%5B|\\[)\\d+(?:%5D|\\])=/i', 'target_types%5B%5D=', $query) ?? $query;
+
+        return $request->withUri($uri->withQuery($query));
     }
 }

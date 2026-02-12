@@ -74,6 +74,29 @@ it('builds batch comparison query correctly', function () {
     expect($query)->not->toHaveKey('display_offset');
 });
 
+it('serializes batch comparison targets with bracket notation (no indexes)', function () {
+    $mockClient = new MockClient([
+        BatchComparisonRequest::class => MockResponse::make("target;metric\nexample.com;10\nexample.org;20", 200),
+    ]);
+
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient($mockClient);
+
+    $response = $connector->send(new BatchComparisonRequest(
+        targets: ['example.com', 'example.org'],
+        targetTypes: ['root_domain', 'root_domain'],
+        exportColumns: 'target,ascore,total',
+    ));
+
+    $query = $response->getPsrRequest()->getUri()->getQuery();
+
+    expect($query)->toContain('targets%5B%5D=example.com');
+    expect($query)->toContain('targets%5B%5D=example.org');
+    expect($query)->toContain('target_types%5B%5D=root_domain');
+    expect($query)->not->toContain('targets%5B0%5D=');
+    expect($query)->not->toContain('target_types%5B0%5D=');
+});
+
 it('rejects batch comparison when target counts mismatch', function () {
     expect(fn () => new BatchComparisonRequest(
         targets: ['example.com', 'example.org'],
