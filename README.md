@@ -86,7 +86,7 @@ $response = $connector->send(new BacklinksOverviewRequest(
     target: 'example.com',
     targetType: 'root_domain',
     database: 'us',
-    exportColumns: 'domain,ascore,backlinks',
+    exportColumns: 'ascore,total,domains_num',
 ));
 
 // Parsed DTO (Saloon-native)

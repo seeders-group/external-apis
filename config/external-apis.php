@@ -256,7 +256,7 @@ return [
 
         'semrush' => [
             'unit_rules' => [
-                'backlinks_overview' => 100,
+                'backlinks_overview' => 40,
                 'backlinks_comparison_per_target' => 40,
                 'api_units' => 0,
             ],

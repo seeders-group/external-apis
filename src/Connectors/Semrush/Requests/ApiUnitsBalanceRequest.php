@@ -16,20 +16,19 @@ class ApiUnitsBalanceRequest extends Request
 
     public function resolveEndpoint(): string
     {
-        return '/';
+        return 'https://www.semrush.com/users/countapiunits.html';
     }
 
     protected function defaultQuery(): array
     {
         return [
-            'type' => 'api_units',
             'key' => config('external-apis.semrush.api_key'),
         ];
     }
 
     public function createDtoFromResponse(Response $response): mixed
     {
-        $units = trim($response->body());
+        $units = str_replace(',', '', trim($response->body()));
 
         if (! preg_match('/^-?\d+$/', $units)) {
             throw new RuntimeException('Invalid Semrush API units balance response. Expected numeric body.');

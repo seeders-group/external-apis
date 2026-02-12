@@ -43,24 +43,13 @@ class BatchComparisonRequest extends Request
 
     protected function defaultQuery(): array
     {
-        $query = [
+        return [
             'type' => 'backlinks_comparison',
-            'targets' => implode(',', $this->targets),
-            'target_types' => implode(',', $this->targetTypes),
-            'database' => $this->database,
+            'targets' => $this->targets,
+            'target_types' => $this->targetTypes,
             'export_columns' => $this->exportColumns,
-            'api_key' => config('external-apis.semrush.api_key'),
+            'key' => config('external-apis.semrush.api_key'),
         ];
-
-        if (! is_null($this->displayLimit)) {
-            $query['display_limit'] = $this->displayLimit;
-        }
-
-        if (! is_null($this->displayOffset)) {
-            $query['display_offset'] = $this->displayOffset;
-        }
-
-        return $query;
     }
 
     public function createDtoFromResponse(Response $response): mixed

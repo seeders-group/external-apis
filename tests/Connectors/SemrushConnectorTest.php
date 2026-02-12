@@ -23,7 +23,7 @@ it('builds backlinks overview query correctly', function () {
         target: 'example.com',
         targetType: 'root_domain',
         database: 'us',
-        exportColumns: 'domain,ascore,backlinks',
+        exportColumns: 'ascore,total,domains_num',
         displayLimit: 10,
         displayOffset: 0,
     );
@@ -39,12 +39,12 @@ it('builds backlinks overview query correctly', function () {
         'type' => 'backlinks_overview',
         'target' => 'example.com',
         'target_type' => 'root_domain',
-        'database' => 'us',
-        'export_columns' => 'domain,ascore,backlinks',
-        'api_key' => 'test-semrush-key',
-        'display_limit' => 10,
-        'display_offset' => 0,
+        'export_columns' => 'ascore,total,domains_num',
+        'key' => 'test-semrush-key',
     ]);
+    expect($query)->not->toHaveKey('database');
+    expect($query)->not->toHaveKey('display_limit');
+    expect($query)->not->toHaveKey('display_offset');
 });
 
 it('builds batch comparison query correctly', function () {
@@ -52,7 +52,7 @@ it('builds batch comparison query correctly', function () {
         targets: ['example.com', 'example.org'],
         targetTypes: ['root_domain', 'root_domain'],
         database: 'us',
-        exportColumns: 'domain,ascore,backlinks',
+        exportColumns: 'target,ascore,total',
         displayLimit: 20,
         displayOffset: 5,
     );
@@ -66,14 +66,14 @@ it('builds batch comparison query correctly', function () {
     expect($request->resolveEndpoint())->toBe('/analytics/v1/');
     expect($query)->toMatchArray([
         'type' => 'backlinks_comparison',
-        'targets' => 'example.com,example.org',
-        'target_types' => 'root_domain,root_domain',
-        'database' => 'us',
-        'export_columns' => 'domain,ascore,backlinks',
-        'api_key' => 'test-semrush-key',
-        'display_limit' => 20,
-        'display_offset' => 5,
+        'targets' => ['example.com', 'example.org'],
+        'target_types' => ['root_domain', 'root_domain'],
+        'export_columns' => 'target,ascore,total',
+        'key' => 'test-semrush-key',
     ]);
+    expect($query)->not->toHaveKey('database');
+    expect($query)->not->toHaveKey('display_limit');
+    expect($query)->not->toHaveKey('display_offset');
 });
 
 it('rejects batch comparison when target counts mismatch', function () {
@@ -94,11 +94,11 @@ it('builds api units balance query correctly', function () {
 
     $query = $method->invoke($request);
 
-    expect($request->resolveEndpoint())->toBe('/');
+    expect($request->resolveEndpoint())->toBe('https://www.semrush.com/users/countapiunits.html');
     expect($query)->toMatchArray([
-        'type' => 'api_units',
         'key' => 'test-semrush-key',
     ]);
+    expect($query)->not->toHaveKey('type');
 });
 
 it('maps backlinks overview csv response into dto', function () {
@@ -236,6 +236,19 @@ it('maps semrush api units balance response into dto', function () {
 
     expect($dto)->toBeInstanceOf(ApiUnitsBalanceResponseData::class);
     expect($dto->units)->toBe(123456);
+});
+
+it('maps comma-separated semrush api units balance response into dto', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        ApiUnitsBalanceRequest::class => MockResponse::make('1,999,800', 200),
+    ]));
+
+    $response = $connector->send(new ApiUnitsBalanceRequest);
+    $dto = $response->dtoOrFail();
+
+    expect($dto)->toBeInstanceOf(ApiUnitsBalanceResponseData::class);
+    expect($dto->units)->toBe(1999800);
 });
 
 it('throws when semrush api units balance response is invalid', function () {

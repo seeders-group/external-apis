@@ -111,7 +111,7 @@ it('records api_log and api_usage_log for backlinks overview', function () {
         target: 'example.com',
         targetType: 'root_domain',
         database: 'us',
-        exportColumns: 'domain,ascore,backlinks',
+        exportColumns: 'ascore,total,domains_num',
     ));
 
     $apiLog = ApiLog::query()->first();
@@ -122,13 +122,13 @@ it('records api_log and api_usage_log for backlinks overview', function () {
 
     expect($apiLog->integration)->toBe('semrush');
     expect($apiLog->consumption_type)->toBe('units');
-    expect((float) $apiLog->consumption)->toBe(100.0);
+    expect((float) $apiLog->consumption)->toBe(40.0);
 
     expect($usageLog->integration)->toBe('semrush');
     expect($usageLog->feature)->toBe('backlinks_overview');
     expect($usageLog->status)->toBe('success');
-    expect($usageLog->total_tokens)->toBe(100);
-    expect((float) $usageLog->estimated_cost)->toBe(0.005);
+    expect($usageLog->total_tokens)->toBe(40);
+    expect((float) $usageLog->estimated_cost)->toBe(0.002);
 });
 
 it('records batch comparison units as 40 per target domain', function () {
@@ -141,7 +141,7 @@ it('records batch comparison units as 40 per target domain', function () {
         targets: ['example.com', 'example.org', 'example.net'],
         targetTypes: ['root_domain', 'root_domain', 'root_domain'],
         database: 'us',
-        exportColumns: 'domain,ascore,backlinks',
+        exportColumns: 'target,ascore,total',
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
@@ -182,7 +182,7 @@ it('logs failed semrush requests as zero units and error status', function () {
         target: 'example.com',
         targetType: 'root_domain',
         database: 'us',
-        exportColumns: 'domain,ascore,backlinks',
+        exportColumns: 'ascore,total,domains_num',
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
@@ -213,7 +213,7 @@ it('triggers semrush budget check after successful usage logging', function () {
         target: 'example.com',
         targetType: 'root_domain',
         database: 'us',
-        exportColumns: 'domain,ascore,backlinks',
+        exportColumns: 'ascore,total,domains_num',
     ));
 
     expect(ApiUsageLog::query()->count())->toBe(1);
@@ -223,8 +223,8 @@ it('uses units for semrush month-to-date budget calculations', function () {
     ApiUsageLog::query()->create([
         'integration' => 'semrush',
         'endpoint' => '/analytics/v1/',
-        'total_tokens' => 100,
-        'estimated_cost' => 0.005,
+        'total_tokens' => 40,
+        'estimated_cost' => 0.002,
         'feature' => 'backlinks_overview',
         'status' => 'success',
     ]);
@@ -244,7 +244,7 @@ it('uses units for semrush month-to-date budget calculations', function () {
 
     $monthToDateSpend = $method->invoke($service, 'semrush');
 
-    expect($monthToDateSpend)->toBe(220.0);
+    expect($monthToDateSpend)->toBe(160.0);
 });
 
 it('fails fast for unsupported semrush requests', function () {
@@ -270,7 +270,7 @@ class UnsupportedSemrushRequest extends Request
     {
         return [
             'type' => 'unsupported_type',
-            'api_key' => 'test-semrush-key',
+            'key' => 'test-semrush-key',
         ];
     }
 }
