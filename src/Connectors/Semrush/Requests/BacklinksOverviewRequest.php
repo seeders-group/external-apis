@@ -17,7 +17,6 @@ class BacklinksOverviewRequest extends Request
     public function __construct(
         public string $target,
         public string $targetType,
-        public string $database,
         public string $exportColumns,
         public ?int $displayLimit = null,
         public ?int $displayOffset = null,

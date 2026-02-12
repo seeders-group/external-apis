@@ -110,7 +110,6 @@ it('records api_log and api_usage_log for backlinks overview', function () {
     $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'ascore,total,domains_num',
     ));
 
@@ -140,7 +139,6 @@ it('records batch comparison units as 40 per target domain', function () {
     $connector->send(new BatchComparisonRequest(
         targets: ['example.com', 'example.org', 'example.net'],
         targetTypes: ['root_domain', 'root_domain', 'root_domain'],
-        database: 'us',
         exportColumns: 'target,ascore,total',
     ));
 
@@ -181,7 +179,6 @@ it('logs failed semrush requests as zero units and error status', function () {
     $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'ascore,total,domains_num',
     ));
 
@@ -212,7 +209,6 @@ it('triggers semrush budget check after successful usage logging', function () {
     $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'ascore,total,domains_num',
     ));
 

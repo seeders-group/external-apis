@@ -22,7 +22,6 @@ it('builds backlinks overview query correctly', function () {
     $request = new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'ascore,total,domains_num',
         displayLimit: 10,
         displayOffset: 0,
@@ -51,7 +50,6 @@ it('builds batch comparison query correctly', function () {
     $request = new BatchComparisonRequest(
         targets: ['example.com', 'example.org'],
         targetTypes: ['root_domain', 'root_domain'],
-        database: 'us',
         exportColumns: 'target,ascore,total',
         displayLimit: 20,
         displayOffset: 5,
@@ -80,7 +78,6 @@ it('rejects batch comparison when target counts mismatch', function () {
     expect(fn () => new BatchComparisonRequest(
         targets: ['example.com', 'example.org'],
         targetTypes: ['root_domain'],
-        database: 'us',
         exportColumns: 'domain,ascore,backlinks',
     ))->toThrow(InvalidArgumentException::class);
 });
@@ -110,7 +107,6 @@ it('maps backlinks overview csv response into dto', function () {
     $response = $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'domain,ascore,backlinks',
     ));
 
@@ -137,7 +133,6 @@ it('maps batch comparison csv response into dto', function () {
     $response = $connector->send(new BatchComparisonRequest(
         targets: ['example.com', 'example.org'],
         targetTypes: ['root_domain', 'root_domain'],
-        database: 'us',
         exportColumns: 'target,metric',
     ));
 
@@ -161,7 +156,6 @@ it('auto-detects comma delimiter for semrush csv parsing', function () {
     $response = $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'domain,ascore,backlinks',
     ));
 
@@ -182,7 +176,6 @@ it('returns an empty dto for empty semrush csv body', function () {
     $response = $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'domain,ascore,backlinks',
     ));
 
@@ -202,7 +195,6 @@ it('throws when semrush csv row has mismatched column count', function () {
     $response = $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'domain,ascore,backlinks',
     ));
 
@@ -218,7 +210,6 @@ it('throws when semrush csv headers contain duplicates', function () {
     $response = $connector->send(new BacklinksOverviewRequest(
         target: 'example.com',
         targetType: 'root_domain',
-        database: 'us',
         exportColumns: 'domain,ascore,backlinks',
     ));
 

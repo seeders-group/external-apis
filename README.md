@@ -85,7 +85,6 @@ $connector = SemrushConnector::forScope('seo_audit');
 $response = $connector->send(new BacklinksOverviewRequest(
     target: 'example.com',
     targetType: 'root_domain',
-    database: 'us',
     exportColumns: 'ascore,total,domains_num',
 ));
 

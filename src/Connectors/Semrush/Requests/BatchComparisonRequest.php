@@ -22,7 +22,6 @@ class BatchComparisonRequest extends Request
     public function __construct(
         public array $targets,
         public array $targetTypes,
-        public string $database,
         public string $exportColumns,
         public ?int $displayLimit = null,
         public ?int $displayOffset = null,
