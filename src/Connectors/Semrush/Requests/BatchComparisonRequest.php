@@ -7,6 +7,9 @@ namespace Seeders\ExternalApis\Connectors\Semrush\Requests;
 use InvalidArgumentException;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use Seeders\ExternalApis\Connectors\Semrush\Support\SemrushCsvParser;
+use Seeders\ExternalApis\Data\Semrush\BatchComparisonResponseData;
 
 class BatchComparisonRequest extends Request
 {
@@ -58,5 +61,16 @@ class BatchComparisonRequest extends Request
         }
 
         return $query;
+    }
+
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        $parsed = SemrushCsvParser::parse($response->body());
+
+        return new BatchComparisonResponseData(
+            headers: $parsed['headers'],
+            rows: $parsed['rows'],
+            rowCount: $parsed['rowCount'],
+        );
     }
 }

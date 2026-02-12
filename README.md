@@ -89,6 +89,11 @@ $response = $connector->send(new BacklinksOverviewRequest(
     exportColumns: 'domain,ascore,backlinks',
 ));
 
+// Parsed DTO (Saloon-native)
+$dto = $response->dtoOrFail();
+$rows = $dto->rows;
+
+// Raw response is still available
 $rawCsv = $response->body();
 ```
 
@@ -106,7 +111,7 @@ use Seeders\ExternalApis\Facades\Semrush;
 use Seeders\ExternalApis\Connectors\Semrush\Requests\ApiUnitsBalanceRequest;
 
 $response = Semrush::withScope('seo_audit')->send(new ApiUnitsBalanceRequest);
-$unitsBalance = $response->body();
+$unitsBalance = $response->dtoOrFail()->units;
 ```
 
 ### Using API Clients

@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\MockResponse;
 use Seeders\ExternalApis\Connectors\Semrush\Requests\ApiUnitsBalanceRequest;
 use Seeders\ExternalApis\Connectors\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Connectors\Semrush\Requests\BatchComparisonRequest;
 use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Data\Semrush\ApiUnitsBalanceResponseData;
+use Seeders\ExternalApis\Data\Semrush\BacklinksOverviewResponseData;
+use Seeders\ExternalApis\Data\Semrush\BatchComparisonResponseData;
 
 it('resolves the correct base url', function () {
     $connector = new SemrushConnector;
@@ -94,4 +99,152 @@ it('builds api units balance query correctly', function () {
         'type' => 'api_units',
         'key' => 'test-semrush-key',
     ]);
+});
+
+it('maps backlinks overview csv response into dto', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        BacklinksOverviewRequest::class => MockResponse::make("domain;ascore;backlinks\nexample.com;12;100", 200),
+    ]));
+
+    $response = $connector->send(new BacklinksOverviewRequest(
+        target: 'example.com',
+        targetType: 'root_domain',
+        database: 'us',
+        exportColumns: 'domain,ascore,backlinks',
+    ));
+
+    $dto = $response->dtoOrFail();
+
+    expect($dto)->toBeInstanceOf(BacklinksOverviewResponseData::class);
+    expect($dto->headers)->toBe(['domain', 'ascore', 'backlinks']);
+    expect($dto->rows)->toBe([
+        [
+            'domain' => 'example.com',
+            'ascore' => '12',
+            'backlinks' => '100',
+        ],
+    ]);
+    expect($dto->rowCount)->toBe(1);
+});
+
+it('maps batch comparison csv response into dto', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        BatchComparisonRequest::class => MockResponse::make("target;metric\nexample.com;10\nexample.org;20", 200),
+    ]));
+
+    $response = $connector->send(new BatchComparisonRequest(
+        targets: ['example.com', 'example.org'],
+        targetTypes: ['root_domain', 'root_domain'],
+        database: 'us',
+        exportColumns: 'target,metric',
+    ));
+
+    $dto = $response->dtoOrFail();
+
+    expect($dto)->toBeInstanceOf(BatchComparisonResponseData::class);
+    expect($dto->headers)->toBe(['target', 'metric']);
+    expect($dto->rows)->toBe([
+        ['target' => 'example.com', 'metric' => '10'],
+        ['target' => 'example.org', 'metric' => '20'],
+    ]);
+    expect($dto->rowCount)->toBe(2);
+});
+
+it('auto-detects comma delimiter for semrush csv parsing', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        BacklinksOverviewRequest::class => MockResponse::make("domain,ascore,backlinks\nexample.com,12,100", 200),
+    ]));
+
+    $response = $connector->send(new BacklinksOverviewRequest(
+        target: 'example.com',
+        targetType: 'root_domain',
+        database: 'us',
+        exportColumns: 'domain,ascore,backlinks',
+    ));
+
+    $dto = $response->dtoOrFail();
+
+    expect($dto->headers)->toBe(['domain', 'ascore', 'backlinks']);
+    expect($dto->rows[0]['domain'])->toBe('example.com');
+    expect($dto->rows[0]['ascore'])->toBe('12');
+    expect($dto->rows[0]['backlinks'])->toBe('100');
+});
+
+it('returns an empty dto for empty semrush csv body', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        BacklinksOverviewRequest::class => MockResponse::make('', 200),
+    ]));
+
+    $response = $connector->send(new BacklinksOverviewRequest(
+        target: 'example.com',
+        targetType: 'root_domain',
+        database: 'us',
+        exportColumns: 'domain,ascore,backlinks',
+    ));
+
+    $dto = $response->dtoOrFail();
+
+    expect($dto->headers)->toBe([]);
+    expect($dto->rows)->toBe([]);
+    expect($dto->rowCount)->toBe(0);
+});
+
+it('throws when semrush csv row has mismatched column count', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        BacklinksOverviewRequest::class => MockResponse::make("domain;ascore;backlinks\nexample.com;12", 200),
+    ]));
+
+    $response = $connector->send(new BacklinksOverviewRequest(
+        target: 'example.com',
+        targetType: 'root_domain',
+        database: 'us',
+        exportColumns: 'domain,ascore,backlinks',
+    ));
+
+    expect(fn () => $response->dtoOrFail())->toThrow(RuntimeException::class);
+});
+
+it('throws when semrush csv headers contain duplicates', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        BacklinksOverviewRequest::class => MockResponse::make("domain;domain\nexample.com;example.org", 200),
+    ]));
+
+    $response = $connector->send(new BacklinksOverviewRequest(
+        target: 'example.com',
+        targetType: 'root_domain',
+        database: 'us',
+        exportColumns: 'domain,ascore,backlinks',
+    ));
+
+    expect(fn () => $response->dtoOrFail())->toThrow(RuntimeException::class);
+});
+
+it('maps semrush api units balance response into dto', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        ApiUnitsBalanceRequest::class => MockResponse::make('123456', 200),
+    ]));
+
+    $response = $connector->send(new ApiUnitsBalanceRequest);
+    $dto = $response->dtoOrFail();
+
+    expect($dto)->toBeInstanceOf(ApiUnitsBalanceResponseData::class);
+    expect($dto->units)->toBe(123456);
+});
+
+it('throws when semrush api units balance response is invalid', function () {
+    $connector = SemrushConnector::forScope('semrush_connector_test');
+    $connector->withMockClient(new MockClient([
+        ApiUnitsBalanceRequest::class => MockResponse::make('not-a-number', 200),
+    ]));
+
+    $response = $connector->send(new ApiUnitsBalanceRequest);
+
+    expect(fn () => $response->dtoOrFail())->toThrow(RuntimeException::class);
 });

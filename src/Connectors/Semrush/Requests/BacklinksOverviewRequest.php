@@ -6,6 +6,9 @@ namespace Seeders\ExternalApis\Connectors\Semrush\Requests;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
+use Seeders\ExternalApis\Connectors\Semrush\Support\SemrushCsvParser;
+use Seeders\ExternalApis\Data\Semrush\BacklinksOverviewResponseData;
 
 class BacklinksOverviewRequest extends Request
 {
@@ -45,5 +48,16 @@ class BacklinksOverviewRequest extends Request
         }
 
         return $query;
+    }
+
+    public function createDtoFromResponse(Response $response): mixed
+    {
+        $parsed = SemrushCsvParser::parse($response->body());
+
+        return new BacklinksOverviewResponseData(
+            headers: $parsed['headers'],
+            rows: $parsed['rows'],
+            rowCount: $parsed['rowCount'],
+        );
     }
 }
