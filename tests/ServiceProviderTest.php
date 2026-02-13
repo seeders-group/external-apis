@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Seeders\ExternalApis\Clients\GeminiClient;
 use Seeders\ExternalApis\Clients\OpenAIClient;
-use Seeders\ExternalApis\Connectors\Ahrefs\AhrefsConnector;
-use Seeders\ExternalApis\Connectors\DataForSeo\DataForSeoConnector;
-use Seeders\ExternalApis\Connectors\Hunter\HunterConnector;
-use Seeders\ExternalApis\Connectors\Moz\MozLinksConnector;
-use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
+use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
+use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
+use Seeders\ExternalApis\Integrations\Moz\MozLinksConnector;
+use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 
 it('registers the ahrefs connector', function (): void {

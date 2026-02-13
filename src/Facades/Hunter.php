@@ -8,12 +8,12 @@ use Saloon\Http\Response;
 use Saloon\Http\Request;
 use Saloon\Http\Faking\MockClient;
 use Illuminate\Support\Facades\Facade;
-use Seeders\ExternalApis\Connectors\Hunter\HunterConnector;
+use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
 
 /**
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Connectors\Hunter\HunterConnector
+ * @see \Seeders\ExternalApis\Integrations\Hunter\HunterConnector
  */
 final class Hunter extends Facade
 {

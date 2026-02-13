@@ -8,12 +8,12 @@ use Saloon\Http\Response;
 use Saloon\Http\Request;
 use Saloon\Http\Faking\MockClient;
 use Illuminate\Support\Facades\Facade;
-use Seeders\ExternalApis\Connectors\DataForSeo\DataForSeoConnector;
+use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 
 /**
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Connectors\DataForSeo\DataForSeoConnector
+ * @see \Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector
  */
 final class DataForSeo extends Facade
 {

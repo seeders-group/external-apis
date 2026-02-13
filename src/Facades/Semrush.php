@@ -9,14 +9,14 @@ use Saloon\Http\Response;
 use Saloon\Http\Request;
 use Saloon\Http\Faking\MockClient;
 use Illuminate\Support\Facades\Facade;
-use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 
 /**
  * @method static SemrushConnector withScope(string $scope)
  * @method static SemrushConnector withTracking(Model $model, string|null $scope = null)
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Connectors\Semrush\SemrushConnector
+ * @see \Seeders\ExternalApis\Integrations\Semrush\SemrushConnector
  */
 final class Semrush extends Facade
 {

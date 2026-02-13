@@ -6,9 +6,9 @@ namespace Seeders\ExternalApis\UsageTracking\Semrush;
 
 use RuntimeException;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Connectors\Semrush\Requests\ApiUnitsBalanceRequest;
-use Seeders\ExternalApis\Connectors\Semrush\Requests\BacklinksOverviewRequest;
-use Seeders\ExternalApis\Connectors\Semrush\Requests\BatchComparisonRequest;
+use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
+use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
+use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
 
 class SemrushUsageResolver
 {
