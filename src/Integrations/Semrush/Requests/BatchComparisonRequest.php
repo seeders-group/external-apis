@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Integrations\Semrush\Requests;
 
-use Override;
 use InvalidArgumentException;
+use Override;
 use Psr\Http\Message\RequestInterface;
 use Saloon\Enums\Method;
 use Saloon\Http\PendingRequest;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
 class BatchComparisonRequest extends Request
 {

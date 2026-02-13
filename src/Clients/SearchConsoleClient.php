@@ -36,7 +36,7 @@ final class SearchConsoleClient
             $request->setStartRow($startRow);
 
             $backoff = new ExponentialBackoff(10);
-            $response = $backoff->execute(fn() => $searchanalyticsResource->query($siteUrl, $request, $this->queryOptParams));
+            $response = $backoff->execute(fn () => $searchanalyticsResource->query($siteUrl, $request, $this->queryOptParams));
 
             // Stop if no more rows returned
             if (count($response->getRows()) === 0) {

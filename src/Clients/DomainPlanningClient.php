@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
-use OpenAI;
-use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\View;
+use OpenAI;
 use OpenAI\Client as OpenAIClientContract;
+use OpenAI\Responses\Chat\CreateResponse;
 use Seeders\ExternalApis\UsageTracking\Contracts\PlanningInterface;
 use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
 

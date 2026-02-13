@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Saloon\Http\Response;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Saloon\Enums\Method;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\Request;
+use Saloon\Http\Response;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;

@@ -164,7 +164,7 @@ final class SemrushCsvParser
      */
     private static function isEmptyRow(array $row): bool
     {
-        return array_all($row, fn($value): bool => trim((string) $value) === '');
+        return array_all($row, fn ($value): bool => trim((string) $value) === '');
     }
 
     private static function stripBom(string $value): string

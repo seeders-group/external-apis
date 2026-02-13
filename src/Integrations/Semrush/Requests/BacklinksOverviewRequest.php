@@ -7,8 +7,8 @@ namespace Seeders\ExternalApis\Integrations\Semrush\Requests;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
 class BacklinksOverviewRequest extends Request
 {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Integrations\Semrush;
 
-use Override;
 use Illuminate\Support\Facades\Log;
+use Override;
 use Saloon\Http\Connector;
 use Saloon\Http\PendingRequest;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 use Seeders\ExternalApis\UsageTracking\Semrush\SemrushUsageResolver;
 use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 use Throwable;
 
 class SemrushConnector extends Connector

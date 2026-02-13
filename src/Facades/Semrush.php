@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Seeders\ExternalApis\Facades;
 
 use Illuminate\Database\Eloquent\Model;
-use Saloon\Http\Response;
-use Saloon\Http\Request;
-use Saloon\Http\Faking\MockClient;
 use Illuminate\Support\Facades\Facade;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Request;
+use Saloon\Http\Response;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 
 /**

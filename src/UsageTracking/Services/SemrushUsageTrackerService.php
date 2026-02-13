@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
-use Throwable;
 use Illuminate\Support\Facades\Log;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
+use Throwable;
 
 class SemrushUsageTrackerService
 {

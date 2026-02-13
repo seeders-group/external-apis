@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
-use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI;
 use OpenAI\Client;
+use OpenAI\Responses\Chat\CreateResponse;
 use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
 
 final class ImageGenerationClient

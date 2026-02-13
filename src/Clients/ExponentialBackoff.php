@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
-use Illuminate\Support\Sleep;
 use Exception;
+use Illuminate\Support\Sleep;
 
 final class ExponentialBackoff
 {
