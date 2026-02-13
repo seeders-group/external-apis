@@ -8,7 +8,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use Seeders\ExternalApis\Data\DataForSeo\OnPage\InstantPagesRequestData;
+use Seeders\ExternalApis\Integrations\DataForSeo\Data\OnPage\InstantPagesRequestData;
 
 class InstantPages extends Request implements HasBody
 {

@@ -8,7 +8,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use Seeders\ExternalApis\Data\Moz\Requests\LinkingRootDomainsRequestData;
+use Seeders\ExternalApis\Integrations\Moz\Data\Requests\LinkingRootDomainsRequestData;
 
 class LinkingRootDomainsRequest extends Request implements HasBody
 {

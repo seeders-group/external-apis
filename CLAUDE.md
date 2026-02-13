@@ -21,13 +21,13 @@ vendor/bin/pest --filter="test_name_here"
 
 ## Architecture
 
-### Connector Pattern (Saloon)
+### Integrations (Saloon)
 
-All external API integrations follow the Saloon connector/request pattern:
+All external API integrations follow the Saloon connector/request pattern and are self-contained under `src/Integrations/{Service}/`:
 
-- **Connectors** (`src/Connectors/{Service}/`) extend `Saloon\Http\Connector` — define base URL and auth
-- **Requests** (`src/Connectors/{Service}/Requests/`) extend `Saloon\Http\Request` — define endpoint, method, and parameters
-- **Data objects** (`src/Data/`) use `Spatie\LaravelData\Data` for typed API responses
+- **Connectors** (`{Service}Connector.php`) extend `Saloon\Http\Connector` — define base URL and auth
+- **Requests** (`Requests/`) extend `Saloon\Http\Request` — define endpoint, method, and parameters
+- **Data objects** (`Data/`) use `Spatie\LaravelData\Data` for typed API responses
 
 To use a connector: `app(AhrefsConnector::class)->send(new SomeRequest(...))` or via facades.
 
@@ -39,6 +39,7 @@ To use a connector: `app(AhrefsConnector::class)->send(new SomeRequest(...))` or
 
 `src/UsageTracking/` is a self-contained module for tracking API costs:
 
+- **Contracts** — Interfaces (`UsageTrackerInterface`, `ApiUsageLogInterface`, etc.)
 - **Models** — `ApiUsageLog`, `AiModelPricing`, `ApiServicePricing`, `ApiBudgetConfig`
 - **Services** — Per-integration trackers (`OpenAIUsageTrackerService`, `AhrefsUsageTrackerService`, `DataForSeoUsageTrackerService`) that calculate costs from pricing config
 - **Traits** — `TracksOpenAIUsage`, `TracksApiUsage`, `TracksPrismUsage` — mix into clients for automatic tracking
@@ -51,9 +52,9 @@ To use a connector: `app(AhrefsConnector::class)->send(new SomeRequest(...))` or
 
 ### Adding a New Integration
 
-1. Create connector in `src/Connectors/{Service}/{Service}Connector.php`
-2. Create request classes in `src/Connectors/{Service}/Requests/`
-3. Add data objects in `src/Data/` if needed
+1. Create connector in `src/Integrations/{Service}/{Service}Connector.php`
+2. Create request classes in `src/Integrations/{Service}/Requests/`
+3. Add data objects in `src/Integrations/{Service}/Data/` if needed
 4. Register as singleton in `ExternalApisServiceProvider::registerConnectors()`
 5. Add config keys to `config/external-apis.php`
 

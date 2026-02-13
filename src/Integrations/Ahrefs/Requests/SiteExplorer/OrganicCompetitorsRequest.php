@@ -7,8 +7,8 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\OrganicCompetitorsRequestData;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\OrganicCompetitorsResponseData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\OrganicCompetitorsRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\OrganicCompetitorsResponseData;
 
 class OrganicCompetitorsRequest extends Request
 {

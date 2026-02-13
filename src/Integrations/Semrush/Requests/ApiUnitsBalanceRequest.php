@@ -8,7 +8,7 @@ use RuntimeException;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\Data\Semrush\ApiUnitsBalanceResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\ApiUnitsBalanceResponseData;
 
 class ApiUnitsBalanceRequest extends Request
 {

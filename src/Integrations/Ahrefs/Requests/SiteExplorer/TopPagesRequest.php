@@ -7,8 +7,8 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\TopPagesRequestData;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\TopPagesResponseData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\TopPagesRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\TopPagesResponseData;
 
 class TopPagesRequest extends Request
 {

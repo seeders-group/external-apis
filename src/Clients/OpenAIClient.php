@@ -9,7 +9,7 @@ use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use OpenAI\Client as OpenAIClientContract;
-use Seeders\ExternalApis\Traits\TracksOpenAIUsage;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
 
 final class OpenAIClient
 {

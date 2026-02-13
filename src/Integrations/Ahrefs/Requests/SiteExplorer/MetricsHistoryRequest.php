@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\MetricsHistoryRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\MetricsHistoryRequestData;
 
 class MetricsHistoryRequest extends Request
 {

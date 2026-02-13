@@ -12,7 +12,7 @@ use Saloon\Http\PendingRequest;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
-use Seeders\ExternalApis\Data\Semrush\BatchComparisonResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
 
 class BatchComparisonRequest extends Request
 {

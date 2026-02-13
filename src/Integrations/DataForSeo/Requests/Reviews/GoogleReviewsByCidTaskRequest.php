@@ -8,7 +8,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use Seeders\ExternalApis\Data\DataForSeo\Reviews\GoogleReviewsByCidRequestData;
+use Seeders\ExternalApis\Integrations\DataForSeo\Data\Reviews\GoogleReviewsByCidRequestData;
 
 class GoogleReviewsByCidTaskRequest extends Request implements HasBody
 {

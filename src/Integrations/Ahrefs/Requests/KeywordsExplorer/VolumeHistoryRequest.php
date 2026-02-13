@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\KeywordsExplorer;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Data\Ahrefs\KeywordsExplorer\VolumeHistoryRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\KeywordsExplorer\VolumeHistoryRequestData;
 
 class VolumeHistoryRequest extends Request
 {

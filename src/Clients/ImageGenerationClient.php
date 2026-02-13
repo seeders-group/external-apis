@@ -7,7 +7,7 @@ namespace Seeders\ExternalApis\Clients;
 use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI;
 use OpenAI\Client;
-use Seeders\ExternalApis\Traits\TracksOpenAIUsage;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
 
 final class ImageGenerationClient
 {

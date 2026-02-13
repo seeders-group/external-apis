@@ -8,7 +8,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use Seeders\ExternalApis\Data\DataForSeo\Serp\GoogleOrganicLiveRequestData;
+use Seeders\ExternalApis\Integrations\DataForSeo\Data\Serp\GoogleOrganicLiveRequestData;
 
 class GoogleOrganicLiveRequest extends Request implements HasBody
 {

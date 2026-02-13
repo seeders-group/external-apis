@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\RefDomainHistoryRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\RefDomainHistoryRequestData;
 
 class RefdomainHistory extends Request
 {

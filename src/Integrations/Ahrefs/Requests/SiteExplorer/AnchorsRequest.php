@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Data\Ahrefs\SiteExplorer\AnchorsRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\AnchorsRequestData;
 
 class AnchorsRequest extends Request
 {

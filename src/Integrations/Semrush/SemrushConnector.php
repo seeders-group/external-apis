@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Saloon\Http\Connector;
 use Saloon\Http\PendingRequest;
 use Saloon\Http\Response;
-use Seeders\ExternalApis\Traits\TracksApiUsage;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 use Seeders\ExternalApis\UsageTracking\Semrush\SemrushUsageResolver;
 use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 use Throwable;

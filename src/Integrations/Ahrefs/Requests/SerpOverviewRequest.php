@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Data\Ahrefs\SerpOverview\SerpOverviewRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\SerpOverview\SerpOverviewRequestData;
 
 class SerpOverviewRequest extends Request
 {

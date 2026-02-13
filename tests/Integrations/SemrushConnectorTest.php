@@ -8,9 +8,9 @@ use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
-use Seeders\ExternalApis\Data\Semrush\ApiUnitsBalanceResponseData;
-use Seeders\ExternalApis\Data\Semrush\BacklinksOverviewResponseData;
-use Seeders\ExternalApis\Data\Semrush\BatchComparisonResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\ApiUnitsBalanceResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
 
 it('resolves the correct base url', function (): void {
     $connector = new SemrushConnector;

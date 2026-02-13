@@ -9,8 +9,8 @@ use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\View;
 use OpenAI\Client as OpenAIClientContract;
-use Seeders\ExternalApis\Contracts\PlanningInterface;
-use Seeders\ExternalApis\Traits\TracksOpenAIUsage;
+use Seeders\ExternalApis\UsageTracking\Contracts\PlanningInterface;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
 
 final class DomainPlanningClient
 {

@@ -8,7 +8,7 @@ use Saloon\Contracts\Body\HasBody;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Traits\Body\HasJsonBody;
-use Seeders\ExternalApis\Data\Moz\UrlMetrics\UrlMetricsRequestData;
+use Seeders\ExternalApis\Integrations\Moz\Data\UrlMetrics\UrlMetricsRequestData;
 
 class UrlMetricsRequest extends Request implements HasBody
 {

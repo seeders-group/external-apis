@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs\Requests\KeywordsExplorer;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
-use Seeders\ExternalApis\Data\Ahrefs\KeywordsExplorer\OverviewRequestData;
+use Seeders\ExternalApis\Integrations\Ahrefs\Data\KeywordsExplorer\OverviewRequestData;
 
 class OverviewRequest extends Request
 {
