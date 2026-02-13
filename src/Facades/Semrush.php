@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Facades;
 
+use Illuminate\Database\Eloquent\Model;
+use Saloon\Http\Response;
+use Saloon\Http\Request;
+use Saloon\Http\Faking\MockClient;
 use Illuminate\Support\Facades\Facade;
 use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
 
 /**
- * @method static \Seeders\ExternalApis\Connectors\Semrush\SemrushConnector withScope(string $scope)
- * @method static \Seeders\ExternalApis\Connectors\Semrush\SemrushConnector withTracking(\Illuminate\Database\Eloquent\Model $model, string|null $scope = null)
- * @method static \Saloon\Http\Response send(\Saloon\Http\Request $request, \Saloon\Http\Faking\MockClient|null $mockClient = null, callable|null $handleRetry = null)
+ * @method static SemrushConnector withScope(string $scope)
+ * @method static SemrushConnector withTracking(Model $model, string|null $scope = null)
+ * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
  * @see \Seeders\ExternalApis\Connectors\Semrush\SemrushConnector
  */

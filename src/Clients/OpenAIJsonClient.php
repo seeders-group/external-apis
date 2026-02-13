@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
+use OpenAI;
+use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use OpenAI\Client as OpenAIClientContract;
 use Seeders\ExternalApis\Traits\TracksOpenAIUsage;
@@ -18,7 +20,7 @@ final class OpenAIJsonClient
     {
         $key = config('external-apis.openai.key');
 
-        $this->client = \OpenAI::factory()
+        $this->client = OpenAI::factory()
             ->withApiKey($key)
             ->withHttpClient(new Client(['timeout' => 120]))
             ->make();
@@ -32,7 +34,7 @@ final class OpenAIJsonClient
                 'model' => $model,
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => $model,
                 'messages' => $prompt,
                 'response_format' => [

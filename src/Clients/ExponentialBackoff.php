@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
+use Illuminate\Support\Sleep;
 use Exception;
 
 final class ExponentialBackoff
 {
-    public const MAX_DELAY_MICROSECONDS = 120000000;
+    public const int MAX_DELAY_MICROSECONDS = 120000000;
 
-    private int $retries;
+    private readonly int $retries;
 
     /** @var callable|null */
     private $retryFunction;
@@ -27,7 +28,7 @@ final class ExponentialBackoff
         $this->retries = $retries ?? 3;
         $this->retryFunction = $retryFunction;
         $this->delayFunction = function (int $delay): void {
-            usleep($delay);
+            Sleep::usleep($delay);
         };
     }
 
@@ -48,10 +49,8 @@ final class ExponentialBackoff
             try {
                 return call_user_func_array($function, $arguments);
             } catch (Exception $exception) {
-                if ($this->retryFunction) {
-                    if (! call_user_func($this->retryFunction, $exception)) {
-                        throw $exception;
-                    }
+                if ($this->retryFunction && ! call_user_func($this->retryFunction, $exception)) {
+                    throw $exception;
                 }
 
                 if ($exception->getCode() >= 400 && $exception->getCode() <= 499) {
@@ -81,7 +80,7 @@ final class ExponentialBackoff
     private function calculateDelay(int $attempt): int
     {
         return (int) min(
-            mt_rand(0, 1000000) + (pow(2, $attempt) * 1000000),
+            mt_rand(0, 1000000) + (2 ** $attempt * 1000000),
             self::MAX_DELAY_MICROSECONDS
         );
     }

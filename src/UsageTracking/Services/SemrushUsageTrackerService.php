@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
+use Throwable;
 use Illuminate\Support\Facades\Log;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
@@ -116,8 +117,8 @@ class SemrushUsageTrackerService
     private function checkBudgetThreshold(): void
     {
         try {
-            app(BudgetAlertService::class)->checkAndAlert('semrush');
-        } catch (\Throwable $e) {
+            resolve(BudgetAlertService::class)->checkAndAlert('semrush');
+        } catch (Throwable $e) {
             Log::warning('Failed to check Semrush budget threshold: '.$e->getMessage());
         }
     }

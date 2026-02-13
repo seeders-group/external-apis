@@ -29,7 +29,7 @@ class GoogleMapsResponseData extends Data
      */
     public static function findBestMatch(array $items, string $businessName): ?self
     {
-        if (empty($items)) {
+        if ($items === []) {
             return null;
         }
 

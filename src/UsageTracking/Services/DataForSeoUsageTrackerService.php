@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
+use Throwable;
 use Illuminate\Support\Facades\Log;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
@@ -51,8 +52,8 @@ class DataForSeoUsageTrackerService
     private function checkBudgetThreshold(): void
     {
         try {
-            app(BudgetAlertService::class)->checkAndAlert('dataforseo');
-        } catch (\Throwable $e) {
+            resolve(BudgetAlertService::class)->checkAndAlert('dataforseo');
+        } catch (Throwable $e) {
             Log::warning('Failed to check DataForSEO budget threshold: '.$e->getMessage());
         }
     }

@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis;
 
+use Override;
+use Prism\Prism\Enums\Provider;
 use Google_Client;
 use Illuminate\Support\ServiceProvider;
 use Seeders\ExternalApis\Clients\DocumentSectionTextGeneratorClient;
-use Seeders\ExternalApis\UsageTracking\Services\AhrefsUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\BudgetAlertService;
-use Seeders\ExternalApis\UsageTracking\Services\DataForSeoUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 use Seeders\ExternalApis\Clients\DomainPlanningClient;
 use Seeders\ExternalApis\Clients\GeminiClient;
 use Seeders\ExternalApis\Clients\ImageGenerationClient;
@@ -40,12 +36,19 @@ use Seeders\ExternalApis\Connectors\TeamleaderOrbit\TeamleaderOrbitConnector;
 use Seeders\ExternalApis\Connectors\TreeNation\TreeNationConnector;
 use Seeders\ExternalApis\Connectors\WebsiteCategorization\WebsiteCategorizationConnector;
 use Seeders\ExternalApis\Connectors\WhitePress\WhitePressConnector;
+use Seeders\ExternalApis\UsageTracking\Services\AhrefsUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\BudgetAlertService;
+use Seeders\ExternalApis\UsageTracking\Services\DataForSeoUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 
 final class ExternalApisServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
+    #[Override]
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/external-apis.php', 'external-apis');
@@ -130,7 +133,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->singleton(GeminiClient::class);
 
         // Google Search Console client with OAuth setup
-        $this->app->singleton(SearchConsoleClient::class, function ($app) {
+        $this->app->singleton(function ($app): SearchConsoleClient {
             $config = config('external-apis.search_console');
 
             $googleClient = new Google_Client;
@@ -164,7 +167,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->singleton(BudgetAlertService::class);
 
         // Only register PrismUsageTrackerService if Prism is installed
-        if (class_exists(\Prism\Prism\Enums\Provider::class)) {
+        if (class_exists(Provider::class)) {
             $this->app->singleton(PrismUsageTrackerService::class);
         }
     }
@@ -174,6 +177,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
      *
      * @return array<class-string>
      */
+    #[Override]
     public function provides(): array
     {
         return [

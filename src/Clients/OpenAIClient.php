@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
+use OpenAI;
+use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Collection;
 use OpenAI\Client as OpenAIClientContract;
@@ -19,7 +21,7 @@ final class OpenAIClient
     {
         $key = config('external-apis.openai.key');
 
-        $this->client = \OpenAI::factory()
+        $this->client = OpenAI::factory()
             ->withApiKey($key)
             ->withHttpClient(new Client(['timeout' => 300]))
             ->make();
@@ -33,7 +35,7 @@ final class OpenAIClient
                 'model' => $model,
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client
+            callback: fn (): CreateResponse => $this->client
                 ->chat()
                 ->create([
                     'model' => $model,
@@ -51,7 +53,7 @@ final class OpenAIClient
                 'model' => 'gpt-4o',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => 'gpt-4o',
                 'messages' => $conversation->toArray(),
             ])
@@ -66,7 +68,7 @@ final class OpenAIClient
                 'model' => $model,
                 'endpoint' => 'responses',
             ], $context),
-            callback: fn () => $this->client
+            callback: fn (): \OpenAI\Responses\Responses\CreateResponse => $this->client
                 ->responses()
                 ->create([
                     'model' => $model,
@@ -83,7 +85,7 @@ final class OpenAIClient
     {
         // Create a client with extended timeout for web search (10 minutes)
         // Competitor discovery with web search can take 5-10 minutes
-        $webSearchClient = \OpenAI::factory()
+        $webSearchClient = OpenAI::factory()
             ->withApiKey(config('external-apis.openai.key'))
             ->withHttpClient(new Client(['timeout' => 600])) // 10 minutes for web search
             ->make();
@@ -106,7 +108,7 @@ final class OpenAIClient
                 'model' => $model,
                 'endpoint' => 'responses.web_search',
             ], $context),
-            callback: fn () => $webSearchClient
+            callback: fn (): \OpenAI\Responses\Responses\CreateResponse => $webSearchClient
                 ->responses()
                 ->create($params)
         );

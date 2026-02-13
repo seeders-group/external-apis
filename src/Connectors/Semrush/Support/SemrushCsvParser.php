@@ -47,7 +47,7 @@ final class SemrushCsvParser
         }
 
         $headers = array_map(
-            static fn ($header): string => trim((string) $header),
+            static fn (?string $header): string => trim((string) $header),
             array_shift($rows)
         );
 
@@ -71,7 +71,7 @@ final class SemrushCsvParser
             }
 
             $values = array_map(
-                static fn ($value): string => (string) ($value ?? ''),
+                static fn (?string $value): string => (string) ($value ?? ''),
                 $row
             );
 
@@ -91,8 +91,8 @@ final class SemrushCsvParser
     {
         $headerLine = self::stripBom($headerLine);
 
-        $semicolonColumns = count(str_getcsv($headerLine, ';'));
-        $commaColumns = count(str_getcsv($headerLine, ','));
+        $semicolonColumns = count(str_getcsv($headerLine, ';', escape: '\\'));
+        $commaColumns = count(str_getcsv($headerLine, ',', escape: '\\'));
 
         if ($commaColumns > $semicolonColumns) {
             return ',';
@@ -117,7 +117,7 @@ final class SemrushCsvParser
 
         $rows = [];
 
-        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+        while (($row = fgetcsv($handle, 0, $delimiter, escape: '\\')) !== false) {
             if ($row === [null]) {
                 continue;
             }
@@ -164,13 +164,7 @@ final class SemrushCsvParser
      */
     private static function isEmptyRow(array $row): bool
     {
-        foreach ($row as $value) {
-            if (trim((string) $value) !== '') {
-                return false;
-            }
-        }
-
-        return true;
+        return array_all($row, fn($value): bool => trim((string) $value) === '');
     }
 
     private static function stripBom(string $value): string

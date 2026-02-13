@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
@@ -50,58 +52,67 @@ class ApiUsageLog extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function scopeToday($query)
+    #[Scope]
+    protected function today($query)
     {
         return $query->whereDate('created_at', today());
     }
 
-    public function scopeThisMonth($query)
+    #[Scope]
+    protected function thisMonth($query)
     {
         return $query->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month);
     }
 
-    public function scopeByIntegration($query, string $integration)
+    #[Scope]
+    protected function byIntegration($query, string $integration)
     {
         return $query->where('integration', $integration);
     }
 
-    public function scopeByFeature($query, string $feature)
+    #[Scope]
+    protected function byFeature($query, string $feature)
     {
         return $query->where('feature', $feature);
     }
 
-    public function scopeByModel($query, string $model)
+    #[Scope]
+    protected function byModel($query, string $model)
     {
         return $query->where('model', $model);
     }
 
-    public function scopeSuccessful($query)
+    #[Scope]
+    protected function successful($query)
     {
         return $query->where('status', 'success');
     }
 
-    public function scopeFailed($query)
+    #[Scope]
+    protected function failed($query)
     {
         return $query->where('status', 'error');
     }
 
-    public function scopeReconciled($query)
+    #[Scope]
+    protected function reconciled($query)
     {
         return $query->whereNotNull('reconciled_at');
     }
 
-    public function scopeUnreconciled($query)
+    #[Scope]
+    protected function unreconciled($query)
     {
         return $query->whereNull('reconciled_at');
     }
 
-    public function getCostInDollarsAttribute(): string
+    protected function getCostInDollarsAttribute(): string
     {
         return '$'.number_format($this->estimated_cost, 4);
     }
 
-    public function getIsReconciledAttribute(): bool
+    protected function getIsReconciledAttribute(): bool
     {
         return $this->reconciled_at !== null;
     }
@@ -140,7 +151,7 @@ class ApiUsageLog extends Model
      * Calculate total cost from a collection of logs by aggregating tokens per model.
      * This avoids precision loss from summing many small individual costs.
      *
-     * @param  \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Collection  $logs
+     * @param Collection|\Illuminate\Database\Eloquent\Collection $logs
      */
     public static function calculateTotalCostFromLogs($logs): float
     {

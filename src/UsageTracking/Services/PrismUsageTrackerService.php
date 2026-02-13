@@ -48,7 +48,7 @@ class PrismUsageTrackerService
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
             'status' => 'success',
-            'metadata' => ! empty($metadata) ? $metadata : null,
+            'metadata' => empty($metadata) ? null : $metadata,
         ]);
     }
 
@@ -217,8 +217,7 @@ class PrismUsageTrackerService
         $pricing = $pricingModel::getPricing($model, $integration);
 
         if (! $pricing) {
-            $embeddingPrice = config("external-apis.usage_tracking.pricing.{$integration}.embeddings.{$model}")
-                ?? config("ai_pricing.{$integration}.embeddings.{$model}");
+            $embeddingPrice = config("external-apis.usage_tracking.pricing.{$integration}.embeddings.{$model}", config("ai_pricing.{$integration}.embeddings.{$model}"));
             if ($embeddingPrice) {
                 return round(($tokens / 1_000_000) * $embeddingPrice, 6);
             }
@@ -239,8 +238,7 @@ class PrismUsageTrackerService
         ?string $quality,
         int $count = 1
     ): float {
-        $pricing = config("external-apis.usage_tracking.pricing.{$integration}.models.{$model}")
-            ?? config("ai_pricing.{$integration}.models.{$model}");
+        $pricing = config("external-apis.usage_tracking.pricing.{$integration}.models.{$model}", config("ai_pricing.{$integration}.models.{$model}"));
 
         if (! $pricing) {
             return 0.0;
@@ -267,8 +265,7 @@ class PrismUsageTrackerService
         ?int $characters,
         ?int $seconds
     ): float {
-        $pricing = config("external-apis.usage_tracking.pricing.{$integration}.audio.{$model}")
-            ?? config("ai_pricing.{$integration}.audio.{$model}");
+        $pricing = config("external-apis.usage_tracking.pricing.{$integration}.audio.{$model}", config("ai_pricing.{$integration}.audio.{$model}"));
 
         if (! $pricing) {
             return 0.0;

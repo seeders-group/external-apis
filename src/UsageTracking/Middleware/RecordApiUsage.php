@@ -88,7 +88,7 @@ class RecordApiUsage
             $metadata['error'] = $this->safeJson($response, 'error') ?? $response->body();
         }
 
-        return empty($metadata) ? null : $metadata;
+        return $metadata === [] ? null : $metadata;
     }
 
     protected function safeJson(Response $response, ?string $key = null): mixed
@@ -104,7 +104,7 @@ class RecordApiUsage
     {
         $stats = $response->getPsrResponse()->getHeader('X-Response-Time');
 
-        if (! empty($stats)) {
+        if ($stats !== []) {
             return (int) ($stats[0] * 1000);
         }
 

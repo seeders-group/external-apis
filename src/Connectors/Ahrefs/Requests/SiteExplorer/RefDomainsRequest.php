@@ -21,6 +21,6 @@ class RefDomainsRequest extends Request
 
     protected function defaultQuery(): array
     {
-        return array_filter($this->data->toArray(), fn ($value) => ! is_null($value));
+        return array_filter($this->data->toArray(), fn ($value): bool => ! is_null($value));
     }
 }

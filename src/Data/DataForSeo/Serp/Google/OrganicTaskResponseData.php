@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Data\DataForSeo\Serp\Google;
 
+use Override;
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\DataCollection;
 
@@ -21,6 +22,7 @@ class OrganicTaskResponseData extends Data
         public DataCollection $tasks,
     ) {}
 
+    #[Override]
     public static function prepareForPipeline(array $properties): array
     {
         if (isset($properties['tasks'])) {

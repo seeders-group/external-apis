@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Saloon\Http\Response;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Saloon\Enums\Method;
@@ -16,13 +17,13 @@ use Seeders\ExternalApis\UsageTracking\Models\ApiLog;
 use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
 use Seeders\ExternalApis\UsageTracking\Services\BudgetAlertService;
 
-beforeEach(function () {
+beforeEach(function (): void {
     Schema::dropIfExists('api_usage_logs');
     Schema::dropIfExists('api_logs');
     Schema::dropIfExists('api_service_pricing');
     Schema::dropIfExists('api_budget_config');
 
-    Schema::create('api_usage_logs', function (Blueprint $table) {
+    Schema::create('api_usage_logs', function (Blueprint $table): void {
         $table->id();
         $table->string('integration', 50)->index();
         $table->string('request_id')->nullable();
@@ -48,7 +49,7 @@ beforeEach(function () {
         $table->timestamps();
     });
 
-    Schema::create('api_logs', function (Blueprint $table) {
+    Schema::create('api_logs', function (Blueprint $table): void {
         $table->id();
         $table->nullableMorphs('trackable');
         $table->string('scope')->nullable();
@@ -62,7 +63,7 @@ beforeEach(function () {
         $table->timestamps();
     });
 
-    Schema::create('api_service_pricing', function (Blueprint $table) {
+    Schema::create('api_service_pricing', function (Blueprint $table): void {
         $table->id();
         $table->string('integration');
         $table->string('endpoint')->nullable();
@@ -73,7 +74,7 @@ beforeEach(function () {
         $table->timestamps();
     });
 
-    Schema::create('api_budget_config', function (Blueprint $table) {
+    Schema::create('api_budget_config', function (Blueprint $table): void {
         $table->id();
         $table->string('integration');
         $table->decimal('monthly_budget', 10, 2)->nullable();
@@ -87,21 +88,21 @@ beforeEach(function () {
     });
 });
 
-afterEach(function () {
+afterEach(function (): void {
     Mockery::close();
 });
 
-it('requires tracking context for semrush requests', function () {
+it('requires tracking context for semrush requests', function (): void {
     $connector = new SemrushConnector;
     $connector->withMockClient(new MockClient([
         ApiUnitsBalanceRequest::class => MockResponse::make('1000', 200),
     ]));
 
-    expect(fn () => $connector->send(new ApiUnitsBalanceRequest))
+    expect(fn (): Response => $connector->send(new ApiUnitsBalanceRequest))
         ->toThrow(RuntimeException::class, 'requires tracking context');
 });
 
-it('records api_log and api_usage_log for backlinks overview', function () {
+it('records api_log and api_usage_log for backlinks overview', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         BacklinksOverviewRequest::class => MockResponse::make("domain;ascore;backlinks\nexample.com;12;100", 200),
@@ -130,7 +131,7 @@ it('records api_log and api_usage_log for backlinks overview', function () {
     expect((float) $usageLog->estimated_cost)->toBe(0.002);
 });
 
-it('records batch comparison units as 40 per target domain', function () {
+it('records batch comparison units as 40 per target domain', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         BatchComparisonRequest::class => MockResponse::make("target;metric\nexample.com;10", 200),
@@ -151,7 +152,7 @@ it('records batch comparison units as 40 per target domain', function () {
     expect((float) $usageLog->estimated_cost)->toBe(0.006);
 });
 
-it('logs balance request with zero units and zero cost', function () {
+it('logs balance request with zero units and zero cost', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         ApiUnitsBalanceRequest::class => MockResponse::make('1000000', 200),
@@ -170,7 +171,7 @@ it('logs balance request with zero units and zero cost', function () {
     expect((float) $usageLog->estimated_cost)->toBe(0.0);
 });
 
-it('logs failed semrush requests as zero units and error status', function () {
+it('logs failed semrush requests as zero units and error status', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         BacklinksOverviewRequest::class => MockResponse::make('internal error', 500),
@@ -193,7 +194,7 @@ it('logs failed semrush requests as zero units and error status', function () {
     expect((float) $usageLog->estimated_cost)->toBe(0.0);
 });
 
-it('triggers semrush budget check after successful usage logging', function () {
+it('triggers semrush budget check after successful usage logging', function (): void {
     $budgetAlertMock = Mockery::mock(BudgetAlertService::class);
     $budgetAlertMock->shouldReceive('checkAndAlert')
         ->once()
@@ -215,7 +216,7 @@ it('triggers semrush budget check after successful usage logging', function () {
     expect(ApiUsageLog::query()->count())->toBe(1);
 });
 
-it('uses units for semrush month-to-date budget calculations', function () {
+it('uses units for semrush month-to-date budget calculations', function (): void {
     ApiUsageLog::query()->create([
         'integration' => 'semrush',
         'endpoint' => '/analytics/v1/',
@@ -234,22 +235,21 @@ it('uses units for semrush month-to-date budget calculations', function () {
         'status' => 'success',
     ]);
 
-    $service = app(BudgetAlertService::class);
+    $service = resolve(BudgetAlertService::class);
     $method = new ReflectionMethod($service, 'getMonthToDateSpend');
-    $method->setAccessible(true);
 
     $monthToDateSpend = $method->invoke($service, 'semrush');
 
     expect($monthToDateSpend)->toBe(160.0);
 });
 
-it('fails fast for unsupported semrush requests', function () {
+it('fails fast for unsupported semrush requests', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         UnsupportedSemrushRequest::class => MockResponse::make('ok', 200),
     ]));
 
-    expect(fn () => $connector->send(new UnsupportedSemrushRequest))
+    expect(fn (): Response => $connector->send(new UnsupportedSemrushRequest))
         ->toThrow(RuntimeException::class, 'Unsupported Semrush request class');
 });
 

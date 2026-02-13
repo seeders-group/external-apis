@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Connectors\Semrush\Requests;
 
+use Override;
 use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Saloon\Enums\Method;
@@ -64,6 +65,7 @@ class BatchComparisonRequest extends Request
         );
     }
 
+    #[Override]
     public function handlePsrRequest(RequestInterface $request, PendingRequest $pendingRequest): RequestInterface
     {
         $uri = $request->getUri();

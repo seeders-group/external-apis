@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Connectors\BrandTracker;
 
+use Exception;
 use Firebase\JWT\JWT;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
@@ -74,7 +75,7 @@ final class BrandTrackerConnector extends Connector
         $jwt_secret = config('external-apis.brand_tracker.jwt_secret');
 
         if (! $jwt_secret) {
-            throw new \Exception('JWT secret not configured');
+            throw new Exception('JWT secret not configured');
         }
 
         return JWT::encode($payload, $jwt_secret, 'HS256');

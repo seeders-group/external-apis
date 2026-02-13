@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
+use OpenAI;
+use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use OpenAI\Client as OpenAIClientContract;
 use Seeders\ExternalApis\Traits\TracksOpenAIUsage;
@@ -18,7 +20,7 @@ final class DocumentSectionTextGeneratorClient
     {
         $key = config('external-apis.openai.key');
 
-        $this->client = \OpenAI::factory()
+        $this->client = OpenAI::factory()
             ->withApiKey($key)
             ->withHttpClient(new Client(['timeout' => 160]))
             ->make();
@@ -37,16 +39,16 @@ final class DocumentSectionTextGeneratorClient
                 'model' => 'gpt-4o',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => 'gpt-4o',
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'You will respond in HTML format. You will analyze the given data and summarize it in a short paragraph for people who do not understand the topic, the writing style is semi-informal. Also briefly describe what is going well, and what not. You will write in ' . $language . ', but do not translate the labels given in the data.',
+                        'content' => 'You will respond in HTML format. You will analyze the given data and summarize it in a short paragraph for people who do not understand the topic, the writing style is semi-informal. Also briefly describe what is going well, and what not. You will write in '.$language.', but do not translate the labels given in the data.',
                     ],
                     [
                         'role' => 'user',
-                        'content' => $prompt . "\n\n" . json_encode($data),
+                        'content' => $prompt."\n\n".json_encode($data),
                     ],
                 ],
             ])
@@ -69,7 +71,7 @@ final class DocumentSectionTextGeneratorClient
                 'model' => 'gpt-4o',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => 'gpt-4o',
                 'messages' => [
                     //                [
@@ -106,7 +108,7 @@ final class DocumentSectionTextGeneratorClient
                 'model' => 'gpt-4o',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => 'gpt-4o',
                 'response_format' => [
                     'type' => 'json_object',
@@ -135,12 +137,12 @@ final class DocumentSectionTextGeneratorClient
                 'model' => 'gpt-4',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => 'gpt-4',
                 'messages' => [
                     [
                         'role' => 'system',
-                        'content' => 'You will respond in HTML format. You will answer in a short paragraph for people who do not understand the topic, the writing style is semi-informal. You will write in ' . $language . ', but do not translate the labels given in the data.',
+                        'content' => 'You will respond in HTML format. You will answer in a short paragraph for people who do not understand the topic, the writing style is semi-informal. You will write in '.$language.', but do not translate the labels given in the data.',
                     ],
                     [
                         'role' => 'user',

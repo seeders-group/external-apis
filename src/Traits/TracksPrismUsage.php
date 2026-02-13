@@ -22,7 +22,7 @@ trait TracksPrismUsage
      */
     protected function trackPrismUsage(Provider $provider, array $context, callable $callback): mixed
     {
-        $tracker = app(PrismUsageTrackerService::class);
+        $tracker = resolve(PrismUsageTrackerService::class);
 
         try {
             $response = $callback();

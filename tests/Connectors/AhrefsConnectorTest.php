@@ -7,7 +7,7 @@ use Saloon\Http\Faking\MockResponse;
 use Seeders\ExternalApis\Connectors\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Connectors\Ahrefs\Requests\SiteExplorer\DomainRatingRequest;
 
-it('can send a domain rating request', function () {
+it('can send a domain rating request', function (): void {
     $mockClient = new MockClient([
         DomainRatingRequest::class => MockResponse::make([
             'domain_rating' => [
@@ -25,7 +25,7 @@ it('can send a domain rating request', function () {
     expect($response->json('domain_rating.domain_rating'))->toBe(75.5);
 });
 
-it('resolves the correct base url', function () {
+it('resolves the correct base url', function (): void {
     $connector = new AhrefsConnector;
 
     expect($connector->resolveBaseUrl())->toBe('https://api.ahrefs.com/v3');

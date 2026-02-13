@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
+use OpenAI\Responses\Chat\CreateResponse;
 use OpenAI;
 use OpenAI\Client;
 use Seeders\ExternalApis\Traits\TracksOpenAIUsage;
@@ -29,7 +30,7 @@ final class ImageGenerationClient
                 'model' => 'gpt-3.5-turbo-1106',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 'model' => 'gpt-3.5-turbo-1106',
                 'prompt' => $prompt,
                 'n' => 1,

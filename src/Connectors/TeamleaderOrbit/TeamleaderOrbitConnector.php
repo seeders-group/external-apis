@@ -13,11 +13,8 @@ class TeamleaderOrbitConnector extends Connector
 {
     use AcceptsJson;
 
-    protected TeamleaderOrbitOAuthServiceInterface $oauthService;
-
-    public function __construct(TeamleaderOrbitOAuthServiceInterface $oauthService)
+    public function __construct(protected TeamleaderOrbitOAuthServiceInterface $oauthService)
     {
-        $this->oauthService = $oauthService;
     }
 
     protected function defaultAuth(): HeaderAuthenticator

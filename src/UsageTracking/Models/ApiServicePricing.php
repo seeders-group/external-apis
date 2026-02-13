@@ -60,8 +60,7 @@ class ApiServicePricing extends Model
         }
 
         // Fallback to config (try package config first, then app config)
-        $configPricing = config("external-apis.usage_tracking.pricing.{$integration}")
-            ?? config("api_pricing.{$integration}");
+        $configPricing = config("external-apis.usage_tracking.pricing.{$integration}", config("api_pricing.{$integration}"));
 
         if ($configPricing && isset($configPricing['cost_per_unit'])) {
             return [

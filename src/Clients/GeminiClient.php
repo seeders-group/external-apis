@@ -15,7 +15,7 @@ final class GeminiClient
 {
     public Client $client;
 
-    private SafetySetting $safetySetting;
+    private readonly SafetySetting $safetySetting;
 
     public function __construct()
     {

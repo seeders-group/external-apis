@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Clients;
 
+use OpenAI;
+use OpenAI\Responses\Chat\CreateResponse;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\View;
 use OpenAI\Client as OpenAIClientContract;
@@ -20,7 +22,7 @@ final class DomainPlanningClient
     {
         $key = config('external-apis.openai.key');
 
-        $this->client = \OpenAI::factory()
+        $this->client = OpenAI::factory()
             ->withApiKey($key)
             ->withHttpClient(new Client(['timeout' => 160]))
             ->make();
@@ -41,7 +43,7 @@ final class DomainPlanningClient
                 'model' => 'gpt-4o',
                 'endpoint' => 'chat.completions',
             ], $context),
-            callback: fn () => $this->client->chat()->create([
+            callback: fn (): CreateResponse => $this->client->chat()->create([
                 //            'model' => 'gpt-4-1106-preview',
                 'model' => 'gpt-4o',
                 'temperature' => 1,

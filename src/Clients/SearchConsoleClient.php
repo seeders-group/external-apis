@@ -14,12 +14,12 @@ use Monolog\Logger;
 
 final class SearchConsoleClient
 {
-    public const CHUNK_SIZE = 25000;
+    public const int CHUNK_SIZE = 25000;
 
     /** @var array<string, mixed> */
     private array $queryOptParams = [];
 
-    public function __construct(private Google_Client $client) {}
+    public function __construct(private readonly Google_Client $client) {}
 
     public function performQuery(string $siteUrl, int $rows, mixed $request): Collection
     {
@@ -36,12 +36,10 @@ final class SearchConsoleClient
             $request->setStartRow($startRow);
 
             $backoff = new ExponentialBackoff(10);
-            $response = $backoff->execute(function () use ($searchanalyticsResource, $siteUrl, $request) {
-                return $searchanalyticsResource->query($siteUrl, $request, $this->queryOptParams);
-            });
+            $response = $backoff->execute(fn() => $searchanalyticsResource->query($siteUrl, $request, $this->queryOptParams));
 
             // Stop if no more rows returned
-            if (count($response->getRows()) == 0) {
+            if (count($response->getRows()) === 0) {
                 break;
             }
 
@@ -110,12 +108,12 @@ final class SearchConsoleClient
         $filters = [];
         foreach ($request->getDimensionFilterGroups() as $dimensionFilterGroup) {
             foreach ($dimensionFilterGroup->filters as $filter) {
-                $filters[] = $filter->dimension . $filter->expression . $filter->operator;
+                $filters[] = $filter->dimension.$filter->expression.$filter->operator;
             }
         }
         $filters = implode('', $filters);
 
-        return md5($keys . $filters . $request->getSearchType() . $request->endDate . $request->startDate);
+        return md5($keys.$filters.$request->getSearchType().$request->endDate.$request->startDate);
     }
 
     public function setQuotaUser(string $quotaUser): void
@@ -126,7 +124,7 @@ final class SearchConsoleClient
 
         $guzzleConfig = $this->client->getHttpClient()->getConfig();
 
-        Arr::set($guzzleConfig, 'base_uri', Google_Client::API_BASE_PATH . '?quotaUser=' . $quotaUser);
+        Arr::set($guzzleConfig, 'base_uri', Google_Client::API_BASE_PATH.'?quotaUser='.$quotaUser);
 
         $guzzleClient = new Client($guzzleConfig);
 

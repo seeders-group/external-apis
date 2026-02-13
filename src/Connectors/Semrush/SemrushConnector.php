@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Connectors\Semrush;
 
+use Override;
 use Illuminate\Support\Facades\Log;
 use Saloon\Http\Connector;
 use Saloon\Http\PendingRequest;
@@ -27,10 +28,11 @@ class SemrushConnector extends Connector
         return 'semrush';
     }
 
+    #[Override]
     public function boot(PendingRequest $pendingRequest): void
     {
         $saloonRequest = $pendingRequest->getRequest();
-        $usageResolver = app(SemrushUsageResolver::class);
+        $usageResolver = resolve(SemrushUsageResolver::class);
         $usage = $usageResolver->resolve($saloonRequest);
 
         // Provide generic consumption hints for RecordApiUsage middleware.
@@ -39,7 +41,7 @@ class SemrushConnector extends Connector
 
         $pendingRequest->middleware()->onResponse(function (Response $response) use ($saloonRequest, $usage): void {
             try {
-                $tracker = app(SemrushUsageTrackerService::class);
+                $tracker = resolve(SemrushUsageTrackerService::class);
 
                 if ($response->successful()) {
                     $tracker->logRequest(

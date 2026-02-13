@@ -122,8 +122,7 @@ class OpenAIUsageTrackerService
         string $quality,
         int $count = 1
     ): float {
-        $pricing = config("external-apis.usage_tracking.pricing.openai.models.{$model}")
-            ?? config("ai_pricing.openai.models.{$model}");
+        $pricing = config("external-apis.usage_tracking.pricing.openai.models.{$model}", config("ai_pricing.openai.models.{$model}"));
 
         if (! $pricing) {
             return 0.0;

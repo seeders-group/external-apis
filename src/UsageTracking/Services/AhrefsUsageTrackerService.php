@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
+use Throwable;
 use Illuminate\Support\Facades\Log;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
@@ -50,8 +51,8 @@ class AhrefsUsageTrackerService
     private function checkBudgetThreshold(): void
     {
         try {
-            app(BudgetAlertService::class)->checkAndAlert('ahrefs');
-        } catch (\Throwable $e) {
+            resolve(BudgetAlertService::class)->checkAndAlert('ahrefs');
+        } catch (Throwable $e) {
             Log::warning('Failed to check Ahrefs budget threshold: '.$e->getMessage());
         }
     }

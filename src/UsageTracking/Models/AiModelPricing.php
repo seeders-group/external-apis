@@ -44,8 +44,7 @@ class AiModelPricing extends Model
         }
 
         // Fallback to config (try package config first, then app config)
-        return config("external-apis.usage_tracking.pricing.{$integration}.models.{$model}")
-            ?? config("ai_pricing.{$integration}.models.{$model}");
+        return config("external-apis.usage_tracking.pricing.{$integration}.models.{$model}", config("ai_pricing.{$integration}.models.{$model}"));
     }
 
     /**
@@ -56,12 +55,12 @@ class AiModelPricing extends Model
         $configPricing = collect(
             config("external-apis.usage_tracking.pricing.{$integration}.models",
                 config("ai_pricing.{$integration}.models", []))
-        )->filter(fn ($pricing) => isset($pricing['input_per_1m_tokens']));
+        )->filter(fn ($pricing): bool => isset($pricing['input_per_1m_tokens']));
 
         $dbPricing = self::where('integration', $integration)
             ->get()
             ->keyBy('model')
-            ->map(fn ($pricing) => [
+            ->map(fn ($pricing): array => [
                 'input_per_1m_tokens' => (float) $pricing->input_per_1m_tokens,
                 'output_per_1m_tokens' => (float) $pricing->output_per_1m_tokens,
                 'cached_input_per_1m_tokens' => $pricing->cached_input_per_1m_tokens

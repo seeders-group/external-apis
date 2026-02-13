@@ -11,7 +11,7 @@ trait TracksOpenAIUsage
 {
     protected function trackUsage(array $context, callable $callback)
     {
-        $tracker = app(OpenAIUsageTrackerService::class);
+        $tracker = resolve(OpenAIUsageTrackerService::class);
 
         try {
             $response = $callback();
