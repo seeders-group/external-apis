@@ -8,6 +8,19 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property int $id
+ * @property string $integration
+ * @property string|null $scope
+ * @property string|null $trackable_type
+ * @property int|null $trackable_id
+ * @property string|null $endpoint
+ * @property int|null $status
+ * @property float $consumption
+ * @property array|null $metadata
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class ApiLog extends Model
 {
     protected $guarded = ['id'];

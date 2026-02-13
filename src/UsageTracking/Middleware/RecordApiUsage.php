@@ -105,7 +105,7 @@ class RecordApiUsage
         $stats = $response->getPsrResponse()->getHeader('X-Response-Time');
 
         if ($stats !== []) {
-            return (int) ($stats[0] * 1000);
+            return (int) ((float) $stats[0] * 1000);
         }
 
         return null;

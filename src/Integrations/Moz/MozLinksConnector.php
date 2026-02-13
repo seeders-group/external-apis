@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\Integrations\Moz;
 
+use Saloon\Http\Auth\BasicAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 
@@ -11,9 +12,12 @@ class MozLinksConnector extends Connector
 {
     use AcceptsJson;
 
-    public function __construct()
+    protected function defaultAuth(): BasicAuthenticator
     {
-        $this->withBasicAuth(config('external-apis.moz.client_id'), config('external-apis.moz.client_secret'));
+        return new BasicAuthenticator(
+            config('external-apis.moz.client_id'),
+            config('external-apis.moz.client_secret'),
+        );
     }
 
     /**

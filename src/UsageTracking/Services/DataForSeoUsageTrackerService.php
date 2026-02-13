@@ -18,7 +18,7 @@ class DataForSeoUsageTrackerService
         string $endpoint,
         float $cost,
         array $context = []
-    ) {
+    ): mixed {
         $logModel = UsageTracking::$apiUsageLogModel;
 
         $log = $logModel::create([
@@ -90,7 +90,7 @@ class DataForSeoUsageTrackerService
     {
         $parts = explode('/', trim($endpoint, '/'));
 
-        $index = ($parts[0] ?? '') === 'v3' ? 1 : 0;
+        $index = $parts[0] === 'v3' ? 1 : 0;
 
         $apiType = $parts[$index] ?? 'unknown';
 

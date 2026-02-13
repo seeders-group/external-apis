@@ -10,6 +10,17 @@ use Illuminate\Database\Eloquent\Model;
  * Pricing configuration for credit/unit-based API services (Ahrefs, DataForSEO, etc.)
  * Different from AiModelPricing which is token-based (OpenAI, Gemini)
  */
+/**
+ * @property int $id
+ * @property string $integration
+ * @property string|null $endpoint
+ * @property float $cost_per_unit
+ * @property string $unit_type
+ * @property string|null $description
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class ApiServicePricing extends Model
 {
     protected $table = 'api_service_pricing';

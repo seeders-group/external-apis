@@ -10,6 +10,32 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
+/**
+ * @property int $id
+ * @property string $integration
+ * @property string|null $request_id
+ * @property string|null $model
+ * @property string|null $endpoint
+ * @property int $prompt_tokens
+ * @property int $completion_tokens
+ * @property int $total_tokens
+ * @property int $input_cached_tokens
+ * @property int $images_generated
+ * @property int $characters_processed
+ * @property int $seconds_processed
+ * @property float $estimated_cost
+ * @property float|null $actual_cost
+ * @property string|null $feature
+ * @property string|null $sub_feature
+ * @property int|null $project_id
+ * @property int|null $user_id
+ * @property string $status
+ * @property string|null $error_message
+ * @property array|null $metadata
+ * @property \Illuminate\Support\Carbon|null $reconciled_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class ApiUsageLog extends Model
 {
     protected $fillable = [

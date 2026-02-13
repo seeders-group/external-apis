@@ -9,6 +9,7 @@ use RuntimeException;
 use Saloon\Http\PendingRequest;
 use Seeders\ExternalApis\UsageTracking\Middleware\RecordApiUsage;
 
+/** @phpstan-consistent-constructor */
 trait TracksApiUsage
 {
     protected ?Model $trackableModel = null;

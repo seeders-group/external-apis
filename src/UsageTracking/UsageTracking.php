@@ -27,7 +27,7 @@ class UsageTracking
     /** @var class-string */
     public static string $apiLogModel = ApiLog::class;
 
-    /** @var class-string */
+    /** @var string */
     public static string $userModel = 'App\\Models\\User';
 
     public static function useApiUsageLogModel(string $model): void

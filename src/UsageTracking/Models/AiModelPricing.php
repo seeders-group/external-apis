@@ -6,6 +6,16 @@ namespace Seeders\ExternalApis\UsageTracking\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $integration
+ * @property string $model
+ * @property float $input_per_1m_tokens
+ * @property float $output_per_1m_tokens
+ * @property float|null $cached_input_per_1m_tokens
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class AiModelPricing extends Model
 {
     protected $table = 'ai_model_pricing';

@@ -7,6 +7,19 @@ namespace Seeders\ExternalApis\UsageTracking\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property string $integration
+ * @property float $monthly_budget
+ * @property float|null $daily_budget
+ * @property int $warning_threshold
+ * @property int $critical_threshold
+ * @property bool $alert_enabled
+ * @property string|null $google_chat_webhook_url
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ */
 class ApiBudgetConfig extends Model
 {
     protected $table = 'api_budget_config';
