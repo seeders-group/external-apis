@@ -31,6 +31,12 @@ Since this is a private package, add the repository to your `composer.json`:
 php artisan vendor:publish --tag=external-apis-config
 ```
 
+### Publish Migrations
+
+```bash
+php artisan vendor:publish --tag=external-apis-migrations
+```
+
 ## Configuration
 
 All API credentials are configured via environment variables. Add these to your `.env` file:
@@ -42,12 +48,6 @@ AHREFS_TOKEN=your-token
 # DataForSEO
 DATAFORSEO_USERNAME=your-username
 DATAFORSEO_PASSWORD=your-password
-
-# OpenAI
-OPENAI_API_KEY=your-key
-
-# Gemini
-GEMINI_API_KEY=your-key
 
 # Hunter
 HUNTER_API_KEY=your-key
@@ -62,13 +62,15 @@ SEMRUSH_API_KEY=your-api-key
 # And more... see config/external-apis.php for all options
 ```
 
+Missing credentials will throw a `MissingConfigurationException` with a clear message indicating which config value needs to be set.
+
 ## Usage
 
 ### Using Connectors (Saloon)
 
 ```php
-use Seeders\ExternalApis\Connectors\Ahrefs\AhrefsConnector;
-use Seeders\ExternalApis\Connectors\Ahrefs\Requests\SiteExplorer\DomainRatingRequest;
+use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
+use Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer\DomainRatingRequest;
 
 $connector = app(AhrefsConnector::class);
 $response = $connector->send(new DomainRatingRequest('example.com'));
@@ -77,8 +79,8 @@ $domainRating = $response->json('domain_rating.domain_rating');
 ```
 
 ```php
-use Seeders\ExternalApis\Connectors\Semrush\Requests\BacklinksOverviewRequest;
-use Seeders\ExternalApis\Connectors\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 
 // Semrush requires tracking context
 $connector = SemrushConnector::forScope('seo_audit');
@@ -100,40 +102,28 @@ $rawCsv = $response->body();
 
 ```php
 use Seeders\ExternalApis\Facades\Ahrefs;
-use Seeders\ExternalApis\Connectors\Ahrefs\Requests\SiteExplorer\DomainRatingRequest;
+use Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer\DomainRatingRequest;
 
 $response = Ahrefs::send(new DomainRatingRequest('example.com'));
 ```
 
 ```php
 use Seeders\ExternalApis\Facades\Semrush;
-use Seeders\ExternalApis\Connectors\Semrush\Requests\ApiUnitsBalanceRequest;
+use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 
 $response = Semrush::withScope('seo_audit')->send(new ApiUnitsBalanceRequest);
 $unitsBalance = $response->dtoOrFail()->units;
 ```
 
-### Using API Clients
-
-```php
-use Seeders\ExternalApis\Clients\OpenAIClient;
-
-$client = app(OpenAIClient::class);
-$response = $client->prompt([
-    ['role' => 'user', 'content' => 'Hello!']
-], 'gpt-4o');
-```
-
 ## Available Integrations
 
-### SEO & Analytics Connectors
+### SEO & Analytics
 - **AhrefsConnector** - Backlinks, domain rating, organic keywords
 - **DataForSeoConnector** - SERP data, reviews, maps, business data
 - **MozLinksConnector** - URL metrics, linking root domains
 - **MajesticConnector** - Trust flow, citation flow
 - **SeRankingConnector** - Rank tracking, keyword management
 - **SemrushConnector** - Backlinks overview, batch comparison, API units balance
-- **AdvancedWebRankingConnector** - Project management, rank tracking
 
 ### Web Scraping & Search
 - **ScraperAPIConnector** - Web scraping, Google search
@@ -143,62 +133,50 @@ $response = $client->prompt([
 ### Email & Contact Discovery
 - **HunterConnector** - Email finder, domain search
 
-### Link Building & Press Release
-- **PrensalinkConnector** - Press release distribution
-- **PaperClubConnector** - Link building marketplace
-- **WhitePressConnector** - Content marketing platform
-
-### Analytics & Data Collection
-- **BazoomConnector** - Domain intelligence
-- **LeolyticsConnector** - Analytics platform
-- **WebsiteCategorizationConnector** - Website classification
-
-### CRM & Business
-- **TeamleaderOrbitConnector** - CRM integration
-
-### AI & Brand Tracking
-- **BrandTrackerConnector** - Brand monitoring with LLMs
-
-### Environmental
-- **TreeNationConnector** - Carbon offset integration
-
-### API Clients
-- **OpenAIClient** - GPT models, content generation
-- **OpenAIJsonClient** - Structured JSON responses
-- **GeminiClient** - Google Gemini models
-- **SearchConsoleClient** - Google Search Console
-- **ImageGenerationClient** - DALL-E image generation
-- **DomainPlanningClient** - Domain planning analysis
-- **DocumentSectionTextGeneratorClient** - Document content generation
+### Planned Integrations
+- AdvancedWebRankingConnector - Project management, rank tracking
+- PrensalinkConnector - Press release distribution
+- PaperClubConnector - Link building marketplace
+- WhitePressConnector - Content marketing platform
+- BazoomConnector - Domain intelligence
+- LeolyticsConnector - Analytics platform
+- WebsiteCategorizationConnector - Website classification
+- TeamleaderOrbitConnector - CRM integration
+- BrandTrackerConnector - Brand monitoring with LLMs
+- TreeNationConnector - Carbon offset integration
 
 ## Usage Tracking
 
-The package supports optional usage tracking for API calls. To enable tracking:
+The package includes a built-in usage tracking system for monitoring API costs. Publish the migrations to get started:
 
-1. Implement the required interfaces in your application:
-
-```php
-use Seeders\ExternalApis\Contracts\UsageTrackerInterface;
-use Seeders\ExternalApis\Contracts\ApiUsageLogInterface;
-
-class YourUsageTracker implements UsageTrackerInterface
-{
-    public function logUsage(array $data): void
-    {
-        // Log to your database
-    }
-
-    public function getUsageStats(array $filters = []): array
-    {
-        // Return usage statistics
-    }
-}
+```bash
+php artisan vendor:publish --tag=external-apis-migrations
+php artisan migrate
 ```
 
-2. Bind your implementation in a service provider:
+### Automatic Tracking via Traits
+
+Connectors using the `TracksApiUsage` trait automatically log every request:
 
 ```php
-$this->app->bind(UsageTrackerInterface::class, YourUsageTracker::class);
+use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
+
+// Track with a model context
+$connector = SemrushConnector::forModel($project, 'seo_audit');
+
+// Or track with just a scope
+$connector = SemrushConnector::forScope('seo_audit');
+```
+
+### Swappable Models
+
+You can swap the default models with your own implementations:
+
+```php
+use Seeders\ExternalApis\UsageTracking\UsageTracking;
+
+UsageTracking::useApiUsageLogModel(YourApiUsageLog::class);
+UsageTracking::useAiModelPricingModel(YourAiModelPricing::class);
 ```
 
 ## Testing
@@ -211,6 +189,12 @@ composer test
 
 ```bash
 composer format
+```
+
+## Static Analysis
+
+```bash
+composer analyse
 ```
 
 ## License

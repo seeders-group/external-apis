@@ -11,6 +11,7 @@ use Saloon\Enums\Method;
 use Saloon\Http\PendingRequest;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
 use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
@@ -45,12 +46,18 @@ class BatchComparisonRequest extends Request
 
     protected function defaultQuery(): array
     {
+        $apiKey = config('external-apis.semrush.api_key');
+
+        if (empty($apiKey)) {
+            throw new MissingConfigurationException('external-apis.semrush.api_key');
+        }
+
         return [
             'type' => 'backlinks_comparison',
             'targets' => $this->targets,
             'target_types' => $this->targetTypes,
             'export_columns' => $this->exportColumns,
-            'key' => config('external-apis.semrush.api_key'),
+            'key' => $apiKey,
         ];
     }
 

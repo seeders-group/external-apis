@@ -35,5 +35,11 @@ abstract class TestCase extends Orchestra
         $app->make(Repository::class)->set('external-apis.moz.client_id', 'test-moz-client-id');
         $app->make(Repository::class)->set('external-apis.moz.client_secret', 'test-moz-client-secret');
         $app->make(Repository::class)->set('external-apis.semrush.api_key', 'test-semrush-key');
+        $app->make(Repository::class)->set('external-apis.hunter.api_key', 'test-hunter-key');
+        $app->make(Repository::class)->set('external-apis.majestic.api_key', 'test-majestic-key');
+        $app->make(Repository::class)->set('external-apis.seranking.token', 'test-seranking-token');
+        $app->make(Repository::class)->set('external-apis.scraperapi.key', 'test-scraperapi-key');
+        $app->make(Repository::class)->set('external-apis.google_search.key', 'test-google-search-key');
+        $app->make(Repository::class)->set('external-apis.google_search.cx', 'test-google-search-cx');
     }
 }

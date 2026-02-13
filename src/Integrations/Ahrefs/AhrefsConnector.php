@@ -7,6 +7,7 @@ namespace Seeders\ExternalApis\Integrations\Ahrefs;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 
 class AhrefsConnector extends Connector
 {
@@ -14,9 +15,13 @@ class AhrefsConnector extends Connector
 
     protected function defaultAuth(): TokenAuthenticator
     {
-        return new TokenAuthenticator(
-            config('external-apis.ahrefs.token')
-        );
+        $token = config('external-apis.ahrefs.token');
+
+        if (empty($token)) {
+            throw new MissingConfigurationException('external-apis.ahrefs.token');
+        }
+
+        return new TokenAuthenticator($token);
     }
 
     /**

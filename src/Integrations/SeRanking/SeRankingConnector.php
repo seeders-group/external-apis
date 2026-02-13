@@ -7,6 +7,7 @@ namespace Seeders\ExternalApis\Integrations\SeRanking;
 use Saloon\Http\Auth\HeaderAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 
 class SeRankingConnector extends Connector
 {
@@ -14,7 +15,13 @@ class SeRankingConnector extends Connector
 
     protected function defaultAuth(): HeaderAuthenticator
     {
-        return new HeaderAuthenticator(config('external-apis.seranking.token'), 'Authorization');
+        $token = config('external-apis.seranking.token');
+
+        if (empty($token)) {
+            throw new MissingConfigurationException('external-apis.seranking.token');
+        }
+
+        return new HeaderAuthenticator($token, 'Authorization');
     }
 
     public function resolveBaseUrl(): string

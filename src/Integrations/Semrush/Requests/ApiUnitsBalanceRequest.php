@@ -8,6 +8,7 @@ use RuntimeException;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 use Seeders\ExternalApis\Integrations\Semrush\Data\ApiUnitsBalanceResponseData;
 
 class ApiUnitsBalanceRequest extends Request
@@ -21,8 +22,14 @@ class ApiUnitsBalanceRequest extends Request
 
     protected function defaultQuery(): array
     {
+        $apiKey = config('external-apis.semrush.api_key');
+
+        if (empty($apiKey)) {
+            throw new MissingConfigurationException('external-apis.semrush.api_key');
+        }
+
         return [
-            'key' => config('external-apis.semrush.api_key'),
+            'key' => $apiKey,
         ];
     }
 

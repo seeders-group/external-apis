@@ -6,6 +6,7 @@ namespace Seeders\ExternalApis\Integrations\GoogleSearch;
 
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 
 class GoogleSearchConnector extends Connector
 {
@@ -37,9 +38,20 @@ class GoogleSearchConnector extends Connector
 
     protected function defaultQuery(): array
     {
+        $key = config('external-apis.google_search.key');
+        $cx = config('external-apis.google_search.cx');
+
+        if (empty($key)) {
+            throw new MissingConfigurationException('external-apis.google_search.key');
+        }
+
+        if (empty($cx)) {
+            throw new MissingConfigurationException('external-apis.google_search.cx');
+        }
+
         return [
-            'key' => config('external-apis.google_search.key'),
-            'cx' => config('external-apis.google_search.cx'),
+            'key' => $key,
+            'cx' => $cx,
         ];
     }
 }

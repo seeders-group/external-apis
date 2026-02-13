@@ -6,6 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Majestic\Requests;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 
 class GetIndexItemInfo extends Request
 {
@@ -26,8 +27,14 @@ class GetIndexItemInfo extends Request
 
     protected function defaultQuery(): array
     {
+        $apiKey = config('external-apis.majestic.api_key');
+
+        if (empty($apiKey)) {
+            throw new MissingConfigurationException('external-apis.majestic.api_key');
+        }
+
         return [
-            'app_api_key' => config('external-apis.majestic.api_key'),
+            'app_api_key' => $apiKey,
             'cmd' => 'GetIndexItemInfo',
             'items' => 1,
             'item0' => str($this->domain)

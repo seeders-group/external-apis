@@ -7,6 +7,7 @@ namespace Seeders\ExternalApis\Integrations\Semrush\Requests;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewResponseData;
 use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
@@ -29,12 +30,18 @@ class BacklinksOverviewRequest extends Request
 
     protected function defaultQuery(): array
     {
+        $apiKey = config('external-apis.semrush.api_key');
+
+        if (empty($apiKey)) {
+            throw new MissingConfigurationException('external-apis.semrush.api_key');
+        }
+
         return [
             'type' => 'backlinks_overview',
             'target' => $this->target,
             'target_type' => $this->targetType,
             'export_columns' => $this->exportColumns,
-            'key' => config('external-apis.semrush.api_key'),
+            'key' => $apiKey,
         ];
     }
 

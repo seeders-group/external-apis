@@ -6,6 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Hunter;
 
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 
 class HunterConnector extends Connector
 {
@@ -40,8 +41,14 @@ class HunterConnector extends Connector
      */
     protected function defaultQuery(): array
     {
+        $apiKey = config('external-apis.hunter.api_key');
+
+        if (empty($apiKey)) {
+            throw new MissingConfigurationException('external-apis.hunter.api_key');
+        }
+
         return [
-            'api_key' => config('external-apis.hunter.api_key'),
+            'api_key' => $apiKey,
         ];
     }
 }

@@ -6,6 +6,7 @@ namespace Seeders\ExternalApis\Integrations\ScraperAPI\Requests;
 
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
+use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 
 class ScrapeRequest extends Request
 {
@@ -23,8 +24,14 @@ class ScrapeRequest extends Request
 
     protected function defaultQuery(): array
     {
+        $apiKey = config('external-apis.scraperapi.key');
+
+        if (empty($apiKey)) {
+            throw new MissingConfigurationException('external-apis.scraperapi.key');
+        }
+
         return [
-            'api_key' => config('external-apis.scraperapi.key'),
+            'api_key' => $apiKey,
             'url' => $this->url,
         ];
     }

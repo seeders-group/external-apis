@@ -135,7 +135,7 @@ class ApiUsageLog extends Model
 
     protected function getCostInDollarsAttribute(): string
     {
-        return '$'.number_format($this->estimated_cost, 4);
+        return '$'.number_format((float) $this->estimated_cost, 4);
     }
 
     protected function getIsReconciledAttribute(): bool
