@@ -59,6 +59,7 @@ function invokeConnectorOptionalMethod(object $instance, string $methodName): vo
 
     if (in_array($methodName, ['defaultHeaders', 'defaultConfig', 'defaultQuery'], true)) {
         expect($result)->toBeArray();
+
         return;
     }
 

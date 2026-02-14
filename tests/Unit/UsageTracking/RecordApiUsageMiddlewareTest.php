@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Saloon\Http\Response;
 use Saloon\Http\PendingRequest;
+use Saloon\Http\Response;
 use Saloon\Repositories\ArrayStore;
 use Seeders\ExternalApis\UsageTracking\Middleware\RecordApiUsage;
 
@@ -45,7 +45,7 @@ it('extracts zero cost and zero tokens correctly', function (): void {
 
     $responseWithCost = \Mockery::mock(Response::class);
     $pendingRequestForCost = \Mockery::mock(PendingRequest::class);
-    $headersForCost = new ArrayStore();
+    $headersForCost = new ArrayStore;
 
     $responseWithCost->shouldReceive('getPendingRequest')->andReturn($pendingRequestForCost);
     $pendingRequestForCost->shouldReceive('headers')->andReturn($headersForCost);
@@ -59,7 +59,7 @@ it('extracts zero cost and zero tokens correctly', function (): void {
 
     $responseWithTokens = \Mockery::mock(Response::class);
     $pendingRequestForTokens = \Mockery::mock(PendingRequest::class);
-    $headersForTokens = new ArrayStore();
+    $headersForTokens = new ArrayStore;
 
     $responseWithTokens->shouldReceive('getPendingRequest')->andReturn($pendingRequestForTokens);
     $pendingRequestForTokens->shouldReceive('headers')->andReturn($headersForTokens);
@@ -98,7 +98,7 @@ it('falls back to request counting when no consumption signals are present', fun
 
     $response = \Mockery::mock(Response::class);
     $pendingRequest = \Mockery::mock(PendingRequest::class);
-    $headers = new ArrayStore();
+    $headers = new ArrayStore;
 
     $response->shouldReceive('getPendingRequest')->andReturn($pendingRequest);
     $pendingRequest->shouldReceive('headers')->andReturn($headers);
