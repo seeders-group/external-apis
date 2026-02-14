@@ -27,6 +27,15 @@ class BudgetAlertService
             return;
         }
 
+        if (empty($budget->monthly_budget) || (float) $budget->monthly_budget <= 0.0) {
+            Log::warning('BudgetAlertService: Invalid monthly budget configured', [
+                'integration' => $integration,
+                'monthly_budget' => $budget->monthly_budget,
+            ]);
+
+            return;
+        }
+
         $monthToDateSpend = $this->getMonthToDateSpend($integration);
 
         $warningThresholdAmount = $this->calculateThresholdAmount(
@@ -235,7 +244,7 @@ class BudgetAlertService
 
         $status = $overBudget ? 'OVER BUDGET' : 'CRITICAL';
 
-        if ($integration === 'ahrefs') {
+        if (in_array($integration, ['ahrefs', 'semrush'], true)) {
             $currentDisplay = number_format($currentSpend).' units';
             $budgetDisplay = number_format($budget).' units';
             $remainingText = $overBudget
@@ -284,7 +293,7 @@ class BudgetAlertService
         $integrationName = strtoupper($integration);
         $month = now()->format('F Y');
 
-        if ($integration === 'ahrefs') {
+        if (in_array($integration, ['ahrefs', 'semrush'], true)) {
             $currentDisplay = number_format($currentSpend).' units';
             $budgetDisplay = number_format($budget).' units';
             $remainingDisplay = number_format($remaining).' units';
@@ -361,6 +370,13 @@ class BudgetAlertService
             return [
                 'status' => 'no_budget',
                 'message' => 'No budget configured',
+            ];
+        }
+
+        if (empty($budget->monthly_budget) || (float) $budget->monthly_budget <= 0.0) {
+            return [
+                'status' => 'invalid_budget',
+                'message' => 'Monthly budget must be greater than zero',
             ];
         }
 

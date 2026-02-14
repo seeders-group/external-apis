@@ -13,6 +13,10 @@ class RecordApiUsage
 {
     public function __invoke(Response $response): void
     {
+        if (! config('external-apis.usage_tracking.enabled', true)) {
+            return;
+        }
+
         try {
             $request = $response->getPendingRequest();
             $connector = $request->getConnector();
@@ -54,15 +58,18 @@ class RecordApiUsage
             ];
         }
 
-        if ($units = $response->header('x-api-units-cost-total-actual')) {
+        $units = $response->header('x-api-units-cost-total-actual');
+        if (! is_null($units) && $units !== '') {
             return ['value' => (float) $units, 'type' => 'units'];
         }
 
-        if ($cost = $this->safeJson($response, 'cost')) {
+        $cost = $this->safeJson($response, 'cost');
+        if (! is_null($cost) && is_numeric($cost)) {
             return ['value' => (float) $cost, 'type' => 'dollars'];
         }
 
-        if ($tokens = $this->safeJson($response, 'usage.total_tokens')) {
+        $tokens = $this->safeJson($response, 'usage.total_tokens');
+        if (! is_null($tokens) && is_numeric($tokens)) {
             return ['value' => (float) $tokens, 'type' => 'tokens'];
         }
 
@@ -77,7 +84,8 @@ class RecordApiUsage
             $metadata['usage'] = $usage;
         }
 
-        if ($unitsActual = $response->header('x-api-units-cost-total-actual')) {
+        $unitsActual = $response->header('x-api-units-cost-total-actual');
+        if (! is_null($unitsActual) && $unitsActual !== '') {
             $metadata['units'] = [
                 'actual' => (int) $unitsActual,
                 'limit_reset' => $response->header('x-api-units-limit-reset'),

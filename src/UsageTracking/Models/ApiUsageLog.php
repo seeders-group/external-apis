@@ -160,7 +160,7 @@ class ApiUsageLog extends Model
             return 0.0;
         }
 
-        $regularInputTokens = $totalPromptTokens - $totalCachedTokens;
+        $regularInputTokens = max(0, $totalPromptTokens - $totalCachedTokens);
         $inputCost = ($regularInputTokens / 1_000_000) * $pricing['input_per_1m_tokens'];
 
         $cachedCost = 0;

@@ -18,7 +18,8 @@ trait TracksApiUsage
 
     protected bool $trackingEnabled = false;
 
-    private bool $trackingBooted = false;
+    /** @var array<int, true> */
+    private array $trackingBootedRequestIds = [];
 
     /**
      * Create a connector instance with model tracking context.
@@ -75,12 +76,17 @@ trait TracksApiUsage
      */
     public function bootTracksApiUsage(PendingRequest $pendingRequest): void
     {
-        // Guard against double-booting when a wrapper trait uses this trait
-        // (Saloon's class_uses_recursive finds both traits with the same base name)
-        if ($this->trackingBooted) {
+        if (! config('external-apis.usage_tracking.enabled', true)) {
             return;
         }
-        $this->trackingBooted = true;
+
+        $requestId = spl_object_id($pendingRequest);
+
+        // Guard against double-booting when a wrapper trait uses this trait
+        // (Saloon's class_uses_recursive finds both traits with the same base name)
+        if (isset($this->trackingBootedRequestIds[$requestId])) {
+            return;
+        }
 
         if (! $this->trackingEnabled) {
             throw new RuntimeException(
@@ -93,6 +99,8 @@ trait TracksApiUsage
                 )
             );
         }
+
+        $this->trackingBootedRequestIds[$requestId] = true;
 
         if ($this->trackableModel !== null) {
             $pendingRequest->headers()->add('X-Seeders-Model-Type', $this->trackableModel->getMorphClass());

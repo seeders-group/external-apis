@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Seeders\ExternalApis\UsageTracking\Models\ApiBudgetConfig;
 use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
@@ -166,4 +169,81 @@ it('uses units for semrush budget calculations', function (): void {
 
     // Should use total_tokens (units) not estimated_cost
     expect($status['current_spend'])->toBe(40.0);
+});
+
+it('sends warning and critical alerts with monthly cache guards', function (): void {
+    ApiBudgetConfig::create([
+        'integration' => 'openai',
+        'monthly_budget' => 100.0,
+        'warning_threshold' => 50,
+        'critical_threshold' => 75,
+        'alert_enabled' => true,
+        'google_chat_webhook_url' => 'https://chat.example/webhook',
+        'is_active' => true,
+    ]);
+
+    Http::fake([
+        '*' => Http::response(['ok' => true], 200),
+    ]);
+
+    Log::spy();
+
+    ApiUsageLog::create([
+        'integration' => 'openai',
+        'estimated_cost' => 60.0,
+        'actual_cost' => 60.0,
+        'feature' => 'test',
+        'status' => 'success',
+    ]);
+
+    $service = new BudgetAlertService;
+    $service->checkAndAlert('openai');
+    $service->checkAndAlert('openai');
+
+    expect(Cache::has('budget_alert_warning_openai_'.now()->format('Y-m')))->toBeTrue();
+    Http::assertSentCount(1);
+
+    ApiUsageLog::query()->update(['actual_cost' => 90.0]);
+    Cache::forget('budget_alert_warning_openai_'.now()->format('Y-m'));
+
+    $service->checkAndAlert('openai');
+
+    expect(Cache::has('budget_alert_critical_openai_'.now()->format('Y-m')))->toBeTrue();
+    Http::assertSentCount(2);
+});
+
+it('handles disabled alerts and missing webhook safely', function (): void {
+    ApiBudgetConfig::create([
+        'integration' => 'dataforseo',
+        'monthly_budget' => 100.0,
+        'warning_threshold' => 80,
+        'critical_threshold' => 90,
+        'alert_enabled' => false,
+        'google_chat_webhook_url' => null,
+        'is_active' => true,
+    ]);
+
+    Http::fake();
+    Log::spy();
+
+    ApiUsageLog::create([
+        'integration' => 'dataforseo',
+        'estimated_cost' => 95.0,
+        'actual_cost' => 95.0,
+        'feature' => 'test',
+        'status' => 'success',
+    ]);
+
+    $service = new BudgetAlertService;
+    $service->checkAndAlert('dataforseo');
+
+    Http::assertNothingSent();
+
+    ApiBudgetConfig::query()->where('integration', 'dataforseo')->update([
+        'alert_enabled' => true,
+    ]);
+
+    $service->checkAndAlert('dataforseo');
+
+    Http::assertNothingSent();
 });

@@ -103,7 +103,7 @@ class OpenAIUsageTrackerService
             return 0.0;
         }
 
-        $regularInputTokens = $promptTokens - $cachedTokens;
+        $regularInputTokens = max(0, $promptTokens - $cachedTokens);
         $inputCost = ($regularInputTokens / 1_000_000) * $pricing['input_per_1m_tokens'];
 
         $cachedCost = 0;
@@ -164,6 +164,14 @@ class OpenAIUsageTrackerService
                 'status' => 'no_budget',
                 'percentage' => 0,
                 'message' => 'No budget configured',
+            ];
+        }
+
+        if (empty($budget->monthly_budget) || (float) $budget->monthly_budget <= 0.0) {
+            return [
+                'status' => 'invalid_budget',
+                'percentage' => 0,
+                'message' => 'Monthly budget must be greater than zero',
             ];
         }
 

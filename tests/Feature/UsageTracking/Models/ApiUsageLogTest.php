@@ -6,6 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Seeders\ExternalApis\UsageTracking\Models\AiModelPricing;
 use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
+use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
 beforeEach(function (): void {
     Schema::dropIfExists('api_usage_logs');
@@ -200,4 +201,44 @@ it('returns zero cost for unknown model', function (): void {
     $cost = ApiUsageLog::calculateCostFromTokens('unknown-model', 1000, 500);
 
     expect($cost)->toBe(0.0);
+});
+
+it('calculates total cost from grouped logs', function (): void {
+    AiModelPricing::create([
+        'integration' => 'openai',
+        'model' => 'gpt-4o',
+        'input_per_1m_tokens' => 2.5,
+        'output_per_1m_tokens' => 10.0,
+        'cached_input_per_1m_tokens' => 1.25,
+    ]);
+
+    $logs = collect([
+        ApiUsageLog::make([
+            'model' => 'gpt-4o',
+            'prompt_tokens' => 500,
+            'completion_tokens' => 250,
+            'input_cached_tokens' => 100,
+        ]),
+        ApiUsageLog::make([
+            'model' => 'gpt-4o',
+            'prompt_tokens' => 500,
+            'completion_tokens' => 250,
+            'input_cached_tokens' => 200,
+        ]),
+    ]);
+
+    $cost = ApiUsageLog::calculateTotalCostFromLogs($logs);
+
+    expect($cost)->toBe(0.007125);
+});
+
+it('defines user relation', function (): void {
+    $userModelClass = get_class(new class extends \Illuminate\Database\Eloquent\Model {});
+    UsageTracking::useUserModel($userModelClass);
+
+    $log = new ApiUsageLog;
+
+    $relation = $log->user();
+
+    expect($relation->getForeignKeyName())->toBe('user_id');
 });

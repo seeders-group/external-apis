@@ -31,6 +31,10 @@ class SemrushConnector extends Connector
     #[Override]
     public function boot(PendingRequest $pendingRequest): void
     {
+        if (! config('external-apis.usage_tracking.enabled', true)) {
+            return;
+        }
+
         $saloonRequest = $pendingRequest->getRequest();
         $usageResolver = resolve(SemrushUsageResolver::class);
         $usage = $usageResolver->resolve($saloonRequest);
