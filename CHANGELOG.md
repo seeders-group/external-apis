@@ -2,6 +2,19 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.0.1 - 2026-03-02
+
+### What's Changed
+
+* Update openai-php/client requirement from ^0.16 to ^0.19 by @dependabot[bot] in https://github.com/seeders-group/external-apis/pull/3
+* Refactor Semrush batch input to DTO targets by @MikeCVermeer in https://github.com/seeders-group/external-apis/pull/4
+
+### New Contributors
+
+* @dependabot[bot] made their first contribution in https://github.com/seeders-group/external-apis/pull/3
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.0.0...v1.0.1
+
 ## v1.0.0 - 2026-02-13
 
 ### Added
