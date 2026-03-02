@@ -13,8 +13,8 @@ use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonRequestData;
-use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
 use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
 class BatchComparisonRequest extends Request
