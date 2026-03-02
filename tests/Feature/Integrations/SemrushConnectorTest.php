@@ -6,7 +6,9 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Seeders\ExternalApis\Integrations\Semrush\Data\ApiUnitsBalanceResponseData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
@@ -70,6 +72,54 @@ it('builds batch comparison query correctly', function (): void {
     expect($query)->not->toHaveKey('database');
     expect($query)->not->toHaveKey('display_limit');
     expect($query)->not->toHaveKey('display_offset');
+});
+
+it('builds batch comparison query from target data objects', function (): void {
+    $request = new BatchComparisonRequest(
+        targets: [
+            new BatchComparisonTargetData(target: 'example.com'),
+            new BatchComparisonTargetData(target: 'example.org', targetType: 'url'),
+        ],
+        exportColumns: 'target,ascore,total',
+    );
+
+    $reflection = new ReflectionClass($request);
+    $method = $reflection->getMethod('defaultQuery');
+
+    $query = $method->invoke($request);
+
+    expect($query)->toMatchArray([
+        'type' => 'backlinks_comparison',
+        'targets' => ['example.com', 'example.org'],
+        'target_types' => ['root_domain', 'url'],
+        'export_columns' => 'target,ascore,total',
+        'key' => 'test-semrush-key',
+    ]);
+});
+
+it('builds batch comparison query from request data object', function (): void {
+    $request = new BatchComparisonRequest(
+        targets: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org'),
+            ],
+            exportColumns: 'target,ascore,total',
+        )
+    );
+
+    $reflection = new ReflectionClass($request);
+    $method = $reflection->getMethod('defaultQuery');
+
+    $query = $method->invoke($request);
+
+    expect($query)->toMatchArray([
+        'type' => 'backlinks_comparison',
+        'targets' => ['example.com', 'example.org'],
+        'target_types' => ['root_domain', 'root_domain'],
+        'export_columns' => 'target,ascore,total',
+        'key' => 'test-semrush-key',
+    ]);
 });
 
 it('serializes batch comparison targets with bracket notation (no indexes)', function (): void {

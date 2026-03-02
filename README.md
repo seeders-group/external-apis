@@ -83,7 +83,7 @@ use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 
 // Semrush requires tracking context
-$connector = SemrushConnector::forScope('seo_audit');
+$connector = SemrushConnector::forModel($project, 'seo_audit');
 $response = $connector->send(new BacklinksOverviewRequest(
     target: 'example.com',
     targetType: 'root_domain',
@@ -111,8 +111,21 @@ $response = Ahrefs::send(new DomainRatingRequest('example.com'));
 use Seeders\ExternalApis\Facades\Semrush;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 
-$response = Semrush::withScope('seo_audit')->send(new ApiUnitsBalanceRequest);
+$response = Semrush::withTracking($project, 'seo_audit')->send(new ApiUnitsBalanceRequest);
 $unitsBalance = $response->dtoOrFail()->units;
+```
+
+```php
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
+use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
+
+$response = $connector->send(new BatchComparisonRequest(
+    targets: [
+        new BatchComparisonTargetData(target: 'example.com'),
+        new BatchComparisonTargetData(target: 'example.org', targetType: 'url'),
+    ],
+    exportColumns: 'target,ascore,total',
+));
 ```
 
 ## Available Integrations

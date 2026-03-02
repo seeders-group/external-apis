@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Saloon\Enums\Method;
@@ -129,6 +130,29 @@ it('records api_log and api_usage_log for backlinks overview', function (): void
     expect($usageLog->status)->toBe('success');
     expect($usageLog->total_tokens)->toBe(40);
     expect((float) $usageLog->estimated_cost)->toBe(0.002);
+});
+
+it('records trackable model metadata in api_logs when using forModel', function (): void {
+    $model = new SemrushTrackableModel;
+    $model->setAttribute($model->getKeyName(), 42);
+    $model->exists = true;
+
+    $connector = SemrushConnector::forModel($model, 'semrush_tracking_test');
+    $connector->withMockClient(new MockClient([
+        BacklinksOverviewRequest::class => MockResponse::make("domain;ascore;backlinks\nexample.com;12;100", 200),
+    ]));
+
+    $connector->send(new BacklinksOverviewRequest(
+        target: 'example.com',
+        targetType: 'root_domain',
+        exportColumns: 'ascore,total,domains_num',
+    ));
+
+    $apiLog = ApiLog::query()->latest()->first();
+
+    expect($apiLog->trackable_type)->toBe($model->getMorphClass());
+    expect((int) $apiLog->trackable_id)->toBe(42);
+    expect($apiLog->scope)->toBe('semrush_tracking_test');
 });
 
 it('records batch comparison units as 40 per target domain', function (): void {
@@ -269,4 +293,9 @@ class UnsupportedSemrushRequest extends Request
             'key' => 'test-semrush-key',
         ];
     }
+}
+
+class SemrushTrackableModel extends Model
+{
+    protected $table = 'projects';
 }
