@@ -38,7 +38,7 @@ class BatchComparisonRequest extends Request
     public ?int $displayOffset;
 
     /**
-     * @param  array<int, string|BatchComparisonTargetData>|BatchComparisonRequestData  $targets
+     * @param  array<int, mixed>|BatchComparisonRequestData  $targets
      * @param  array<int, string>|null  $targetTypes
      */
     public function __construct(
@@ -120,7 +120,7 @@ class BatchComparisonRequest extends Request
         $targets = [];
         $targetTypes = [];
 
-        foreach ($data->targets as $index => $target) {
+        foreach ($data->targets as $target) {
             if ($target instanceof BatchComparisonTargetData) {
                 $targets[] = $target->target;
                 $targetTypes[] = $target->targetType;
@@ -128,27 +128,15 @@ class BatchComparisonRequest extends Request
                 continue;
             }
 
-            if (is_string($target)) {
-                $targets[] = $target;
-                $targetTypes[] = 'root_domain';
-
-                continue;
-            }
-
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Target at index %d must be a string or an instance of %s.',
-                    $index,
-                    BatchComparisonTargetData::class
-                )
-            );
+            $targets[] = $target;
+            $targetTypes[] = 'root_domain';
         }
 
         return [$targets, $targetTypes];
     }
 
     /**
-     * @param  array<int, string|BatchComparisonTargetData>  $targets
+     * @param  array<int, mixed>  $targets
      * @param  array<int, string>|null  $targetTypes
      * @return array{0: array<int, string>, 1: array<int, string>}
      */
@@ -163,21 +151,19 @@ class BatchComparisonRequest extends Request
                 throw new InvalidArgumentException('Targets and target types must have the same number of items.');
             }
 
-            return [
-                array_map(
-                    static function (string|BatchComparisonTargetData $target): string {
-                        if (! is_string($target)) {
-                            throw new InvalidArgumentException(
-                                'When targetTypes are provided, targets must be an array of strings.'
-                            );
-                        }
+            $normalizedTargets = [];
 
-                        return $target;
-                    },
-                    $targets
-                ),
-                $targetTypes,
-            ];
+            foreach ($targets as $target) {
+                if (! is_string($target)) {
+                    throw new InvalidArgumentException(
+                        'When targetTypes are provided, targets must be an array of strings.'
+                    );
+                }
+
+                $normalizedTargets[] = $target;
+            }
+
+            return [$normalizedTargets, $targetTypes];
         }
 
         $normalizedTargets = [];

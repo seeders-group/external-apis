@@ -9,12 +9,19 @@ use Spatie\LaravelData\Data;
 class BatchComparisonRequestData extends Data
 {
     /**
-     * @param  array<int, BatchComparisonTargetData>  $targets
+     * @var array<int, BatchComparisonTargetData|string>
+     */
+    public array $targets;
+
+    /**
+     * @param  array<int, BatchComparisonTargetData|string>  $targets
      */
     public function __construct(
-        public array $targets,
+        array $targets,
         public string $exportColumns = 'target,ascore,total',
         public ?int $displayLimit = null,
         public ?int $displayOffset = null,
-    ) {}
+    ) {
+        $this->targets = $targets;
+    }
 }
