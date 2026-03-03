@@ -31,11 +31,13 @@ Since this is a private package, add the repository to your `composer.json`:
 php artisan vendor:publish --tag=external-apis-config
 ```
 
-### Publish Migrations
+### Publish Migrations (Optional)
 
 ```bash
 php artisan vendor:publish --tag=external-apis-migrations
 ```
+
+Migrations are auto-loaded by the package, so publishing is only needed if you want to customize the files in your app.
 
 ## Configuration
 
@@ -160,11 +162,16 @@ $response = $connector->send(new BatchComparisonRequest(
 
 ## Usage Tracking
 
-The package includes a built-in usage tracking system for monitoring API costs. Publish the migrations to get started:
+The package includes a built-in usage tracking system for monitoring API costs. Run migrations to get started:
+
+```bash
+php artisan migrate
+```
+
+If you need to edit migration files in your app, publish them first:
 
 ```bash
 php artisan vendor:publish --tag=external-apis-migrations
-php artisan migrate
 ```
 
 ### Automatic Tracking via Traits
