@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Seeders\ExternalApis\Integrations\Semrush\Data\ApiUnitsBalanceResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewResponseData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
@@ -22,11 +23,13 @@ it('resolves the correct base url', function (): void {
 
 it('builds backlinks overview query correctly', function (): void {
     $request = new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'ascore,total,domains_num',
-        displayLimit: 10,
-        displayOffset: 0,
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'ascore,total,domains_num',
+            displayLimit: 10,
+            displayOffset: 0,
+        ),
     );
 
     $reflection = new ReflectionClass($request);
@@ -161,9 +164,11 @@ it('maps backlinks overview csv response into dto', function (): void {
     ]));
 
     $response = $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'domain,ascore,backlinks',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'domain,ascore,backlinks',
+        ),
     ));
 
     $dto = $response->dtoOrFail();
@@ -214,9 +219,11 @@ it('auto-detects comma delimiter for semrush csv parsing', function (): void {
     ]));
 
     $response = $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'domain,ascore,backlinks',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'domain,ascore,backlinks',
+        ),
     ));
 
     $dto = $response->dtoOrFail();
@@ -234,9 +241,11 @@ it('returns an empty dto for empty semrush csv body', function (): void {
     ]));
 
     $response = $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'domain,ascore,backlinks',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'domain,ascore,backlinks',
+        ),
     ));
 
     $dto = $response->dtoOrFail();
@@ -253,9 +262,11 @@ it('throws when semrush csv row has mismatched column count', function (): void 
     ]));
 
     $response = $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'domain,ascore,backlinks',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'domain,ascore,backlinks',
+        ),
     ));
 
     expect(fn (): mixed => $response->dtoOrFail())->toThrow(RuntimeException::class);
@@ -268,9 +279,11 @@ it('throws when semrush csv headers contain duplicates', function (): void {
     ]));
 
     $response = $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'domain,ascore,backlinks',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'domain,ascore,backlinks',
+        ),
     ));
 
     expect(fn (): mixed => $response->dtoOrFail())->toThrow(RuntimeException::class);

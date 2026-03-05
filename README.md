@@ -82,14 +82,17 @@ $domainRating = $response->json('domain_rating.domain_rating');
 
 ```php
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 
 // Semrush requires tracking context
 $connector = SemrushConnector::forModel($project, 'seo_audit');
 $response = $connector->send(new BacklinksOverviewRequest(
-    target: 'example.com',
-    targetType: 'root_domain',
-    exportColumns: 'ascore,total,domains_num',
+    data: new BacklinksOverviewRequestData(
+        target: 'example.com',
+        targetType: 'root_domain',
+        exportColumns: 'ascore,total,domains_num',
+    ),
 ));
 
 // Parsed DTO (Saloon-native)
