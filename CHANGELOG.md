@@ -2,6 +2,10 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.0.5 - 2026-03-05
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.0.4...v1.0.5
+
 ## v1.0.4 - 2026-03-05
 
 **Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.0.3...v1.0.4
