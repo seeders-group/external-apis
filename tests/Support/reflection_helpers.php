@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Date;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Date;
 use Spatie\LaravelData\Data;
 
 if (! function_exists('instantiateClass')) {

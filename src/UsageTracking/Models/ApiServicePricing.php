@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Pricing configuration for credit/unit-based API services (Ahrefs, DataForSEO, etc.)

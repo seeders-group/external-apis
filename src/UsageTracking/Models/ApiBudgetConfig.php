@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
