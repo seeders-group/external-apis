@@ -15,5 +15,6 @@ class AnchorsRequestData extends Data
         public int $limit = 1000,
         public string|Carbon $history = 'all_time',
         public string $order_by = 'refdomains',
+        public string $mode = 'subdomains',
     ) {}
 }

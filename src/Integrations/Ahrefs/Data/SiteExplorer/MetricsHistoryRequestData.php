@@ -15,5 +15,6 @@ class MetricsHistoryRequestData extends Data
         public string $target,
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public Carbon $date_from,
+        public string $mode = 'subdomains',
     ) {}
 }
