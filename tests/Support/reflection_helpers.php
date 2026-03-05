@@ -2,17 +2,22 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
+use Carbon\CarbonImmutable;
+use Spatie\LaravelData\Data;
+
 if (! function_exists('instantiateClass')) {
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     function instantiateClass(string $class, int $depth = 0): object
     {
         if ($depth > 6) {
-            throw new \RuntimeException("Exceeded max reflection depth while building {$class}");
+            throw new RuntimeException("Exceeded max reflection depth while building {$class}");
         }
 
-        $reflection = new \ReflectionClass($class);
+        $reflection = new ReflectionClass($class);
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null || $constructor->getNumberOfRequiredParameters() === 0) {
@@ -31,9 +36,9 @@ if (! function_exists('instantiateClass')) {
 
 if (! function_exists('valueForParameter')) {
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    function valueForParameter(\ReflectionParameter $parameter, int $depth): mixed
+    function valueForParameter(ReflectionParameter $parameter, int $depth): mixed
     {
         if ($parameter->isDefaultValueAvailable()) {
             return $parameter->getDefaultValue();
@@ -51,19 +56,19 @@ if (! function_exists('valueForParameter')) {
 
 if (! function_exists('valueForType')) {
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    function valueForType(\ReflectionType $type, \ReflectionParameter $parameter, int $depth): mixed
+    function valueForType(ReflectionType $type, ReflectionParameter $parameter, int $depth): mixed
     {
-        if ($type instanceof \ReflectionUnionType) {
+        if ($type instanceof ReflectionUnionType) {
             foreach ($type->getTypes() as $unionType) {
-                if ($unionType instanceof \ReflectionNamedType && $unionType->getName() === 'null') {
+                if ($unionType instanceof ReflectionNamedType && $unionType->getName() === 'null') {
                     continue;
                 }
 
                 try {
                     return valueForType($unionType, $parameter, $depth);
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     continue;
                 }
             }
@@ -71,11 +76,11 @@ if (! function_exists('valueForType')) {
             return null;
         }
 
-        if ($type instanceof \ReflectionIntersectionType) {
+        if ($type instanceof ReflectionIntersectionType) {
             return null;
         }
 
-        if (! $type instanceof \ReflectionNamedType) {
+        if (! $type instanceof ReflectionNamedType) {
             return null;
         }
 
@@ -104,23 +109,23 @@ if (! function_exists('valueForType')) {
             return null;
         }
 
-        if (is_subclass_of($className, \DateTimeInterface::class)) {
-            if (is_a($className, \Carbon\Carbon::class, true)) {
-                return \Carbon\Carbon::now();
+        if (is_subclass_of($className, DateTimeInterface::class)) {
+            if (is_a($className, Carbon::class, true)) {
+                return Date::now();
             }
 
-            if (is_a($className, \Carbon\CarbonImmutable::class, true)) {
-                return \Carbon\CarbonImmutable::now();
+            if (is_a($className, CarbonImmutable::class, true)) {
+                return CarbonImmutable::now();
             }
 
-            return new \DateTimeImmutable;
+            return new DateTimeImmutable;
         }
 
-        if (is_subclass_of($className, \Spatie\LaravelData\Data::class)) {
+        if (is_subclass_of($className, Data::class)) {
             return instantiateClass($className, $depth + 1);
         }
 
-        $classReflection = new \ReflectionClass($className);
+        $classReflection = new ReflectionClass($className);
 
         if ($classReflection->isInstantiable()) {
             return instantiateClass($className, $depth + 1);

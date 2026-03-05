@@ -22,7 +22,7 @@ dataset('integration connector classes', function (): array {
             continue;
         }
 
-        if (is_subclass_of($class, Connector::class) && ! (new \ReflectionClass($class))->isAbstract()) {
+        if (is_subclass_of($class, Connector::class) && ! new ReflectionClass($class)->isAbstract()) {
             $classes[$class] = [$class];
         }
     }
@@ -53,8 +53,7 @@ function invokeConnectorOptionalMethod(object $instance, string $methodName): vo
         return;
     }
 
-    $method = new \ReflectionMethod($instance, $methodName);
-    $method->setAccessible(true);
+    $method = new ReflectionMethod($instance, $methodName);
     $result = $method->invoke($instance);
 
     if (in_array($methodName, ['defaultHeaders', 'defaultConfig', 'defaultQuery'], true)) {

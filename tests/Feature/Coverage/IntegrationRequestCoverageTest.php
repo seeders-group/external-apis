@@ -9,8 +9,8 @@ dataset('integration request classes', function (): array {
 
     $classes = [];
 
-    $iterator = new \RecursiveIteratorIterator(
-        new \RecursiveDirectoryIterator($root.'/src/Integrations')
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($root.'/src/Integrations')
     );
 
     foreach ($iterator as $fileInfo) {
@@ -19,11 +19,13 @@ dataset('integration request classes', function (): array {
         }
 
         $file = $fileInfo->getPathname();
-
-        if (! str_contains($file, '/Requests/') || ! str_ends_with($file, '.php')) {
+        if (! str_contains((string) $file, '/Requests/')) {
             continue;
         }
-        $relativePath = substr($file, strlen($root.'/src/'));
+        if (! str_ends_with((string) $file, '.php')) {
+            continue;
+        }
+        $relativePath = substr((string) $file, strlen($root.'/src/'));
         $class = 'Seeders\\ExternalApis\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($class)) {
@@ -34,7 +36,7 @@ dataset('integration request classes', function (): array {
             continue;
         }
 
-        if (is_subclass_of($class, Request::class) && ! (new \ReflectionClass($class))->isAbstract()) {
+        if (is_subclass_of($class, Request::class) && ! new ReflectionClass($class)->isAbstract()) {
             $classes[$class] = [$class];
         }
     }
@@ -60,14 +62,13 @@ function invokeOptionalMethod(object $instance, string $methodName): void
         return;
     }
 
-    $method = new \ReflectionMethod($instance, $methodName);
-    $method->setAccessible(true);
+    $method = new ReflectionMethod($instance, $methodName);
 
     try {
         $result = $method->invoke($instance);
 
         expect($result)->toBeArray();
-    } catch (\TypeError $e) {
+    } catch (TypeError $e) {
         if (! str_contains($e->getMessage(), 'TransformationContext::__construct')) {
             throw $e;
         }

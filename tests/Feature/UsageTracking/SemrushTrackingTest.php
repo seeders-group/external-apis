@@ -10,6 +10,8 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonRequestData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
@@ -162,9 +164,14 @@ it('records batch comparison units as 40 per target domain', function (): void {
     ]));
 
     $connector->send(new BatchComparisonRequest(
-        targets: ['example.com', 'example.org', 'example.net'],
-        targetTypes: ['root_domain', 'root_domain', 'root_domain'],
-        exportColumns: 'target,ascore,total',
+        data: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org'),
+                new BatchComparisonTargetData(target: 'example.net'),
+            ],
+            exportColumns: 'target,ascore,total',
+        ),
     ));
 
     $apiLog = ApiLog::query()->latest()->first();

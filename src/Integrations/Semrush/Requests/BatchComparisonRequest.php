@@ -31,36 +31,30 @@ class BatchComparisonRequest extends Request
      */
     public array $targetTypes;
 
-    public string $exportColumns;
-
-    public ?int $displayLimit;
-
-    public ?int $displayOffset;
-
-    /**
-     * @param  array<int, mixed>|BatchComparisonRequestData  $targets
-     * @param  array<int, string>|null  $targetTypes
-     */
     public function __construct(
-        array|BatchComparisonRequestData $targets,
-        ?array $targetTypes = null,
-        ?string $exportColumns = null,
-        ?int $displayLimit = null,
-        ?int $displayOffset = null,
+        public readonly BatchComparisonRequestData $data,
     ) {
-        if ($targets instanceof BatchComparisonRequestData) {
-            [$this->targets, $this->targetTypes] = $this->normalizeFromData($targets);
-            $this->exportColumns = $exportColumns ?? $targets->exportColumns;
-            $this->displayLimit = $displayLimit ?? $targets->displayLimit;
-            $this->displayOffset = $displayOffset ?? $targets->displayOffset;
-
-            return;
+        if ($data->targets === []) {
+            throw new InvalidArgumentException('Targets array cannot be empty.');
         }
 
-        [$this->targets, $this->targetTypes] = $this->normalizeFromArrays($targets, $targetTypes);
-        $this->exportColumns = $exportColumns ?? 'target,ascore,total';
-        $this->displayLimit = $displayLimit;
-        $this->displayOffset = $displayOffset;
+        $targets = [];
+        $targetTypes = [];
+
+        foreach ($data->targets as $target) {
+            if ($target instanceof BatchComparisonTargetData) {
+                $targets[] = $target->target;
+                $targetTypes[] = $target->targetType;
+
+                continue;
+            }
+
+            $targets[] = $target;
+            $targetTypes[] = 'root_domain';
+        }
+
+        $this->targets = $targets;
+        $this->targetTypes = $targetTypes;
     }
 
     public function resolveEndpoint(): string
@@ -80,7 +74,7 @@ class BatchComparisonRequest extends Request
             'type' => 'backlinks_comparison',
             'targets' => $this->targets,
             'target_types' => $this->targetTypes,
-            'export_columns' => $this->exportColumns,
+            'export_columns' => $this->data->exportColumns,
             'key' => $apiKey,
         ];
     }
@@ -106,87 +100,5 @@ class BatchComparisonRequest extends Request
         $query = preg_replace('/target_types(?:%5B|\\[)\\d+(?:%5D|\\])=/i', 'target_types%5B%5D=', $query) ?? $query;
 
         return $request->withUri($uri->withQuery($query));
-    }
-
-    /**
-     * @return array{0: array<int, string>, 1: array<int, string>}
-     */
-    private function normalizeFromData(BatchComparisonRequestData $data): array
-    {
-        if ($data->targets === []) {
-            throw new InvalidArgumentException('Targets array cannot be empty.');
-        }
-
-        $targets = [];
-        $targetTypes = [];
-
-        foreach ($data->targets as $target) {
-            if ($target instanceof BatchComparisonTargetData) {
-                $targets[] = $target->target;
-                $targetTypes[] = $target->targetType;
-
-                continue;
-            }
-
-            $targets[] = $target;
-            $targetTypes[] = 'root_domain';
-        }
-
-        return [$targets, $targetTypes];
-    }
-
-    /**
-     * @param  array<int, mixed>  $targets
-     * @param  array<int, string>|null  $targetTypes
-     * @return array{0: array<int, string>, 1: array<int, string>}
-     */
-    private function normalizeFromArrays(array $targets, ?array $targetTypes): array
-    {
-        if ($targets === []) {
-            throw new InvalidArgumentException('Targets array cannot be empty.');
-        }
-
-        if ($targetTypes !== null) {
-            if (count($targets) !== count($targetTypes)) {
-                throw new InvalidArgumentException('Targets and target types must have the same number of items.');
-            }
-
-            $normalizedTargets = [];
-
-            foreach ($targets as $target) {
-                if (! is_string($target)) {
-                    throw new InvalidArgumentException(
-                        'When targetTypes are provided, targets must be an array of strings.'
-                    );
-                }
-
-                $normalizedTargets[] = $target;
-            }
-
-            return [$normalizedTargets, $targetTypes];
-        }
-
-        $normalizedTargets = [];
-        $normalizedTargetTypes = [];
-
-        foreach ($targets as $target) {
-            if ($target instanceof BatchComparisonTargetData) {
-                $normalizedTargets[] = $target->target;
-                $normalizedTargetTypes[] = $target->targetType;
-
-                continue;
-            }
-
-            if (is_string($target)) {
-                $normalizedTargets[] = $target;
-                $normalizedTargetTypes[] = 'root_domain';
-
-                continue;
-            }
-
-            throw new InvalidArgumentException('Targets must be strings or BatchComparisonTargetData instances.');
-        }
-
-        return [$normalizedTargets, $normalizedTargetTypes];
     }
 }

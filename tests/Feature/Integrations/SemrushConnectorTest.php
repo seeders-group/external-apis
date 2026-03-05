@@ -49,11 +49,15 @@ it('builds backlinks overview query correctly', function (): void {
 
 it('builds batch comparison query correctly', function (): void {
     $request = new BatchComparisonRequest(
-        targets: ['example.com', 'example.org'],
-        targetTypes: ['root_domain', 'root_domain'],
-        exportColumns: 'target,ascore,total',
-        displayLimit: 20,
-        displayOffset: 5,
+        data: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org'),
+            ],
+            exportColumns: 'target,ascore,total',
+            displayLimit: 20,
+            displayOffset: 5,
+        ),
     );
 
     $reflection = new ReflectionClass($request);
@@ -74,13 +78,15 @@ it('builds batch comparison query correctly', function (): void {
     expect($query)->not->toHaveKey('display_offset');
 });
 
-it('builds batch comparison query from target data objects', function (): void {
+it('builds batch comparison query from target data objects with mixed types', function (): void {
     $request = new BatchComparisonRequest(
-        targets: [
-            new BatchComparisonTargetData(target: 'example.com'),
-            new BatchComparisonTargetData(target: 'example.org', targetType: 'url'),
-        ],
-        exportColumns: 'target,ascore,total',
+        data: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org', targetType: 'url'),
+            ],
+            exportColumns: 'target,ascore,total',
+        ),
     );
 
     $reflection = new ReflectionClass($request);
@@ -97,31 +103,6 @@ it('builds batch comparison query from target data objects', function (): void {
     ]);
 });
 
-it('builds batch comparison query from request data object', function (): void {
-    $request = new BatchComparisonRequest(
-        targets: new BatchComparisonRequestData(
-            targets: [
-                new BatchComparisonTargetData(target: 'example.com'),
-                new BatchComparisonTargetData(target: 'example.org'),
-            ],
-            exportColumns: 'target,ascore,total',
-        )
-    );
-
-    $reflection = new ReflectionClass($request);
-    $method = $reflection->getMethod('defaultQuery');
-
-    $query = $method->invoke($request);
-
-    expect($query)->toMatchArray([
-        'type' => 'backlinks_comparison',
-        'targets' => ['example.com', 'example.org'],
-        'target_types' => ['root_domain', 'root_domain'],
-        'export_columns' => 'target,ascore,total',
-        'key' => 'test-semrush-key',
-    ]);
-});
-
 it('serializes batch comparison targets with bracket notation (no indexes)', function (): void {
     $mockClient = new MockClient([
         BatchComparisonRequest::class => MockResponse::make("target;metric\nexample.com;10\nexample.org;20", 200),
@@ -131,9 +112,13 @@ it('serializes batch comparison targets with bracket notation (no indexes)', fun
     $connector->withMockClient($mockClient);
 
     $response = $connector->send(new BatchComparisonRequest(
-        targets: ['example.com', 'example.org'],
-        targetTypes: ['root_domain', 'root_domain'],
-        exportColumns: 'target,ascore,total',
+        data: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org'),
+            ],
+            exportColumns: 'target,ascore,total',
+        ),
     ));
 
     $query = $response->getPsrRequest()->getUri()->getQuery();
@@ -145,11 +130,12 @@ it('serializes batch comparison targets with bracket notation (no indexes)', fun
     expect($query)->not->toContain('target_types%5B0%5D=');
 });
 
-it('rejects batch comparison when target counts mismatch', function (): void {
+it('rejects batch comparison when targets are empty', function (): void {
     expect(fn (): BatchComparisonRequest => new BatchComparisonRequest(
-        targets: ['example.com', 'example.org'],
-        targetTypes: ['root_domain'],
-        exportColumns: 'domain,ascore,backlinks',
+        data: new BatchComparisonRequestData(
+            targets: [],
+            exportColumns: 'domain,ascore,backlinks',
+        ),
     ))->toThrow(InvalidArgumentException::class);
 });
 
@@ -201,9 +187,13 @@ it('maps batch comparison csv response into dto', function (): void {
     ]));
 
     $response = $connector->send(new BatchComparisonRequest(
-        targets: ['example.com', 'example.org'],
-        targetTypes: ['root_domain', 'root_domain'],
-        exportColumns: 'target,metric',
+        data: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org'),
+            ],
+            exportColumns: 'target,metric',
+        ),
     ));
 
     $dto = $response->dtoOrFail();

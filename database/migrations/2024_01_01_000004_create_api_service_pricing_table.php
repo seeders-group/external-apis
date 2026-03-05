@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('api_service_pricing', function (Blueprint $table) {
+        Schema::create('api_service_pricing', function (Blueprint $table): void {
             $table->id();
             $table->string('integration');
             $table->string('endpoint')->nullable();

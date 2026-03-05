@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -13,8 +14,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property float $input_per_1m_tokens
  * @property float $output_per_1m_tokens
  * @property float|null $cached_input_per_1m_tokens
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class AiModelPricing extends Model
 {

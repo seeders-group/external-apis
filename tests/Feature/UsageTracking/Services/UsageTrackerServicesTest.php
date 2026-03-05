@@ -85,7 +85,7 @@ beforeEach(function (): void {
 });
 
 afterEach(function (): void {
-    \Mockery::close();
+    Mockery::close();
 });
 
 it('tracks openai requests, errors, and budget thresholds', function (): void {
@@ -136,8 +136,8 @@ it('tracks ahrefs usage and logs warning when budget check fails', function (): 
         'is_active' => true,
     ]);
 
-    $budgetAlertMock = \Mockery::mock(BudgetAlertService::class);
-    $budgetAlertMock->shouldReceive('checkAndAlert')->once()->andThrow(new \RuntimeException('boom'));
+    $budgetAlertMock = Mockery::mock(BudgetAlertService::class);
+    $budgetAlertMock->shouldReceive('checkAndAlert')->once()->andThrow(new RuntimeException('boom'));
     app()->instance(BudgetAlertService::class, $budgetAlertMock);
 
     Log::shouldReceive('warning')
@@ -155,7 +155,7 @@ it('tracks ahrefs usage and logs warning when budget check fails', function (): 
 });
 
 it('tracks dataforseo usage with endpoint-derived features', function (): void {
-    $budgetAlertMock = \Mockery::mock(BudgetAlertService::class);
+    $budgetAlertMock = Mockery::mock(BudgetAlertService::class);
     $budgetAlertMock->shouldReceive('checkAndAlert')->twice()->with('dataforseo');
     app()->instance(BudgetAlertService::class, $budgetAlertMock);
 
@@ -305,8 +305,8 @@ it('tracks semrush requests and errors through semrush usage service', function 
         'is_active' => true,
     ]);
 
-    $budgetAlertMock = \Mockery::mock(BudgetAlertService::class);
-    $budgetAlertMock->shouldReceive('checkAndAlert')->once()->andThrow(new \RuntimeException('semrush-check-failed'));
+    $budgetAlertMock = Mockery::mock(BudgetAlertService::class);
+    $budgetAlertMock->shouldReceive('checkAndAlert')->once()->andThrow(new RuntimeException('semrush-check-failed'));
     app()->instance(BudgetAlertService::class, $budgetAlertMock);
 
     Log::shouldReceive('warning')

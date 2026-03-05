@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,9 +33,9 @@ use Seeders\ExternalApis\UsageTracking\UsageTracking;
  * @property string $status
  * @property string|null $error_message
  * @property array|null $metadata
- * @property \Illuminate\Support\Carbon|null $reconciled_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $reconciled_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class ApiUsageLog extends Model
 {

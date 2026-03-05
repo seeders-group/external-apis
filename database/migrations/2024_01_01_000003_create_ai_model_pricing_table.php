@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ai_model_pricing', function (Blueprint $table) {
+        Schema::create('ai_model_pricing', function (Blueprint $table): void {
             $table->id();
             $table->string('integration')->default('openai');
             $table->string('model');

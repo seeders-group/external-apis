@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,8 +18,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $alert_enabled
  * @property string|null $google_chat_webhook_url
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class ApiBudgetConfig extends Model
 {
