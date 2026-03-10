@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": "^8.4",
-        "google-gemini-php/client": "^1.0",
+        "google-gemini-php/client": "^2.7",
         "google/apiclient": "^2.15.0",
         "guzzlehttp/guzzle": "^7.8",
         "illuminate/contracts": "^11.0|^12.0",
