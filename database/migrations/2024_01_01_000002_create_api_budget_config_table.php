@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('api_budget_config', function (Blueprint $table) {
+        Schema::create('api_budget_config', function (Blueprint $table): void {
             $table->id();
 
             // Integration identifier

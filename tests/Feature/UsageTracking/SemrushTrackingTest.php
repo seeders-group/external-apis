@@ -10,6 +10,9 @@ use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewRequestData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonRequestData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\ApiUnitsBalanceRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
@@ -110,9 +113,11 @@ it('records api_log and api_usage_log for backlinks overview', function (): void
     ]));
 
     $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'ascore,total,domains_num',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'ascore,total,domains_num',
+        ),
     ));
 
     $apiLog = ApiLog::query()->first();
@@ -143,9 +148,11 @@ it('records trackable model metadata in api_logs when using forModel', function 
     ]));
 
     $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'ascore,total,domains_num',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'ascore,total,domains_num',
+        ),
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
@@ -162,9 +169,14 @@ it('records batch comparison units as 40 per target domain', function (): void {
     ]));
 
     $connector->send(new BatchComparisonRequest(
-        targets: ['example.com', 'example.org', 'example.net'],
-        targetTypes: ['root_domain', 'root_domain', 'root_domain'],
-        exportColumns: 'target,ascore,total',
+        data: new BatchComparisonRequestData(
+            targets: [
+                new BatchComparisonTargetData(target: 'example.com'),
+                new BatchComparisonTargetData(target: 'example.org'),
+                new BatchComparisonTargetData(target: 'example.net'),
+            ],
+            exportColumns: 'target,ascore,total',
+        ),
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
@@ -202,9 +214,11 @@ it('logs failed semrush requests as zero units and error status', function (): v
     ]));
 
     $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'ascore,total,domains_num',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'ascore,total,domains_num',
+        ),
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
@@ -232,9 +246,11 @@ it('triggers semrush budget check after successful usage logging', function (): 
     ]));
 
     $connector->send(new BacklinksOverviewRequest(
-        target: 'example.com',
-        targetType: 'root_domain',
-        exportColumns: 'ascore,total,domains_num',
+        data: new BacklinksOverviewRequestData(
+            target: 'example.com',
+            targetType: 'root_domain',
+            exportColumns: 'ascore,total,domains_num',
+        ),
     ));
 
     expect(ApiUsageLog::query()->count())->toBe(1);

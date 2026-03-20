@@ -8,6 +8,7 @@ use Saloon\Enums\Method;
 use Saloon\Http\Request;
 use Saloon\Http\Response;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewResponseData;
 use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
@@ -16,11 +17,7 @@ class BacklinksOverviewRequest extends Request
     protected Method $method = Method::GET;
 
     public function __construct(
-        public string $target,
-        public string $targetType,
-        public string $exportColumns,
-        public ?int $displayLimit = null,
-        public ?int $displayOffset = null,
+        public readonly BacklinksOverviewRequestData $data,
     ) {}
 
     public function resolveEndpoint(): string
@@ -38,9 +35,9 @@ class BacklinksOverviewRequest extends Request
 
         return [
             'type' => 'backlinks_overview',
-            'target' => $this->target,
-            'target_type' => $this->targetType,
-            'export_columns' => $this->exportColumns,
+            'target' => $this->data->target,
+            'target_type' => $this->data->targetType,
+            'export_columns' => $this->data->exportColumns,
             'key' => $apiKey,
         ];
     }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Seeders\ExternalApis\UsageTracking\Models\AiModelPricing;
@@ -233,7 +234,7 @@ it('calculates total cost from grouped logs', function (): void {
 });
 
 it('defines user relation', function (): void {
-    $userModelClass = get_class(new class extends \Illuminate\Database\Eloquent\Model {});
+    $userModelClass = (new class extends Model {})::class;
     UsageTracking::useUserModel($userModelClass);
 
     $log = new ApiUsageLog;

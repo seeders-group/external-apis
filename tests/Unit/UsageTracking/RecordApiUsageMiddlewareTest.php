@@ -8,23 +8,23 @@ use Saloon\Repositories\ArrayStore;
 use Seeders\ExternalApis\UsageTracking\Middleware\RecordApiUsage;
 
 afterEach(function (): void {
-    \Mockery::close();
+    Mockery::close();
 });
 
 it('returns early when usage tracking is disabled', function (): void {
     config()->set('external-apis.usage_tracking.enabled', false);
 
     $middleware = new TestRecordApiUsageMiddleware;
-    $response = \Mockery::mock(Response::class);
+    $response = Mockery::mock(Response::class);
 
-    expect(fn () => $middleware->__invoke($response))->not->toThrow(\Throwable::class);
+    expect(fn () => $middleware->__invoke($response))->not->toThrow(Throwable::class);
 });
 
 it('extracts expected consumption when value is zero', function (): void {
     $middleware = new TestRecordApiUsageMiddleware;
 
-    $response = \Mockery::mock(Response::class);
-    $pendingRequest = \Mockery::mock(PendingRequest::class);
+    $response = Mockery::mock(Response::class);
+    $pendingRequest = Mockery::mock(PendingRequest::class);
     $headers = new ArrayStore([
         'X-Seeders-Expected-Consumption' => '0',
     ]);
@@ -43,8 +43,8 @@ it('extracts expected consumption when value is zero', function (): void {
 it('extracts zero cost and zero tokens correctly', function (): void {
     $middleware = new TestRecordApiUsageMiddleware;
 
-    $responseWithCost = \Mockery::mock(Response::class);
-    $pendingRequestForCost = \Mockery::mock(PendingRequest::class);
+    $responseWithCost = Mockery::mock(Response::class);
+    $pendingRequestForCost = Mockery::mock(PendingRequest::class);
     $headersForCost = new ArrayStore;
 
     $responseWithCost->shouldReceive('getPendingRequest')->andReturn($pendingRequestForCost);
@@ -57,8 +57,8 @@ it('extracts zero cost and zero tokens correctly', function (): void {
         'type' => 'dollars',
     ]);
 
-    $responseWithTokens = \Mockery::mock(Response::class);
-    $pendingRequestForTokens = \Mockery::mock(PendingRequest::class);
+    $responseWithTokens = Mockery::mock(Response::class);
+    $pendingRequestForTokens = Mockery::mock(PendingRequest::class);
     $headersForTokens = new ArrayStore;
 
     $responseWithTokens->shouldReceive('getPendingRequest')->andReturn($pendingRequestForTokens);
@@ -76,7 +76,7 @@ it('extracts zero cost and zero tokens correctly', function (): void {
 it('extracts metadata units with zero value and error payloads', function (): void {
     $middleware = new TestRecordApiUsageMiddleware;
 
-    $response = \Mockery::mock(Response::class);
+    $response = Mockery::mock(Response::class);
     $response->shouldReceive('json')->with('usage')->andReturn(['total_tokens' => 10]);
     $response->shouldReceive('header')->with('x-api-units-cost-total-actual')->andReturn('0');
     $response->shouldReceive('header')->with('x-api-units-limit-reset')->andReturn('2026-02-13T12:00:00Z');
@@ -96,8 +96,8 @@ it('extracts metadata units with zero value and error payloads', function (): vo
 it('falls back to request counting when no consumption signals are present', function (): void {
     $middleware = new TestRecordApiUsageMiddleware;
 
-    $response = \Mockery::mock(Response::class);
-    $pendingRequest = \Mockery::mock(PendingRequest::class);
+    $response = Mockery::mock(Response::class);
+    $pendingRequest = Mockery::mock(PendingRequest::class);
     $headers = new ArrayStore;
 
     $response->shouldReceive('getPendingRequest')->andReturn($pendingRequest);

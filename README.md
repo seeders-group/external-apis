@@ -31,11 +31,13 @@ Since this is a private package, add the repository to your `composer.json`:
 php artisan vendor:publish --tag=external-apis-config
 ```
 
-### Publish Migrations
+### Publish Migrations (Optional)
 
 ```bash
 php artisan vendor:publish --tag=external-apis-migrations
 ```
+
+Migrations are auto-loaded by the package, so publishing is only needed if you want to customize the files in your app.
 
 ## Configuration
 
@@ -80,14 +82,17 @@ $domainRating = $response->json('domain_rating.domain_rating');
 
 ```php
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BacklinksOverviewRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 
 // Semrush requires tracking context
 $connector = SemrushConnector::forModel($project, 'seo_audit');
 $response = $connector->send(new BacklinksOverviewRequest(
-    target: 'example.com',
-    targetType: 'root_domain',
-    exportColumns: 'ascore,total,domains_num',
+    data: new BacklinksOverviewRequestData(
+        target: 'example.com',
+        targetType: 'root_domain',
+        exportColumns: 'ascore,total,domains_num',
+    ),
 ));
 
 // Parsed DTO (Saloon-native)
@@ -160,11 +165,16 @@ $response = $connector->send(new BatchComparisonRequest(
 
 ## Usage Tracking
 
-The package includes a built-in usage tracking system for monitoring API costs. Publish the migrations to get started:
+The package includes a built-in usage tracking system for monitoring API costs. Run migrations to get started:
+
+```bash
+php artisan migrate
+```
+
+If you need to edit migration files in your app, publish them first:
 
 ```bash
 php artisan vendor:publish --tag=external-apis-migrations
-php artisan migrate
 ```
 
 ### Automatic Tracking via Traits

@@ -17,11 +17,11 @@ use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
 use Seeders\ExternalApis\UsageTracking\Traits\TracksPrismUsage;
 
 afterEach(function (): void {
-    \Mockery::close();
+    Mockery::close();
 });
 
 it('tracks openai success and error paths', function (): void {
-    $tracker = \Mockery::mock(OpenAIUsageTrackerService::class);
+    $tracker = Mockery::mock(OpenAIUsageTrackerService::class);
     $tracker->shouldReceive('logRequest')->once()->withArgs(
         fn (string $model, int $promptTokens, int $completionTokens, array $context, int $cachedTokens, ?string $requestId, string $endpoint): bool => $model === 'gpt-4o'
             && $promptTokens === 10
@@ -80,13 +80,13 @@ it('tracks openai success and error paths', function (): void {
             'cached_tokens' => 0,
         ]);
 
-    expect(fn () => $client->runTrackUsage(['feature' => 'assistant', 'model' => 'gpt-4o'], function (): never {
-        throw new \RuntimeException('failed');
-    }))->toThrow(\RuntimeException::class, 'failed');
+    expect(fn (): mixed => $client->runTrackUsage(['feature' => 'assistant', 'model' => 'gpt-4o'], function (): never {
+        throw new RuntimeException('failed');
+    }))->toThrow(RuntimeException::class, 'failed');
 });
 
 it('tracks prism text, structured, embeddings, and error paths', function (): void {
-    $tracker = \Mockery::mock(PrismUsageTrackerService::class);
+    $tracker = Mockery::mock(PrismUsageTrackerService::class);
     $tracker->shouldReceive('logRequest')->twice();
     $tracker->shouldReceive('logEmbeddingsRequest')->once();
     $tracker->shouldReceive('logError')->once()->withArgs(
@@ -136,19 +136,19 @@ it('tracks prism text, structured, embeddings, and error paths', function (): vo
         meta: new Meta(id: 'req-2', model: 'embed-prism')
     );
 
-    $textResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn () => $textResponse);
-    $structuredResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn () => $structuredResponse);
-    $embeddingsResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn () => $embeddingsResponse);
+    $textResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): \Prism\Prism\Text\Response => $textResponse);
+    $structuredResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): \Prism\Prism\Structured\Response => $structuredResponse);
+    $embeddingsResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): EmbeddingsResponse => $embeddingsResponse);
 
     expect($textResult)->toBe($textResponse);
     expect($structuredResult)->toBe($structuredResponse);
     expect($embeddingsResult)->toBe($embeddingsResponse);
 
-    expect(fn () => $client->runTrackPrismUsage(
+    expect(fn (): mixed => $client->runTrackPrismUsage(
         Provider::OpenAI,
         ['feature' => 'assistant', 'model' => 'gpt-prism'],
         function (): never {
-            throw new \RuntimeException('prism failed');
+            throw new RuntimeException('prism failed');
         }
-    ))->toThrow(\RuntimeException::class, 'prism failed');
+    ))->toThrow(RuntimeException::class, 'prism failed');
 });

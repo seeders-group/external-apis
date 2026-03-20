@@ -48,8 +48,8 @@ it('maps google maps results and finds best matches', function (): void {
 });
 
 it('supports mutable helper methods and pipeline preparation', function (): void {
-    $reviewsPost = (new ReviewsTaskPostData(keyword: 'seeders'))->withPingbackUrl('https://example.test/reviews');
-    $organicPost = (new OrganicTaskPostData(keyword: 'seeders', location_name: 'Amsterdam'))->withPingbackUrl('https://example.test/organic');
+    $reviewsPost = new ReviewsTaskPostData(keyword: 'seeders')->withPingbackUrl('https://example.test/reviews');
+    $organicPost = new OrganicTaskPostData(keyword: 'seeders', location_name: 'Amsterdam')->withPingbackUrl('https://example.test/organic');
 
     $preparedOrganic = OrganicResultData::prepareForPipeline([
         'items' => [[

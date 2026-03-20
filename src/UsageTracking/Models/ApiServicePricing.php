@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Pricing configuration for credit/unit-based API services (Ahrefs, DataForSEO, etc.)
@@ -18,8 +19,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $unit_type
  * @property string|null $description
  * @property bool $is_active
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class ApiServicePricing extends Model
 {

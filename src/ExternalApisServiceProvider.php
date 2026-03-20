@@ -29,6 +29,8 @@ final class ExternalApisServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/external-apis.php' => config_path('external-apis.php'),

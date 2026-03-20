@@ -22,7 +22,7 @@ dataset('facade classes', function (): array {
             continue;
         }
 
-        if (is_subclass_of($class, Facade::class) && ! (new \ReflectionClass($class))->isAbstract()) {
+        if (is_subclass_of($class, Facade::class) && ! new ReflectionClass($class)->isAbstract()) {
             $classes[$class] = [$class];
         }
     }
@@ -31,7 +31,7 @@ dataset('facade classes', function (): array {
 });
 
 it('defines facade accessors', function (string $facadeClass): void {
-    $accessor = \Closure::bind(
+    $accessor = Closure::bind(
         static fn () => $facadeClass::getFacadeAccessor(),
         null,
         $facadeClass
