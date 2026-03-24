@@ -2,6 +2,10 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.2.0 - 2026-03-24
+
+Added support for Laravel 13
+
 ## v1.1.0 - 2026-03-24
 
 - Added Ahrefs Domain Rating History
