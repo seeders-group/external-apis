@@ -13,7 +13,7 @@ use Seeders\ExternalApis\Integrations\Moz\MozLinksConnector;
 /**
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Integrations\Moz\MozLinksConnector
+ * @see MozLinksConnector
  */
 final class Moz extends Facade
 {

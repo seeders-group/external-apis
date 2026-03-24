@@ -13,7 +13,7 @@ use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
 /**
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Integrations\Hunter\HunterConnector
+ * @see HunterConnector
  */
 final class Hunter extends Facade
 {
