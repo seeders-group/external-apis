@@ -202,22 +202,32 @@ UsageTracking::useApiUsageLogModel(YourApiUsageLog::class);
 UsageTracking::useAiModelPricingModel(YourAiModelPricing::class);
 ```
 
-## Testing
+## Development
+
+### Testing
 
 ```bash
-composer test
+composer test                # Run tests (Pest)
+composer test-coverage       # Run tests with coverage report
 ```
 
-## Code Style
+To run a single test file or filter by name:
 
 ```bash
-composer format
+vendor/bin/pest tests/ServiceProviderTest.php
+vendor/bin/pest --filter="test_name_here"
 ```
 
-## Static Analysis
+### Formatting
 
 ```bash
-composer analyse
+composer format              # Run Pint (code style) and Rector (automated refactoring)
+```
+
+### Static Analysis
+
+```bash
+composer analyse             # Run PHPStan
 ```
 
 ## License
