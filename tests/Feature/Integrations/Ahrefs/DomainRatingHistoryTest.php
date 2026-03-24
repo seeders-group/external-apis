@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Date;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\DomainRatingHistoryRequestData;
 use Seeders\ExternalApis\Integrations\Ahrefs\Data\SiteExplorer\DomainRatingHistoryResponseData;
 use Seeders\ExternalApis\Integrations\Ahrefs\Requests\SiteExplorer\DomainRatingHistoryRequest;

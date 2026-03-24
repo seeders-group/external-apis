@@ -16,7 +16,7 @@ use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
  * @method static SemrushConnector withTracking(Model $model, string|null $scope = null)
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Integrations\Semrush\SemrushConnector
+ * @see SemrushConnector
  */
 final class Semrush extends Facade
 {

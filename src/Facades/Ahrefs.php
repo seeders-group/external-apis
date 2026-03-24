@@ -13,7 +13,7 @@ use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
 /**
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector
+ * @see AhrefsConnector
  */
 final class Ahrefs extends Facade
 {

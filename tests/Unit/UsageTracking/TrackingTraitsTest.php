@@ -6,6 +6,7 @@ use Prism\Prism\Embeddings\Response as EmbeddingsResponse;
 use Prism\Prism\Enums\FinishReason;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Structured\Response as StructuredResponse;
+use Prism\Prism\Text\Response;
 use Prism\Prism\Text\Response as TextResponse;
 use Prism\Prism\ValueObjects\Embedding;
 use Prism\Prism\ValueObjects\EmbeddingsUsage;
@@ -136,8 +137,8 @@ it('tracks prism text, structured, embeddings, and error paths', function (): vo
         meta: new Meta(id: 'req-2', model: 'embed-prism')
     );
 
-    $textResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): \Prism\Prism\Text\Response => $textResponse);
-    $structuredResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): \Prism\Prism\Structured\Response => $structuredResponse);
+    $textResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): Response => $textResponse);
+    $structuredResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): StructuredResponse => $structuredResponse);
     $embeddingsResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): EmbeddingsResponse => $embeddingsResponse);
 
     expect($textResult)->toBe($textResponse);

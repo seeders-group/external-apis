@@ -13,7 +13,7 @@ use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 /**
  * @method static Response send(Request $request, MockClient|null $mockClient = null, callable|null $handleRetry = null)
  *
- * @see \Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector
+ * @see DataForSeoConnector
  */
 final class DataForSeo extends Facade
 {
