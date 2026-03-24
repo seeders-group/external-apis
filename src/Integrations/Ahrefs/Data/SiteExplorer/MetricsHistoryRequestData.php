@@ -15,6 +15,13 @@ class MetricsHistoryRequestData extends Data
         public string $target,
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public Carbon $date_from,
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?Carbon $date_to = null,
         public string $mode = 'subdomains',
+        public string $history_grouping = 'monthly',
+        public string $volume_mode = 'monthly',
+        public ?string $country = null,
+        public string $protocol = 'both',
+        public string $select = 'date,org_cost,org_traffic,paid_cost,paid_traffic',
     ) {}
 }

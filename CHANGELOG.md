@@ -2,6 +2,10 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.2.1 - 2026-03-24
+
+- Added missing query parameters to Ahrefs MetricsHistoryRequestData (date_to, history_grouping, volume_mode, country, protocol, select)
+
 ## v1.2.0 - 2026-03-24
 
 Added support for Laravel 13
