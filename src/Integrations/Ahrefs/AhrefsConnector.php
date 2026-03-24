@@ -8,10 +8,12 @@ use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class AhrefsConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
 
     protected function defaultAuth(): TokenAuthenticator
     {
@@ -22,6 +24,11 @@ class AhrefsConnector extends Connector
         }
 
         return new TokenAuthenticator($token);
+    }
+
+    public function getIntegrationName(): string
+    {
+        return 'ahrefs';
     }
 
     /**

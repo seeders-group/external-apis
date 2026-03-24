@@ -16,7 +16,7 @@ it('can send a domain rating request', function (): void {
         ], 200),
     ]);
 
-    $connector = new AhrefsConnector;
+    $connector = AhrefsConnector::forScope('test');
     $connector->withMockClient($mockClient);
 
     $response = $connector->send(new DomainRatingRequest('example.com'));
