@@ -184,6 +184,10 @@ return [
                 'cost_per_unit' => 0.00005,
                 'unit_type' => 'api_units',
             ],
+            'scraperapi' => [
+                'cost_per_unit' => 0.00049,
+                'unit_type' => 'api_credits',
+            ],
         ],
     ],
 ];
