@@ -61,6 +61,9 @@ MOZ_CLIENT_SECRET=your-client-secret
 # Semrush
 SEMRUSH_API_KEY=your-api-key
 
+# ScraperAPI
+SCRAPERAPI_KEY=your-key
+
 # And more... see config/external-apis.php for all options
 ```
 
