@@ -42,6 +42,7 @@ beforeEach(function (): void {
         $table->string('sub_feature', 100)->nullable();
         $table->unsignedBigInteger('project_id')->nullable();
         $table->unsignedBigInteger('user_id')->nullable();
+        $table->nullableMorphs('trackable');
         $table->string('status', 20)->default('success');
         $table->text('error_message')->nullable();
         $table->json('metadata')->nullable();
@@ -322,4 +323,44 @@ it('tracks semrush requests and errors through semrush usage service', function 
     expect($service->getTodayUnitsConsumed())->toBe(40);
     expect($service->getMonthToDateSpend())->toBe(0.002);
     expect($service->getMonthToDateUnitsConsumed())->toBe(40);
+});
+
+it('stores trackable_type and trackable_id from prism context', function (): void {
+    AiModelPricing::create([
+        'integration' => 'openai',
+        'model' => 'gpt-trackable',
+        'input_per_1m_tokens' => 1.0,
+        'output_per_1m_tokens' => 2.0,
+    ]);
+
+    $service = new PrismUsageTrackerService;
+
+    $log = $service->logRequest(
+        Provider::OpenAI,
+        'gpt-trackable',
+        1000,
+        500,
+        [
+            'feature' => 'test',
+            'trackable_type' => 'App\\Models\\Project',
+            'trackable_id' => 99,
+        ],
+    );
+
+    expect($log->trackable_type)->toBe('App\\Models\\Project');
+    expect($log->trackable_id)->toBe(99);
+
+    $error = $service->logError(
+        Provider::OpenAI,
+        'gpt-trackable',
+        'test error',
+        [
+            'feature' => 'test',
+            'trackable_type' => 'App\\Models\\Project',
+            'trackable_id' => 99,
+        ],
+    );
+
+    expect($error->trackable_type)->toBe('App\\Models\\Project');
+    expect($error->trackable_id)->toBe(99);
 });

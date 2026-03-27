@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -32,6 +33,7 @@ beforeEach(function (): void {
         $table->string('sub_feature', 100)->nullable();
         $table->unsignedBigInteger('project_id')->nullable();
         $table->unsignedBigInteger('user_id')->nullable();
+        $table->nullableMorphs('trackable');
         $table->string('status', 20)->default('success');
         $table->text('error_message')->nullable();
         $table->json('metadata')->nullable();
@@ -231,6 +233,27 @@ it('calculates total cost from grouped logs', function (): void {
     $cost = ApiUsageLog::calculateTotalCostFromLogs($logs);
 
     expect($cost)->toBe(0.007125);
+});
+
+it('defines trackable morph relation', function (): void {
+    $trackableModel = new class extends Model
+    {
+        protected $table = 'test_trackables';
+    };
+
+    $log = ApiUsageLog::create([
+        'integration' => 'openai',
+        'estimated_cost' => 0.01,
+        'feature' => 'test',
+        'trackable_type' => $trackableModel::class,
+        'trackable_id' => 42,
+    ]);
+
+    $relation = $log->trackable();
+
+    expect($relation)->toBeInstanceOf(MorphTo::class);
+    expect($log->trackable_type)->toBe($trackableModel::class);
+    expect($log->trackable_id)->toBe(42);
 });
 
 it('defines user relation', function (): void {

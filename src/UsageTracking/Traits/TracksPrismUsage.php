@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Prism\Prism\Embeddings\Response as EmbeddingsResponse;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Structured\Response as StructuredResponse;
@@ -16,12 +17,17 @@ trait TracksPrismUsage
     /**
      * Track usage for a Prism API call.
      *
-     * @param  array{feature: string, sub_feature?: string, model?: string, project_id?: int, user_id?: int, metadata?: array}  $context
+     * @param  array{feature: string, sub_feature?: string, model?: string, project_id?: int, user_id?: int, trackable_type?: string, trackable_id?: int, metadata?: array}  $context
      * @param  callable  $callback  The Prism API call to execute
+     * @param  Model|null  $trackable  Optional model to associate usage with
      * @return TextResponse|StructuredResponse|EmbeddingsResponse|mixed
      */
-    protected function trackPrismUsage(Provider $provider, array $context, callable $callback): mixed
+    protected function trackPrismUsage(Provider $provider, array $context, callable $callback, ?Model $trackable = null): mixed
     {
+        if ($trackable instanceof Model) {
+            $context['trackable_type'] = $trackable->getMorphClass();
+            $context['trackable_id'] = $trackable->getKey();
+        }
         $tracker = resolve(PrismUsageTrackerService::class);
 
         try {

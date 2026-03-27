@@ -7,6 +7,7 @@ namespace Seeders\ExternalApis\UsageTracking\Models;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
@@ -30,6 +31,8 @@ use Seeders\ExternalApis\UsageTracking\UsageTracking;
  * @property string|null $sub_feature
  * @property int|null $project_id
  * @property int|null $user_id
+ * @property string|null $trackable_type
+ * @property int|null $trackable_id
  * @property string $status
  * @property string|null $error_message
  * @property array|null $metadata
@@ -57,6 +60,8 @@ class ApiUsageLog extends Model
         'sub_feature',
         'project_id',
         'user_id',
+        'trackable_type',
+        'trackable_id',
         'status',
         'error_message',
         'metadata',
@@ -202,6 +207,11 @@ class ApiUsageLog extends Model
         }
 
         return $totalCost;
+    }
+
+    public function trackable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     public function user(): BelongsTo

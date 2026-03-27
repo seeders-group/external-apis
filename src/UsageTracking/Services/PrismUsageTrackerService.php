@@ -47,6 +47,8 @@ class PrismUsageTrackerService
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
+            'trackable_type' => $context['trackable_type'] ?? null,
+            'trackable_id' => $context['trackable_id'] ?? null,
             'status' => 'success',
             'metadata' => empty($metadata) ? null : $metadata,
         ]);
@@ -80,6 +82,8 @@ class PrismUsageTrackerService
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
+            'trackable_type' => $context['trackable_type'] ?? null,
+            'trackable_id' => $context['trackable_id'] ?? null,
             'status' => 'success',
             'metadata' => $context['metadata'] ?? null,
         ]);
@@ -111,6 +115,8 @@ class PrismUsageTrackerService
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
+            'trackable_type' => $context['trackable_type'] ?? null,
+            'trackable_id' => $context['trackable_id'] ?? null,
             'status' => 'success',
             'metadata' => array_filter([
                 'size' => $size,
@@ -148,6 +154,8 @@ class PrismUsageTrackerService
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
+            'trackable_type' => $context['trackable_type'] ?? null,
+            'trackable_id' => $context['trackable_id'] ?? null,
             'status' => 'success',
             'metadata' => $context['metadata'] ?? null,
         ]);
@@ -172,6 +180,8 @@ class PrismUsageTrackerService
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
+            'trackable_type' => $context['trackable_type'] ?? null,
+            'trackable_id' => $context['trackable_id'] ?? null,
             'status' => 'error',
             'error_message' => $errorMessage,
             'metadata' => $context['metadata'] ?? null,
