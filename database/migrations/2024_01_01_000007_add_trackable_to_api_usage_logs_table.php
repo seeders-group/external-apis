@@ -14,7 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('api_usage_logs', function (Blueprint $table): void {
-            $table->nullableMorphs('trackable');
+            $table->string('trackable_type')->nullable()->after('metadata');
+            $table->unsignedBigInteger('trackable_id')->nullable()->after('trackable_type');
+
+            $table->index(['trackable_type', 'trackable_id']);
         });
     }
 
@@ -24,7 +27,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('api_usage_logs', function (Blueprint $table): void {
-            $table->dropMorphs('trackable');
+            $table->dropIndex(['trackable_type', 'trackable_id']);
+            $table->dropColumn(['trackable_type', 'trackable_id']);
         });
     }
 };
