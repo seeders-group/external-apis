@@ -20,10 +20,6 @@ class BudgetAlertService
         $budget = $this->getBudgetConfig($integration);
 
         if (! $budget || ! $budget->shouldAlert()) {
-            Log::info('BudgetAlertService: Budget alerts disabled', [
-                'integration' => $integration,
-            ]);
-
             return;
         }
 
