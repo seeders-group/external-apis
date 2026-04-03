@@ -154,6 +154,9 @@ $response = $connector->send(new BatchComparisonRequest(
 ### Email & Contact Discovery
 - **HunterConnector** - Email finder, domain search
 
+### CRM
+- **TeamleaderOrbitConnector** - Contacts, companies, deals, contracts, offers, and more (OAuth 2.0)
+
 ### Planned Integrations
 - AdvancedWebRankingConnector - Project management, rank tracking
 - PrensalinkConnector - Press release distribution
@@ -162,9 +165,96 @@ $response = $connector->send(new BatchComparisonRequest(
 - BazoomConnector - Domain intelligence
 - LeolyticsConnector - Analytics platform
 - WebsiteCategorizationConnector - Website classification
-- TeamleaderOrbitConnector - CRM integration
 - BrandTrackerConnector - Brand monitoring with LLMs
 - TreeNationConnector - Carbon offset integration
+
+### Teamleader Orbit
+
+Teamleader Orbit uses OAuth 2.0 authentication. The `TeamleaderOrbit` facade provides a fluent API for all available resources.
+
+```env
+TEAMLEADER_ORBIT_CLIENT_ID=your-client-id
+TEAMLEADER_ORBIT_CLIENT_SECRET=your-client-secret
+TEAMLEADER_ORBIT_REDIRECT_URI=https://your-app.com/callback
+TEAMLEADER_ORBIT_AUTHORIZE_URL=https://app.teamleader.eu/oauth2/authorize
+TEAMLEADER_ORBIT_TOKEN_URL=https://app.teamleader.eu/oauth2/token
+```
+
+#### Authenticating
+
+All requests require an `OAuthAuthenticator`. Call `authenticate()` before accessing any resource:
+
+```php
+use Seeders\ExternalApis\Facades\TeamleaderOrbit;
+use Saloon\Http\Auth\AccessTokenAuthenticator;
+
+$authenticator = new AccessTokenAuthenticator(
+    accessToken: 'your-access-token',
+    refreshToken: 'your-refresh-token',
+    expiresAt: $expiresAt,
+);
+
+$service = TeamleaderOrbit::authenticate($authenticator);
+```
+
+#### Fluent Resource API
+
+```php
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Data\Contacts\ContactsGetRequestData;
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Data\Common\ListRequestData;
+
+// Get a single contact
+$response = TeamleaderOrbit::authenticate($authenticator)
+    ->contacts()
+    ->get(new ContactsGetRequestData(id: 42));
+
+// List companies with filtering and pagination
+$response = TeamleaderOrbit::authenticate($authenticator)
+    ->companies()
+    ->list(new ListRequestData(
+        filter: ['search' => 'Seeders'],
+        page: ['size' => 20, 'number' => 1],
+    ));
+
+// Get the current user
+$response = TeamleaderOrbit::authenticate($authenticator)
+    ->users()
+    ->me();
+```
+
+#### Available Resources
+
+| Resource | Methods |
+|---|---|
+| `assets()` | `get`, `list`, `set`, `types` |
+| `companies()` | `get`, `list`, `set` |
+| `contacts()` | `get`, `list`, `detail`, `checkadd`, `set` |
+| `contracts()` | `get`, `list`, `getVariable`, `setVariable` |
+| `deals()` | `get`, `list`, `set`, `context` |
+| `entities()` | `get`, `list`, `set`, `context` |
+| `expenses()` | `context`, `set` |
+| `offers()` | `get`, `list`, `set`, `context` |
+| `pos()` | `get`, `set` |
+| `users()` | `me`, `get`, `list`, `mailsContext` |
+
+#### OAuth Flow
+
+Use the connector directly for the OAuth authorization code flow:
+
+```php
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitConnector;
+
+$connector = app(TeamleaderOrbitConnector::class);
+
+// Get the authorization URL to redirect the user to
+$authUrl = $connector->getAuthorizationUrl();
+
+// Exchange the authorization code for tokens (in your callback)
+$authenticator = $connector->getAccessToken($authorizationCode);
+
+// Refresh an expired token
+$authenticator = $connector->refreshAccessToken($authenticator);
+```
 
 ## Usage Tracking
 

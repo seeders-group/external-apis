@@ -117,6 +117,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Teamleader ORBIT (Yadera) API Configuration
+    |--------------------------------------------------------------------------
+    */
+    'teamleader_orbit' => [
+        'client_id' => env('TEAMLEADER_ORBIT_CLIENT_ID'),
+        'client_secret' => env('TEAMLEADER_ORBIT_CLIENT_SECRET'),
+        'redirect_uri' => env('TEAMLEADER_ORBIT_REDIRECT_URI'),
+        'authorize_url' => env('TEAMLEADER_ORBIT_AUTHORIZE_URL'),
+        'token_url' => env('TEAMLEADER_ORBIT_TOKEN_URL'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Usage Tracking Configuration
     |--------------------------------------------------------------------------
     */

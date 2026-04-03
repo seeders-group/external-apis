@@ -8,6 +8,8 @@ use Illuminate\Support\ServiceProvider;
 use Override;
 use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitConnector;
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitService;
 use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
 
 final class ExternalApisServiceProvider extends ServiceProvider
@@ -21,6 +23,8 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/external-apis.php', 'external-apis');
 
         $this->app->bind(SemrushConnector::class);
+        $this->app->bind(TeamleaderOrbitConnector::class);
+        $this->app->bind(TeamleaderOrbitService::class);
 
         if (class_exists(Provider::class)) {
             $this->app->singleton(PrismUsageTrackerService::class);
