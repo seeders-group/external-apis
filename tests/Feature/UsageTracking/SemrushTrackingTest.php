@@ -19,13 +19,10 @@ use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\UsageTracking\Models\ApiLog;
 use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
-use Seeders\ExternalApis\UsageTracking\Services\BudgetAlertService;
 
 beforeEach(function (): void {
     Schema::dropIfExists('api_usage_logs');
     Schema::dropIfExists('api_logs');
-    Schema::dropIfExists('api_service_pricing');
-    Schema::dropIfExists('api_budget_config');
 
     Schema::create('api_usage_logs', function (Blueprint $table): void {
         $table->id();
@@ -40,16 +37,14 @@ beforeEach(function (): void {
         $table->integer('images_generated')->nullable();
         $table->integer('characters_processed')->nullable();
         $table->integer('seconds_processed')->nullable();
-        $table->decimal('estimated_cost', 10, 6);
-        $table->decimal('actual_cost', 10, 6)->nullable();
         $table->string('feature', 100)->index();
         $table->string('sub_feature', 100)->nullable();
         $table->unsignedBigInteger('project_id')->nullable();
         $table->unsignedBigInteger('user_id')->nullable();
+        $table->nullableMorphs('trackable');
         $table->string('status', 20)->default('success');
         $table->text('error_message')->nullable();
         $table->json('metadata')->nullable();
-        $table->timestamp('reconciled_at')->nullable();
         $table->timestamps();
     });
 
@@ -64,30 +59,6 @@ beforeEach(function (): void {
         $table->string('consumption_type')->nullable();
         $table->integer('latency_ms')->nullable();
         $table->json('metadata')->nullable();
-        $table->timestamps();
-    });
-
-    Schema::create('api_service_pricing', function (Blueprint $table): void {
-        $table->id();
-        $table->string('integration');
-        $table->string('endpoint')->nullable();
-        $table->decimal('cost_per_unit', 10, 6)->default(0);
-        $table->string('unit_type')->default('api_units');
-        $table->text('description')->nullable();
-        $table->boolean('is_active')->default(true);
-        $table->timestamps();
-    });
-
-    Schema::create('api_budget_config', function (Blueprint $table): void {
-        $table->id();
-        $table->string('integration');
-        $table->decimal('monthly_budget', 10, 2)->nullable();
-        $table->decimal('daily_budget', 10, 2)->nullable();
-        $table->integer('warning_threshold')->default(80);
-        $table->integer('critical_threshold')->default(90);
-        $table->boolean('alert_enabled')->default(true);
-        $table->string('google_chat_webhook_url')->nullable();
-        $table->boolean('is_active')->default(true);
         $table->timestamps();
     });
 });
@@ -134,7 +105,6 @@ it('records api_log and api_usage_log for backlinks overview', function (): void
     expect($usageLog->feature)->toBe('backlinks_overview');
     expect($usageLog->status)->toBe('success');
     expect($usageLog->total_tokens)->toBe(40);
-    expect((float) $usageLog->estimated_cost)->toBe(0.002);
 });
 
 it('records trackable model metadata in api_logs when using forModel', function (): void {
@@ -185,10 +155,9 @@ it('records batch comparison units as 40 per target domain', function (): void {
     expect((float) $apiLog->consumption)->toBe(120.0);
     expect($usageLog->feature)->toBe('backlinks_comparison');
     expect($usageLog->total_tokens)->toBe(120);
-    expect((float) $usageLog->estimated_cost)->toBe(0.006);
 });
 
-it('logs balance request with zero units and zero cost', function (): void {
+it('logs balance request with zero units', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         ApiUnitsBalanceRequest::class => MockResponse::make('1000000', 200),
@@ -204,7 +173,6 @@ it('logs balance request with zero units and zero cost', function (): void {
 
     expect($usageLog->feature)->toBe('api_units_balance');
     expect($usageLog->total_tokens)->toBe(0);
-    expect((float) $usageLog->estimated_cost)->toBe(0.0);
 });
 
 it('logs failed semrush requests as zero units and error status', function (): void {
@@ -229,17 +197,9 @@ it('logs failed semrush requests as zero units and error status', function (): v
 
     expect($usageLog->status)->toBe('error');
     expect($usageLog->total_tokens)->toBe(0);
-    expect((float) $usageLog->estimated_cost)->toBe(0.0);
 });
 
-it('triggers semrush budget check after successful usage logging', function (): void {
-    $budgetAlertMock = Mockery::mock(BudgetAlertService::class);
-    $budgetAlertMock->shouldReceive('checkAndAlert')
-        ->once()
-        ->with('semrush');
-
-    app()->instance(BudgetAlertService::class, $budgetAlertMock);
-
+it('records semrush usage without any budget side effects', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         BacklinksOverviewRequest::class => MockResponse::make('ok', 200),
@@ -254,33 +214,6 @@ it('triggers semrush budget check after successful usage logging', function (): 
     ));
 
     expect(ApiUsageLog::query()->count())->toBe(1);
-});
-
-it('uses units for semrush month-to-date budget calculations', function (): void {
-    ApiUsageLog::query()->create([
-        'integration' => 'semrush',
-        'endpoint' => '/analytics/v1/',
-        'total_tokens' => 40,
-        'estimated_cost' => 0.002,
-        'feature' => 'backlinks_overview',
-        'status' => 'success',
-    ]);
-
-    ApiUsageLog::query()->create([
-        'integration' => 'semrush',
-        'endpoint' => '/analytics/v1/',
-        'total_tokens' => 120,
-        'estimated_cost' => 0.006,
-        'feature' => 'backlinks_comparison',
-        'status' => 'success',
-    ]);
-
-    $service = resolve(BudgetAlertService::class);
-    $method = new ReflectionMethod($service, 'getMonthToDateSpend');
-
-    $monthToDateSpend = $method->invoke($service, 'semrush');
-
-    expect($monthToDateSpend)->toBe(160.0);
 });
 
 it('fails fast for unsupported semrush requests', function (): void {

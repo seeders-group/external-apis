@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
 /**
@@ -25,8 +24,6 @@ use Seeders\ExternalApis\UsageTracking\UsageTracking;
  * @property int $images_generated
  * @property int $characters_processed
  * @property int $seconds_processed
- * @property float $estimated_cost
- * @property float|null $actual_cost
  * @property string|null $feature
  * @property string|null $sub_feature
  * @property int|null $project_id
@@ -36,7 +33,6 @@ use Seeders\ExternalApis\UsageTracking\UsageTracking;
  * @property string $status
  * @property string|null $error_message
  * @property array|null $metadata
- * @property Carbon|null $reconciled_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -54,8 +50,6 @@ class ApiUsageLog extends Model
         'images_generated',
         'characters_processed',
         'seconds_processed',
-        'estimated_cost',
-        'actual_cost',
         'feature',
         'sub_feature',
         'project_id',
@@ -65,7 +59,6 @@ class ApiUsageLog extends Model
         'status',
         'error_message',
         'metadata',
-        'reconciled_at',
     ];
 
     protected $casts = [
@@ -76,10 +69,7 @@ class ApiUsageLog extends Model
         'images_generated' => 'integer',
         'characters_processed' => 'integer',
         'seconds_processed' => 'integer',
-        'estimated_cost' => 'decimal:6',
-        'actual_cost' => 'decimal:6',
         'metadata' => 'array',
-        'reconciled_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -125,88 +115,6 @@ class ApiUsageLog extends Model
     protected function failed($query)
     {
         return $query->where('status', 'error');
-    }
-
-    #[Scope]
-    protected function reconciled($query)
-    {
-        return $query->whereNotNull('reconciled_at');
-    }
-
-    #[Scope]
-    protected function unreconciled($query)
-    {
-        return $query->whereNull('reconciled_at');
-    }
-
-    protected function getCostInDollarsAttribute(): string
-    {
-        return '$'.number_format((float) $this->estimated_cost, 4);
-    }
-
-    protected function getIsReconciledAttribute(): bool
-    {
-        return $this->reconciled_at !== null;
-    }
-
-    /**
-     * Calculate cost from aggregated token counts.
-     * This avoids precision loss from summing many small individual costs.
-     */
-    public static function calculateCostFromTokens(
-        string $model,
-        int $totalPromptTokens,
-        int $totalCompletionTokens,
-        int $totalCachedTokens = 0
-    ): float {
-        $pricingModel = UsageTracking::$aiModelPricingModel;
-        $pricing = $pricingModel::getPricing($model, 'openai');
-
-        if (! $pricing) {
-            return 0.0;
-        }
-
-        $regularInputTokens = max(0, $totalPromptTokens - $totalCachedTokens);
-        $inputCost = ($regularInputTokens / 1_000_000) * $pricing['input_per_1m_tokens'];
-
-        $cachedCost = 0;
-        if ($totalCachedTokens > 0 && isset($pricing['cached_input_per_1m_tokens']) && $pricing['cached_input_per_1m_tokens']) {
-            $cachedCost = ($totalCachedTokens / 1_000_000) * $pricing['cached_input_per_1m_tokens'];
-        }
-
-        $outputCost = ($totalCompletionTokens / 1_000_000) * $pricing['output_per_1m_tokens'];
-
-        return round($inputCost + $cachedCost + $outputCost, 6);
-    }
-
-    /**
-     * Calculate total cost from a collection of logs by aggregating tokens per model.
-     * This avoids precision loss from summing many small individual costs.
-     *
-     * @param  Collection|\Illuminate\Database\Eloquent\Collection  $logs
-     */
-    public static function calculateTotalCostFromLogs($logs): float
-    {
-        $modelGroups = $logs->groupBy('model');
-
-        $totalCost = 0.0;
-
-        foreach ($modelGroups as $model => $modelLogs) {
-            $totalPromptTokens = $modelLogs->sum('prompt_tokens');
-            $totalCompletionTokens = $modelLogs->sum('completion_tokens');
-            $totalCachedTokens = $modelLogs->sum('input_cached_tokens');
-
-            $cost = self::calculateCostFromTokens(
-                $model,
-                (int) $totalPromptTokens,
-                (int) $totalCompletionTokens,
-                (int) $totalCachedTokens
-            );
-
-            $totalCost += $cost;
-        }
-
-        return $totalCost;
     }
 
     public function trackable(): MorphTo

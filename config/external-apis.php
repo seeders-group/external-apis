@@ -123,70 +123,28 @@ return [
     'usage_tracking' => [
         'enabled' => true,
 
+        /*
+        |----------------------------------------------------------------------
+        | Prometheus Metrics Endpoint
+        |----------------------------------------------------------------------
+        |
+        | Exposes aggregated API usage metrics in the Prometheus text exposition
+        | format. Set `enabled` to false to skip route registration. When `token`
+        | is non-empty, requests must include it via Bearer auth, the
+        | `X-Prometheus-Token` header, or the `token` query parameter.
+        */
+        'prometheus' => [
+            'enabled' => env('EXTERNAL_APIS_PROMETHEUS_ENABLED', true),
+            'route' => env('EXTERNAL_APIS_PROMETHEUS_ROUTE', 'metrics/external-apis'),
+            'middleware' => ['api'],
+            'token' => env('EXTERNAL_APIS_PROMETHEUS_TOKEN'),
+        ],
+
         'semrush' => [
             'unit_rules' => [
                 'backlinks_overview' => 40,
                 'backlinks_comparison_per_target' => 40,
                 'api_units' => 0,
-            ],
-        ],
-
-        'pricing' => [
-            'openai' => [
-                'models' => [
-                    'dall-e-3' => [
-                        'standard_1024x1024' => 0.040,
-                        'standard_1024x1792' => 0.080,
-                        'standard_1792x1024' => 0.080,
-                        'hd_1024x1024' => 0.080,
-                        'hd_1024x1792' => 0.120,
-                        'hd_1792x1024' => 0.120,
-                    ],
-                    'dall-e-2' => [
-                        '1024x1024' => 0.016,
-                        '512x512' => 0.018,
-                        '256x256' => 0.020,
-                    ],
-                    'whisper' => [
-                        'per_minute' => 0.006,
-                    ],
-                    'tts' => [
-                        'per_1m_characters' => 15.00,
-                    ],
-                    'tts-hd' => [
-                        'per_1m_characters' => 30.00,
-                    ],
-                ],
-                'costs_api_url' => 'https://api.openai.com/v1/organization/costs',
-                'usage_api_url' => 'https://api.openai.com/v1/organization/usage',
-            ],
-            'gemini' => [
-                'models' => [
-                    'gemini-2.0-flash' => [
-                        'input_per_1m_tokens' => 0.10,
-                        'output_per_1m_tokens' => 0.40,
-                    ],
-                    'gemini-1.5-flash' => [
-                        'input_per_1m_tokens' => 0.075,
-                        'output_per_1m_tokens' => 0.30,
-                    ],
-                    'gemini-1.5-pro' => [
-                        'input_per_1m_tokens' => 1.25,
-                        'output_per_1m_tokens' => 5.00,
-                    ],
-                ],
-            ],
-            'ahrefs' => [
-                'cost_per_unit' => 0.01,
-                'unit_type' => 'api_units',
-            ],
-            'semrush' => [
-                'cost_per_unit' => 0.00005,
-                'unit_type' => 'api_units',
-            ],
-            'scraperapi' => [
-                'cost_per_unit' => 0.00049,
-                'unit_type' => 'api_credits',
             ],
         ],
     ],

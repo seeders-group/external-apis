@@ -57,5 +57,4 @@ it('loads the configuration', function (): void {
     expect(config('external-apis.dataforseo.username'))->toBe('test-user');
     expect(config('external-apis.openai.key'))->toBe('test-key');
     expect(config('external-apis.semrush.api_key'))->toBe('test-semrush-key');
-    expect(config('external-apis.usage_tracking.pricing.semrush.cost_per_unit'))->toBe(0.00005);
 });
