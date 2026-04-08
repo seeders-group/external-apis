@@ -14,6 +14,7 @@ use Saloon\Http\Response;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonRequestData;
 use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonResponseData;
+use Seeders\ExternalApis\Integrations\Semrush\Data\BatchComparisonTargetData;
 use Seeders\ExternalApis\Integrations\Semrush\Support\SemrushCsvParser;
 
 class BatchComparisonRequest extends Request
@@ -41,8 +42,15 @@ class BatchComparisonRequest extends Request
         $targetTypes = [];
 
         foreach ($data->targets as $target) {
-            $targets[] = $target->target;
-            $targetTypes[] = $target->targetType;
+            if ($target instanceof BatchComparisonTargetData) {
+                $targets[] = $target->target;
+                $targetTypes[] = $target->targetType;
+
+                continue;
+            }
+
+            $targets[] = $target;
+            $targetTypes[] = 'root_domain';
         }
 
         $this->targets = $targets;
