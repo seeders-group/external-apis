@@ -4,18 +4,30 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Prometheus;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\Client\Factory as HttpFactory;
+use Illuminate\Http\Client\Response;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
-final class ApiUsageMetricsController
+final class GrafanaCloudPusher
 {
-    public function __invoke(Request $request): Response
-    {
-        if (! $this->authorized($request)) {
-            return new Response('Unauthorized', 401);
-        }
+    public function __construct(
+        private readonly HttpFactory $http,
+    ) {}
 
+    public function push(): Response
+    {
+        $config = config('external-apis.usage_tracking.grafana_cloud');
+
+        $body = $this->buildPayload();
+
+        return $this->http
+            ->withBasicAuth((string) $config['user_id'], (string) $config['api_token'])
+            ->withBody($body, 'text/plain')
+            ->post(rtrim((string) $config['endpoint'], '/').'/api/v1/import/prometheus');
+    }
+
+    private function buildPayload(): string
+    {
         $logModel = UsageTracking::$apiUsageLogModel;
         $rows = $logModel::query()
             ->selectRaw('integration, status, COUNT(*) as request_count')
@@ -68,25 +80,6 @@ final class ApiUsageMetricsController
             $totalTokenSamples,
         );
 
-        return new Response(
-            $formatter->render(),
-            200,
-            ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8'],
-        );
-    }
-
-    private function authorized(Request $request): bool
-    {
-        $expectedToken = config('external-apis.usage_tracking.prometheus.token');
-
-        if ($expectedToken === null || $expectedToken === '') {
-            return true;
-        }
-
-        $providedToken = $request->bearerToken()
-            ?? $request->header('X-Prometheus-Token')
-            ?? $request->query('token');
-
-        return is_string($providedToken) && hash_equals((string) $expectedToken, $providedToken);
+        return $formatter->render();
     }
 }

@@ -125,19 +125,20 @@ return [
 
         /*
         |----------------------------------------------------------------------
-        | Prometheus Metrics Endpoint
+        | Grafana Cloud Metrics (Push)
         |----------------------------------------------------------------------
         |
-        | Exposes aggregated API usage metrics in the Prometheus text exposition
-        | format. Set `enabled` to false to skip route registration. When `token`
-        | is non-empty, requests must include it via Bearer auth, the
-        | `X-Prometheus-Token` header, or the `token` query parameter.
+        | Pushes aggregated API usage metrics to Grafana Cloud using the
+        | Prometheus remote-write compatible endpoint. Metrics are sent in
+        | Prometheus text exposition format via the Mimir import API.
+        | Run `php artisan external-apis:push-metrics` (or schedule it)
+        | to trigger a push.
         */
-        'prometheus' => [
-            'enabled' => env('EXTERNAL_APIS_PROMETHEUS_ENABLED', true),
-            'route' => env('EXTERNAL_APIS_PROMETHEUS_ROUTE', 'metrics/external-apis'),
-            'middleware' => ['api'],
-            'token' => env('EXTERNAL_APIS_PROMETHEUS_TOKEN'),
+        'grafana_cloud' => [
+            'enabled' => env('GRAFANA_CLOUD_METRICS_ENABLED', false),
+            'endpoint' => env('GRAFANA_CLOUD_METRICS_ENDPOINT'),
+            'user_id' => env('GRAFANA_CLOUD_USER_ID'),
+            'api_token' => env('GRAFANA_CLOUD_API_TOKEN'),
         ],
 
         'semrush' => [
