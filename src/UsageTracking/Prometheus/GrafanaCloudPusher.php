@@ -35,11 +35,10 @@ final class GrafanaCloudPusher
         $response = $this->http
             ->withBasicAuth((string) $config['user_id'], (string) $config['api_token'])
             ->withHeaders([
-                'Content-Type' => 'application/x-protobuf',
                 'Content-Encoding' => 'snappy',
                 'X-Prometheus-Remote-Write-Version' => '0.1.0',
             ])
-            ->withBody($compressed)
+            ->withBody($compressed, 'application/x-protobuf')
             ->post(rtrim((string) $config['endpoint'], '/'));
 
         $this->timeSeries = [];
@@ -261,8 +260,21 @@ final class GrafanaCloudPusher
 
         $offset = 0;
         while ($offset < $length) {
-            $chunkSize = min(60, $length - $offset);
-            $encoded .= chr(($chunkSize - 1) << 2);
+            $chunkSize = min(65536, $length - $offset);
+
+            if ($chunkSize < 60) {
+                // Short literal: length encoded in tag byte upper 6 bits
+                $encoded .= chr(($chunkSize - 1) << 2);
+            } elseif ($chunkSize <= 256) {
+                // 1-byte extended length (tag bits [7:2] = 60)
+                $encoded .= chr(60 << 2);
+                $encoded .= chr($chunkSize - 1);
+            } else {
+                // 2-byte extended length (tag bits [7:2] = 61)
+                $encoded .= chr(61 << 2);
+                $encoded .= pack('v', $chunkSize - 1);
+            }
+
             $encoded .= substr($data, $offset, $chunkSize);
             $offset += $chunkSize;
         }
