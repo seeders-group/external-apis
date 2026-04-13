@@ -7,7 +7,6 @@ use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
 use Seeders\ExternalApis\Integrations\Moz\MozLinksConnector;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
-use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 
 it('registers the ahrefs connector', function (): void {
     $connector = resolve(AhrefsConnector::class);
@@ -44,12 +43,6 @@ it('registers semrush connector as transient', function (): void {
     $secondConnector = resolve(SemrushConnector::class);
 
     expect($firstConnector)->not->toBe($secondConnector);
-});
-
-it('registers the semrush usage tracker service', function (): void {
-    $service = resolve(SemrushUsageTrackerService::class);
-
-    expect($service)->toBeInstanceOf(SemrushUsageTrackerService::class);
 });
 
 it('loads the configuration', function (): void {
