@@ -9,7 +9,6 @@ use Seeders\ExternalApis\UsageTracking\Services\AhrefsUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\DataForSeoUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\SemrushUsageTrackerService;
 
 beforeEach(function (): void {
     Schema::dropIfExists('api_usage_logs');
@@ -129,17 +128,6 @@ it('tracks prism usage across text, embeddings, image, and audio paths', functio
     expect($audio->characters_processed)->toBe(300_000);
     expect($error->status)->toBe('error');
     expect($service->providerToIntegration(Provider::OpenAI))->toBe('openai');
-});
-
-it('tracks semrush requests and errors through semrush usage service', function (): void {
-    $service = new SemrushUsageTrackerService;
-    $log = $service->logRequest('/analytics/v1/', 'backlinks_overview', 40, ['feature' => 'backlinks']);
-    $error = $service->logError('/analytics/v1/', 'backlinks_overview', 'rate-limit', ['feature' => 'backlinks']);
-
-    expect($log->total_tokens)->toBe(40);
-    expect($error->status)->toBe('error');
-    expect($service->getTodayUnitsConsumed())->toBe(40);
-    expect($service->getMonthToDateUnitsConsumed())->toBe(40);
 });
 
 it('stores trackable_type and trackable_id from prism context', function (): void {

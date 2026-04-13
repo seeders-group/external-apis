@@ -18,35 +18,9 @@ use Seeders\ExternalApis\Integrations\Semrush\Requests\BacklinksOverviewRequest;
 use Seeders\ExternalApis\Integrations\Semrush\Requests\BatchComparisonRequest;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\UsageTracking\Models\ApiLog;
-use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
 
 beforeEach(function (): void {
-    Schema::dropIfExists('api_usage_logs');
     Schema::dropIfExists('api_logs');
-
-    Schema::create('api_usage_logs', function (Blueprint $table): void {
-        $table->id();
-        $table->string('integration', 50)->index();
-        $table->string('request_id')->nullable();
-        $table->string('model', 50)->nullable()->index();
-        $table->string('endpoint', 100)->nullable();
-        $table->integer('prompt_tokens')->nullable();
-        $table->integer('completion_tokens')->nullable();
-        $table->integer('total_tokens')->nullable();
-        $table->integer('input_cached_tokens')->nullable();
-        $table->integer('images_generated')->nullable();
-        $table->integer('characters_processed')->nullable();
-        $table->integer('seconds_processed')->nullable();
-        $table->string('feature', 100)->index();
-        $table->string('sub_feature', 100)->nullable();
-        $table->unsignedBigInteger('project_id')->nullable();
-        $table->unsignedBigInteger('user_id')->nullable();
-        $table->nullableMorphs('trackable');
-        $table->string('status', 20)->default('success');
-        $table->text('error_message')->nullable();
-        $table->json('metadata')->nullable();
-        $table->timestamps();
-    });
 
     Schema::create('api_logs', function (Blueprint $table): void {
         $table->id();
@@ -77,7 +51,7 @@ it('requires tracking context for semrush requests', function (): void {
         ->toThrow(RuntimeException::class, 'requires tracking context');
 });
 
-it('records api_log and api_usage_log for backlinks overview', function (): void {
+it('records api_log for backlinks overview', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         BacklinksOverviewRequest::class => MockResponse::make("domain;ascore;backlinks\nexample.com;12;100", 200),
@@ -92,19 +66,11 @@ it('records api_log and api_usage_log for backlinks overview', function (): void
     ));
 
     $apiLog = ApiLog::query()->first();
-    $usageLog = ApiUsageLog::query()->first();
 
     expect($apiLog)->not->toBeNull();
-    expect($usageLog)->not->toBeNull();
-
     expect($apiLog->integration)->toBe('semrush');
     expect($apiLog->consumption_type)->toBe('units');
     expect((float) $apiLog->consumption)->toBe(40.0);
-
-    expect($usageLog->integration)->toBe('semrush');
-    expect($usageLog->feature)->toBe('backlinks_overview');
-    expect($usageLog->status)->toBe('success');
-    expect($usageLog->total_tokens)->toBe(40);
 });
 
 it('records trackable model metadata in api_logs when using forModel', function (): void {
@@ -150,11 +116,8 @@ it('records batch comparison units as 40 per target domain', function (): void {
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
-    $usageLog = ApiUsageLog::query()->latest()->first();
 
     expect((float) $apiLog->consumption)->toBe(120.0);
-    expect($usageLog->feature)->toBe('backlinks_comparison');
-    expect($usageLog->total_tokens)->toBe(120);
 });
 
 it('logs balance request with zero units', function (): void {
@@ -166,16 +129,12 @@ it('logs balance request with zero units', function (): void {
     $connector->send(new ApiUnitsBalanceRequest);
 
     $apiLog = ApiLog::query()->latest()->first();
-    $usageLog = ApiUsageLog::query()->latest()->first();
 
     expect((float) $apiLog->consumption)->toBe(0.0);
     expect($apiLog->consumption_type)->toBe('units');
-
-    expect($usageLog->feature)->toBe('api_units_balance');
-    expect($usageLog->total_tokens)->toBe(0);
 });
 
-it('logs failed semrush requests as zero units and error status', function (): void {
+it('logs failed semrush requests as zero units', function (): void {
     $connector = SemrushConnector::forScope('semrush_tracking_test');
     $connector->withMockClient(new MockClient([
         BacklinksOverviewRequest::class => MockResponse::make('internal error', 500),
@@ -190,13 +149,9 @@ it('logs failed semrush requests as zero units and error status', function (): v
     ));
 
     $apiLog = ApiLog::query()->latest()->first();
-    $usageLog = ApiUsageLog::query()->latest()->first();
 
     expect((float) $apiLog->consumption)->toBe(0.0);
     expect($apiLog->status)->toBe(500);
-
-    expect($usageLog->status)->toBe('error');
-    expect($usageLog->total_tokens)->toBe(0);
 });
 
 it('records semrush usage without any budget side effects', function (): void {
@@ -213,7 +168,7 @@ it('records semrush usage without any budget side effects', function (): void {
         ),
     ));
 
-    expect(ApiUsageLog::query()->count())->toBe(1);
+    expect(ApiLog::query()->count())->toBe(1);
 });
 
 it('fails fast for unsupported semrush requests', function (): void {
