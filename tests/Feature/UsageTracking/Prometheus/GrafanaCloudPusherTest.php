@@ -5,11 +5,13 @@ declare(strict_types=1);
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
-use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
+use Seeders\ExternalApis\UsageTracking\Models\AiUsageLog;
+use Seeders\ExternalApis\UsageTracking\Models\ApiConsumptionLog;
 use Seeders\ExternalApis\UsageTracking\Prometheus\GrafanaCloudPusher;
 
 beforeEach(function (): void {
     Schema::dropIfExists('api_usage_logs');
+    Schema::dropIfExists('api_logs');
 
     Schema::create('api_usage_logs', function (Blueprint $table): void {
         $table->id();
@@ -35,6 +37,18 @@ beforeEach(function (): void {
         $table->timestamps();
     });
 
+    Schema::create('api_logs', function (Blueprint $table): void {
+        $table->id();
+        $table->string('integration', 50)->index();
+        $table->string('scope')->nullable();
+        $table->nullableMorphs('trackable');
+        $table->string('endpoint', 100)->nullable();
+        $table->integer('status')->nullable();
+        $table->decimal('consumption', 12, 6)->default(0);
+        $table->json('metadata')->nullable();
+        $table->timestamps();
+    });
+
     config()->set('external-apis.usage_tracking.grafana_cloud', [
         'enabled' => true,
         'endpoint' => 'https://prometheus-prod-01.grafana.net/api/prom/push',
@@ -49,7 +63,7 @@ it('pushes metrics to grafana cloud via prometheus remote write', function (): v
         'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
     ]);
 
-    ApiUsageLog::create([
+    AiUsageLog::create([
         'integration' => 'openai',
         'prompt_tokens' => 1000,
         'completion_tokens' => 500,
@@ -57,7 +71,7 @@ it('pushes metrics to grafana cloud via prometheus remote write', function (): v
         'feature' => 'chat',
         'status' => 'success',
     ]);
-    ApiUsageLog::create([
+    AiUsageLog::create([
         'integration' => 'ahrefs',
         'prompt_tokens' => 0,
         'completion_tokens' => 0,
@@ -86,7 +100,7 @@ it('sends basic auth with user id and api token', function (): void {
         'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
     ]);
 
-    ApiUsageLog::create([
+    AiUsageLog::create([
         'integration' => 'openai',
         'prompt_tokens' => 100,
         'completion_tokens' => 50,
@@ -112,7 +126,7 @@ it('strips trailing slash from endpoint', function (): void {
         'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
     ]);
 
-    ApiUsageLog::create([
+    AiUsageLog::create([
         'integration' => 'openai',
         'prompt_tokens' => 100,
         'completion_tokens' => 50,
@@ -134,7 +148,7 @@ it('prefixes metric names with the configured namespace', function (): void {
         'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
     ]);
 
-    ApiUsageLog::create([
+    AiUsageLog::create([
         'integration' => 'openai',
         'prompt_tokens' => 100,
         'completion_tokens' => 50,
@@ -152,8 +166,91 @@ it('prefixes metric names with the configured namespace', function (): void {
         $body = $request->body();
 
         // The binary protobuf body should contain the namespaced metric name
-        return str_contains($body, 'seeders_external_apis_requests_total')
-            && str_contains($body, 'seeders_external_apis_total_tokens_total')
-            && ! str_contains($body, '__name__external_apis_requests_total');
+        return str_contains($body, 'seeders_api_usage_logs_requests_total')
+            && str_contains($body, 'seeders_api_usage_logs_total_tokens_total')
+            && ! str_contains($body, '__name__api_usage_logs_requests_total');
+    });
+});
+
+it('includes api log metrics in the push', function (): void {
+    Http::fake([
+        'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
+    ]);
+
+    ApiConsumptionLog::create([
+        'integration' => 'semrush',
+        'scope' => 'backlinks',
+        'endpoint' => '/backlinks/overview',
+        'status' => 200,
+        'consumption' => 40.0,
+    ]);
+    ApiConsumptionLog::create([
+        'integration' => 'semrush',
+        'scope' => 'backlinks',
+        'endpoint' => '/backlinks/overview',
+        'status' => 429,
+        'consumption' => 0,
+    ]);
+    ApiConsumptionLog::create([
+        'integration' => 'dataforseo',
+        'scope' => 'serp',
+        'endpoint' => '/serp/google/organic',
+        'status' => 200,
+        'consumption' => 1.5,
+    ]);
+
+    $pusher = app(GrafanaCloudPusher::class);
+    $response = $pusher->push();
+
+    expect($response->successful())->toBeTrue();
+
+    Http::assertSent(function ($request) {
+        $body = $request->body();
+
+        return str_contains($body, 'api_logs_requests_total')
+            && str_contains($body, 'api_logs_consumption_total')
+            && str_contains($body, 'api_logs_success_total')
+            && str_contains($body, 'api_logs_failures_total')
+            && str_contains($body, 'semrush')
+            && str_contains($body, 'dataforseo')
+            && str_contains($body, 'ApiConsumptionLog')
+            && str_contains($body, 'api_logs');
+    });
+});
+
+it('includes model and table labels in all metrics', function (): void {
+    Http::fake([
+        'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
+    ]);
+
+    AiUsageLog::create([
+        'integration' => 'openai',
+        'prompt_tokens' => 100,
+        'completion_tokens' => 50,
+        'total_tokens' => 150,
+        'feature' => 'chat',
+        'status' => 'success',
+    ]);
+
+    ApiConsumptionLog::create([
+        'integration' => 'semrush',
+        'scope' => 'backlinks',
+        'endpoint' => '/backlinks/overview',
+        'status' => 200,
+        'consumption' => 40.0,
+    ]);
+
+    $pusher = app(GrafanaCloudPusher::class);
+    $response = $pusher->push();
+
+    expect($response->successful())->toBeTrue();
+
+    Http::assertSent(function ($request) {
+        $body = $request->body();
+
+        return str_contains($body, 'AiUsageLog')
+            && str_contains($body, 'api_usage_logs')
+            && str_contains($body, 'ApiConsumptionLog')
+            && str_contains($body, 'api_logs');
     });
 });

@@ -4,18 +4,9 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Contracts;
 
-interface ApiUsageLogInterface
+/**
+ * @deprecated Use {@see AiUsageLogInterface} instead. This interface will be removed in a future release.
+ */
+interface ApiUsageLogInterface extends AiUsageLogInterface
 {
-    /**
-     * Create a new usage log entry.
-     *
-     * @param  array<string, mixed>  $attributes
-     * @return static
-     */
-    public static function create(array $attributes): self;
-
-    /**
-     * Get the table name for this model.
-     */
-    public function getTable(): string;
 }

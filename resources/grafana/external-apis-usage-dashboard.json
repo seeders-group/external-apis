@@ -1,0 +1,519 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus / Mimir datasource for external-apis metrics",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    { "type": "grafana", "id": "grafana", "name": "Grafana", "version": "10.0.0" },
+    { "type": "datasource", "id": "prometheus", "name": "Prometheus", "version": "1.0.0" },
+    { "type": "panel", "id": "timeseries", "name": "Time series", "version": "" },
+    { "type": "panel", "id": "stat", "name": "Stat", "version": "" },
+    { "type": "panel", "id": "table", "name": "Table", "version": "" },
+    { "type": "panel", "id": "piechart", "name": "Pie chart", "version": "" },
+    { "type": "panel", "id": "barchart", "name": "Bar chart", "version": "" },
+    { "type": "panel", "id": "bargauge", "name": "Bar gauge", "version": "" }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "Deep monitoring for the seeders-group/external-apis package.\n\nTwo data sources:\n- ApiUsageLog (api_usage_logs) — AI / LLM token-based usage (OpenAI, Gemini, etc.)\n- ApiLog (api_logs) — General API consumption tracking (Ahrefs, SEMrush, DataForSEO, etc.)",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "AI / LLM Usage — ApiUsageLog (api_usage_logs)",
+      "type": "row",
+      "panels": []
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5000 }, { "color": "red", "value": 50000 }] }, "mappings": [] } },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "id": 1,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "AI Requests",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "yellow", "value": 500000 }, { "color": "red", "value": 5000000 }] }, "mappings": [] } },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
+      "id": 2,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Total Tokens",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_usage_logs_total_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "super-light-blue", "value": null }, { "color": "yellow", "value": 250000 }, { "color": "red", "value": 2500000 }] }, "mappings": [] } },
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+      "id": 3,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Prompt Tokens",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_usage_logs_prompt_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "light-orange", "value": null }, { "color": "yellow", "value": 250000 }, { "color": "red", "value": 2500000 }] }, "mappings": [] } },
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
+      "id": 4,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Completion Tokens",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_usage_logs_completion_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "mappings": [], "noValue": "0" } },
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
+      "id": 5,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Successful",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\", status=\"success\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 50 }] }, "mappings": [], "noValue": "0" } },
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
+      "id": 6,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Failed",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\", status=\"failure\"}) or vector(0)", "legendFormat": "", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Requests", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "showPoints": "auto", "stacking": { "group": "A", "mode": "none" } }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 6 },
+      "id": 10,
+      "options": { "legend": { "calcs": ["lastNotNull", "max", "mean"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "AI Requests Over Time",
+      "type": "timeseries",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Tokens", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "showPoints": "auto", "stacking": { "group": "A", "mode": "none" } }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 6 },
+      "id": 11,
+      "options": { "legend": { "calcs": ["lastNotNull", "max", "mean"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "Total Tokens Over Time",
+      "type": "timeseries",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_usage_logs_total_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Tokens", "drawStyle": "bars", "fillOpacity": 80, "lineWidth": 1, "stacking": { "group": "A", "mode": "normal" } }, "mappings": [], "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Prompt" }, "properties": [{ "id": "color", "value": { "fixedColor": "semi-dark-blue", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Completion" }, "properties": [{ "id": "color", "value": { "fixedColor": "semi-dark-orange", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 15 },
+      "id": 12,
+      "options": { "legend": { "calcs": ["lastNotNull", "sum"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "Prompt vs Completion Tokens (Stacked)",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum(${namespace}_api_usage_logs_prompt_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "Prompt", "refId": "A" },
+        { "expr": "sum(${namespace}_api_usage_logs_completion_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "Completion", "refId": "B" }
+      ]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Tokens", "drawStyle": "bars", "fillOpacity": 80, "lineWidth": 1, "stacking": { "group": "A", "mode": "normal" } }, "mappings": [], "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Prompt" }, "properties": [{ "id": "color", "value": { "fixedColor": "semi-dark-blue", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "Completion" }, "properties": [{ "id": "color", "value": { "fixedColor": "semi-dark-orange", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 15 },
+      "id": 13,
+      "options": { "legend": { "calcs": ["lastNotNull", "sum"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "Prompt vs Completion per Integration",
+      "type": "timeseries",
+      "targets": [
+        { "expr": "sum by (integration) (${namespace}_api_usage_logs_prompt_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }} prompt", "refId": "A" },
+        { "expr": "sum by (integration) (${namespace}_api_usage_logs_completion_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }} completion", "refId": "B" }
+      ]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] } },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 24 },
+      "id": 14,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "AI Request Share by Integration",
+      "type": "piechart",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] } },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 24 },
+      "id": 15,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "Token Share by Integration",
+      "type": "piechart",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_usage_logs_total_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "success" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "failure" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 24 },
+      "id": 16,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "AI Success vs Failure",
+      "type": "piechart",
+      "targets": [{ "expr": "sum by (status) (${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\"})", "legendFormat": "{{ status }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 24 },
+      "id": 17,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "horizontal", "displayMode": "gradient", "valueMode": "color", "showUnfilled": true, "minVizWidth": 8, "minVizHeight": 16 },
+      "title": "Tokens per AI Integration",
+      "type": "bargauge",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_usage_logs_total_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "legendFormat": "{{ integration }}", "refId": "A", "instant": true }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic-by-name" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Value #requests" }, "properties": [{ "id": "displayName", "value": "Requests" }] },
+          { "matcher": { "id": "byName", "options": "Value #prompt" }, "properties": [{ "id": "displayName", "value": "Prompt Tokens" }] },
+          { "matcher": { "id": "byName", "options": "Value #completion" }, "properties": [{ "id": "displayName", "value": "Completion Tokens" }] },
+          { "matcher": { "id": "byName", "options": "Value #total" }, "properties": [{ "id": "displayName", "value": "Total Tokens" }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+      "id": 18,
+      "options": { "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Total Tokens" }], "footer": { "show": true, "reducer": ["sum"], "countRows": false } },
+      "title": "AI Usage Breakdown — api_usage_logs",
+      "type": "table",
+      "transformations": [{ "id": "merge", "options": {} }],
+      "targets": [
+        { "expr": "sum by (integration, status) (${namespace}_api_usage_logs_requests_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "refId": "requests", "instant": true, "format": "table" },
+        { "expr": "sum by (integration, status) (${namespace}_api_usage_logs_prompt_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "refId": "prompt", "instant": true, "format": "table" },
+        { "expr": "sum by (integration, status) (${namespace}_api_usage_logs_completion_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "refId": "completion", "instant": true, "format": "table" },
+        { "expr": "sum by (integration, status) (${namespace}_api_usage_logs_total_tokens_total{integration=~\"$ai_integration\", status=~\"$ai_status\"})", "refId": "total", "instant": true, "format": "table" }
+      ]
+    },
+
+
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 40 },
+      "id": 200,
+      "title": "General API Consumption — ApiLog (api_logs)",
+      "type": "row",
+      "panels": []
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 5000 }, { "color": "red", "value": 50000 }] }, "mappings": [] } },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 41 },
+      "id": 20,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Total API Calls",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_logs_requests_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }, { "color": "yellow", "value": 10000 }, { "color": "red", "value": 100000 }] }, "mappings": [] } },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 41 },
+      "id": 21,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Total Consumption (Units)",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "mappings": [], "noValue": "0" } },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 41 },
+      "id": 22,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Successful Calls",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_logs_success_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }, { "color": "red", "value": 100 }] }, "mappings": [], "noValue": "0" } },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 41 },
+      "id": 23,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "auto", "colorMode": "background", "graphMode": "area" },
+      "title": "Failed Calls",
+      "type": "stat",
+      "targets": [{ "expr": "sum(${namespace}_api_logs_failures_total{integration=~\"$api_integration\", scope=~\"$scope\"}) or vector(0)", "legendFormat": "", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Requests", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "showPoints": "auto", "stacking": { "group": "A", "mode": "none" } }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 46 },
+      "id": 30,
+      "options": { "legend": { "calcs": ["lastNotNull", "max", "mean"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "API Requests Over Time",
+      "type": "timeseries",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_logs_requests_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Units", "drawStyle": "line", "fillOpacity": 20, "gradientMode": "opacity", "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "showPoints": "auto", "stacking": { "group": "A", "mode": "none" } }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 46 },
+      "id": 31,
+      "options": { "legend": { "calcs": ["lastNotNull", "max", "mean"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "API Consumption Over Time",
+      "type": "timeseries",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Units", "drawStyle": "bars", "fillOpacity": 80, "lineWidth": 1, "stacking": { "group": "A", "mode": "normal" } }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 55 },
+      "id": 32,
+      "options": { "legend": { "calcs": ["lastNotNull", "sum"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "Consumption by Scope (Stacked)",
+      "type": "timeseries",
+      "targets": [{ "expr": "sum by (scope) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ scope }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "axisLabel": "Requests", "drawStyle": "bars", "fillOpacity": 80, "lineWidth": 1, "stacking": { "group": "A", "mode": "normal" } }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 55 },
+      "id": 33,
+      "options": { "legend": { "calcs": ["lastNotNull", "sum"], "displayMode": "table", "placement": "bottom" }, "tooltip": { "mode": "multi", "sort": "desc" } },
+      "title": "Requests by Scope (Stacked)",
+      "type": "timeseries",
+      "targets": [{ "expr": "sum by (scope) (${namespace}_api_logs_requests_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ scope }}", "refId": "A" }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] } },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 64 },
+      "id": 34,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "Request Share by Integration",
+      "type": "piechart",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_logs_requests_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] } },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 64 },
+      "id": 35,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "Consumption Share by Integration",
+      "type": "piechart",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ integration }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] } },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 64 },
+      "id": 36,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "Consumption Share by Scope",
+      "type": "piechart",
+      "targets": [{ "expr": "sum by (scope) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ scope }}", "refId": "A" }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic" }, "custom": { "hideFrom": { "legend": false, "tooltip": false, "viz": false } }, "mappings": [] },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "success" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] },
+          { "matcher": { "id": "byName", "options": "failures" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 64 },
+      "id": 37,
+      "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] }, "tooltip": { "mode": "single" }, "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "pieType": "donut" },
+      "title": "API Success vs Failure",
+      "type": "piechart",
+      "targets": [
+        { "expr": "sum(${namespace}_api_logs_success_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "success", "refId": "A" },
+        { "expr": "sum(${namespace}_api_logs_failures_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "failures", "refId": "B" }
+      ]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 72 },
+      "id": 38,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "horizontal", "displayMode": "gradient", "valueMode": "color", "showUnfilled": true, "minVizWidth": 8, "minVizHeight": 16 },
+      "title": "Consumption per Integration (Bar Gauge)",
+      "type": "bargauge",
+      "targets": [{ "expr": "sum by (integration) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ integration }}", "refId": "A", "instant": true }]
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }, "mappings": [], "unit": "short" } },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 72 },
+      "id": 39,
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "horizontal", "displayMode": "gradient", "valueMode": "color", "showUnfilled": true, "minVizWidth": 8, "minVizHeight": 16 },
+      "title": "Consumption per Scope (Bar Gauge)",
+      "type": "bargauge",
+      "targets": [{ "expr": "sum by (scope) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "legendFormat": "{{ scope }}", "refId": "A", "instant": true }]
+    },
+
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": { "color": { "mode": "palette-classic-by-name" }, "custom": { "align": "auto", "cellOptions": { "type": "auto" }, "inspect": false }, "mappings": [], "unit": "short" },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Value #requests" }, "properties": [{ "id": "displayName", "value": "Requests" }] },
+          { "matcher": { "id": "byName", "options": "Value #consumption" }, "properties": [{ "id": "displayName", "value": "Consumption" }] },
+          { "matcher": { "id": "byName", "options": "Value #success" }, "properties": [{ "id": "displayName", "value": "Successful" }] },
+          { "matcher": { "id": "byName", "options": "Value #failures" }, "properties": [{ "id": "displayName", "value": "Failed" }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 80 },
+      "id": 40,
+      "options": { "showHeader": true, "sortBy": [{ "desc": true, "displayName": "Consumption" }], "footer": { "show": true, "reducer": ["sum"], "countRows": false } },
+      "title": "API Consumption Breakdown — api_logs",
+      "type": "table",
+      "transformations": [{ "id": "merge", "options": {} }],
+      "targets": [
+        { "expr": "sum by (integration, scope) (${namespace}_api_logs_requests_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "refId": "requests", "instant": true, "format": "table" },
+        { "expr": "sum by (integration, scope) (${namespace}_api_logs_consumption_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "refId": "consumption", "instant": true, "format": "table" },
+        { "expr": "sum by (integration, scope) (${namespace}_api_logs_success_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "refId": "success", "instant": true, "format": "table" },
+        { "expr": "sum by (integration, scope) (${namespace}_api_logs_failures_total{integration=~\"$api_integration\", scope=~\"$scope\"})", "refId": "failures", "instant": true, "format": "table" }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["external-apis", "usage-tracking", "prometheus", "ai", "api-consumption"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "", "value": "" },
+        "description": "Metric namespace prefix (e.g. 'seeders_'). Leave empty if no namespace.",
+        "hide": 0,
+        "label": "Namespace",
+        "name": "namespace",
+        "options": [
+          { "selected": true, "text": "", "value": "" },
+          { "selected": false, "text": "seeders_", "value": "seeders_" }
+        ],
+        "query": ",seeders_",
+        "type": "custom"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "definition": "label_values(${namespace}_api_usage_logs_requests_total, integration)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "AI Integration",
+        "multi": true,
+        "name": "ai_integration",
+        "query": { "query": "label_values(${namespace}_api_usage_logs_requests_total, integration)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "definition": "label_values(${namespace}_api_usage_logs_requests_total, status)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "AI Status",
+        "multi": true,
+        "name": "ai_status",
+        "query": { "query": "label_values(${namespace}_api_usage_logs_requests_total, status)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "definition": "label_values(${namespace}_api_logs_requests_total, integration)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "API Integration",
+        "multi": true,
+        "name": "api_integration",
+        "query": { "query": "label_values(${namespace}_api_logs_requests_total, integration)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": true, "text": "All", "value": "$__all" },
+        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "definition": "label_values(${namespace}_api_logs_requests_total, scope)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Scope",
+        "multi": true,
+        "name": "scope",
+        "query": { "query": "label_values(${namespace}_api_logs_requests_total, scope)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-24h", "to": "now" },
+  "timepicker": {},
+  "timezone": "",
+  "title": "External APIs — Usage Tracking",
+  "uid": "",
+  "version": 0
+}

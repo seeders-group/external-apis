@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking;
 
-use Seeders\ExternalApis\UsageTracking\Models\ApiLog;
-use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
+use Seeders\ExternalApis\UsageTracking\Models\AiUsageLog;
+use Seeders\ExternalApis\UsageTracking\Models\ApiConsumptionLog;
 
 class UsageTracking
 {
     /** @var class-string */
-    public static string $apiUsageLogModel = ApiUsageLog::class;
+    public static string $apiUsageLogModel = AiUsageLog::class;
 
     /** @var class-string */
-    public static string $apiLogModel = ApiLog::class;
+    public static string $apiLogModel = ApiConsumptionLog::class;
 
     public static string $userModel = 'App\\Models\\User';
 

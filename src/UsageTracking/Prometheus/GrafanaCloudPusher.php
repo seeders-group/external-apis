@@ -50,7 +50,18 @@ final class GrafanaCloudPusher
     private function buildTimeSeries(string $namespace): void
     {
         $prefix = $namespace !== '' ? rtrim($namespace, '_') . '_' : '';
+        $timestampMs = (int) (microtime(true) * 1000);
 
+        $this->buildApiUsageLogSeries($prefix, $timestampMs);
+        $this->buildApiLogSeries($prefix, $timestampMs);
+    }
+
+    /**
+     * Metrics from the AiUsageLog model (api_usage_logs table).
+     * Tracks AI/token-based API usage: prompt tokens, completion tokens, etc.
+     */
+    private function buildApiUsageLogSeries(string $prefix, int $timestampMs): void
+    {
         $logModel = UsageTracking::$apiUsageLogModel;
         $rows = $logModel::query()
             ->selectRaw('integration, status, COUNT(*) as request_count')
@@ -60,18 +71,54 @@ final class GrafanaCloudPusher
             ->groupBy('integration', 'status')
             ->get();
 
-        $timestampMs = (int) (microtime(true) * 1000);
+        $modelClass = class_basename($logModel);
+        $tableName = (new $logModel)->getTable();
 
         foreach ($rows as $row) {
             $labels = [
                 'integration' => $row->integration,
                 'status' => $row->status,
+                'model' => $modelClass,
+                'table' => $tableName,
             ];
 
-            $this->addGauge($prefix . 'external_apis_requests_total', (float) $row->request_count, $labels, $timestampMs);
-            $this->addGauge($prefix . 'external_apis_prompt_tokens_total', (float) $row->prompt_tokens_total, $labels, $timestampMs);
-            $this->addGauge($prefix . 'external_apis_completion_tokens_total', (float) $row->completion_tokens_total, $labels, $timestampMs);
-            $this->addGauge($prefix . 'external_apis_total_tokens_total', (float) $row->total_tokens_total, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_usage_logs_requests_total', (float) $row->request_count, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_usage_logs_prompt_tokens_total', (float) $row->prompt_tokens_total, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_usage_logs_completion_tokens_total', (float) $row->completion_tokens_total, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_usage_logs_total_tokens_total', (float) $row->total_tokens_total, $labels, $timestampMs);
+        }
+    }
+
+    /**
+     * Metrics from the ApiConsumptionLog model (api_logs table).
+     * Tracks general API consumption: request counts, consumption units, success/failure.
+     */
+    private function buildApiLogSeries(string $prefix, int $timestampMs): void
+    {
+        $logModel = UsageTracking::$apiLogModel;
+        $rows = $logModel::query()
+            ->selectRaw('integration, scope, COUNT(*) as request_count')
+            ->selectRaw('COALESCE(SUM(consumption), 0) as consumption_total')
+            ->selectRaw('SUM(CASE WHEN status >= 200 AND status < 300 THEN 1 ELSE 0 END) as success_count')
+            ->selectRaw('SUM(CASE WHEN status < 200 OR status >= 400 THEN 1 ELSE 0 END) as failure_count')
+            ->groupBy('integration', 'scope')
+            ->get();
+
+        $modelClass = class_basename($logModel);
+        $tableName = (new $logModel)->getTable();
+
+        foreach ($rows as $row) {
+            $labels = [
+                'integration' => $row->integration,
+                'scope' => (string) ($row->scope ?? ''),
+                'model' => $modelClass,
+                'table' => $tableName,
+            ];
+
+            $this->addGauge($prefix . 'api_logs_requests_total', (float) $row->request_count, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_logs_consumption_total', (float) $row->consumption_total, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_logs_success_total', (float) $row->success_count, $labels, $timestampMs);
+            $this->addGauge($prefix . 'api_logs_failures_total', (float) $row->failure_count, $labels, $timestampMs);
         }
     }
 
