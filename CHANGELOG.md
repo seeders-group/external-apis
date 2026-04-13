@@ -2,6 +2,19 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.3.2 - 2026-04-13
+
+### What's Changed
+
+* Fixed the Semrush integrations to log only to api_logs by @jessehendriks in https://github.com/seeders-group/external-apis/pull/12
+* Feature/std 475 added usage tracking by @Jeffrey-H in https://github.com/seeders-group/external-apis/pull/13
+
+### New Contributors
+
+* @jessehendriks made their first contribution in https://github.com/seeders-group/external-apis/pull/12
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.3.1...v1.3.2
+
 ## v1.3.1 - 2026-04-13
 
 ### What's Changed
