@@ -49,7 +49,7 @@ final class GrafanaCloudPusher
 
     private function buildTimeSeries(string $namespace): void
     {
-        $prefix = $namespace !== '' ? rtrim($namespace, '_') . '_' : '';
+        $prefix = $namespace !== '' ? rtrim($namespace, '_').'_' : '';
 
         $logModel = UsageTracking::$apiUsageLogModel;
         $rows = $logModel::query()
@@ -68,15 +68,15 @@ final class GrafanaCloudPusher
                 'status' => $row->status,
             ];
 
-            $this->addGauge($prefix . 'external_apis_requests_total', (float) $row->request_count, $labels, $timestampMs);
-            $this->addGauge($prefix . 'external_apis_prompt_tokens_total', (float) $row->prompt_tokens_total, $labels, $timestampMs);
-            $this->addGauge($prefix . 'external_apis_completion_tokens_total', (float) $row->completion_tokens_total, $labels, $timestampMs);
-            $this->addGauge($prefix . 'external_apis_total_tokens_total', (float) $row->total_tokens_total, $labels, $timestampMs);
+            $this->addGauge($prefix.'external_apis_requests_total', (float) $row->request_count, $labels, $timestampMs);
+            $this->addGauge($prefix.'external_apis_prompt_tokens_total', (float) $row->prompt_tokens_total, $labels, $timestampMs);
+            $this->addGauge($prefix.'external_apis_completion_tokens_total', (float) $row->completion_tokens_total, $labels, $timestampMs);
+            $this->addGauge($prefix.'external_apis_total_tokens_total', (float) $row->total_tokens_total, $labels, $timestampMs);
         }
     }
 
     /**
-     * @param array<string, string> $labels
+     * @param  array<string, string>  $labels
      */
     private function addGauge(string $name, float $value, array $labels, int $timestampMs): void
     {
@@ -109,7 +109,7 @@ final class GrafanaCloudPusher
     }
 
     /**
-     * @param array<string, string> $labels
+     * @param  array<string, string>  $labels
      */
     private function encodeTimeSeries(array $labels, float $value, int $timestampMs): string
     {
@@ -127,11 +127,11 @@ final class GrafanaCloudPusher
         });
 
         foreach ($labels as $name => $labelValue) {
-            $label = $this->encodeString(1, $name) . $this->encodeString(2, $labelValue);
+            $label = $this->encodeString(1, $name).$this->encodeString(2, $labelValue);
             $ts .= $this->encodeField(1, $label);
         }
 
-        $sample = $this->encodeDouble(1, $value) . $this->encodeVarintField(2, $timestampMs);
+        $sample = $this->encodeDouble(1, $value).$this->encodeVarintField(2, $timestampMs);
         $ts .= $this->encodeField(2, $sample);
 
         return $ts;
@@ -144,7 +144,7 @@ final class GrafanaCloudPusher
     {
         $tag = ($fieldNumber << 3) | 2;
 
-        return $this->encodeVarint($tag) . $this->encodeVarint(strlen($data)) . $data;
+        return $this->encodeVarint($tag).$this->encodeVarint(strlen($data)).$data;
     }
 
     /**
@@ -162,7 +162,7 @@ final class GrafanaCloudPusher
     {
         $tag = ($fieldNumber << 3) | 1;
 
-        return $this->encodeVarint($tag) . pack('e', $value);
+        return $this->encodeVarint($tag).pack('e', $value);
     }
 
     /**
@@ -172,7 +172,7 @@ final class GrafanaCloudPusher
     {
         $tag = ($fieldNumber << 3) | 0;
 
-        return $this->encodeVarint($tag) . $this->encodeVarint($value);
+        return $this->encodeVarint($tag).$this->encodeVarint($value);
     }
 
     /**
