@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
-use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
@@ -36,40 +35,34 @@ class ApiLog extends Model
         return $this->morphTo();
     }
 
-    #[Scope]
-    protected function forIntegration($query, string $integration)
+    public function scopeForIntegration($query, string $integration)
     {
         return $query->where('integration', $integration);
     }
 
-    #[Scope]
-    protected function forScope($query, string $scope)
+    public function scopeForScope($query, string $scope)
     {
         return $query->where('scope', $scope);
     }
 
-    #[Scope]
-    protected function today($query)
+    public function scopeToday($query)
     {
         return $query->whereDate('created_at', today());
     }
 
-    #[Scope]
-    protected function thisMonth($query)
+    public function scopeThisMonth($query)
     {
         return $query->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year);
     }
 
-    #[Scope]
-    protected function successful($query)
+    public function scopeSuccessful($query)
     {
         return $query->where('status', '>=', 200)
             ->where('status', '<', 300);
     }
 
-    #[Scope]
-    protected function failed($query)
+    public function scopeFailed($query)
     {
         return $query->where(function ($q): void {
             $q->where('status', '<', 200)

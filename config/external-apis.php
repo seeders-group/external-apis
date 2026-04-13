@@ -123,70 +123,29 @@ return [
     'usage_tracking' => [
         'enabled' => true,
 
+        /*
+        |----------------------------------------------------------------------
+        | Grafana Cloud Metrics (Push)
+        |----------------------------------------------------------------------
+        |
+        | Pushes aggregated API usage metrics to Grafana Cloud using the
+        | Prometheus remote-write compatible endpoint. Metrics are sent in
+        | Prometheus text exposition format via the Mimir import API.
+        | Run `php artisan external-apis:push-metrics` (or schedule it)
+        | to trigger a push.
+        */
+        'grafana_cloud' => [
+            'enabled' => env('GRAFANA_CLOUD_METRICS_ENABLED', false),
+            'endpoint' => env('GRAFANA_CLOUD_METRICS_ENDPOINT'),
+            'user_id' => env('GRAFANA_CLOUD_USER_ID'),
+            'api_token' => env('GRAFANA_CLOUD_API_TOKEN'),
+        ],
+
         'semrush' => [
             'unit_rules' => [
                 'backlinks_overview' => 40,
                 'backlinks_comparison_per_target' => 40,
                 'api_units' => 0,
-            ],
-        ],
-
-        'pricing' => [
-            'openai' => [
-                'models' => [
-                    'dall-e-3' => [
-                        'standard_1024x1024' => 0.040,
-                        'standard_1024x1792' => 0.080,
-                        'standard_1792x1024' => 0.080,
-                        'hd_1024x1024' => 0.080,
-                        'hd_1024x1792' => 0.120,
-                        'hd_1792x1024' => 0.120,
-                    ],
-                    'dall-e-2' => [
-                        '1024x1024' => 0.016,
-                        '512x512' => 0.018,
-                        '256x256' => 0.020,
-                    ],
-                    'whisper' => [
-                        'per_minute' => 0.006,
-                    ],
-                    'tts' => [
-                        'per_1m_characters' => 15.00,
-                    ],
-                    'tts-hd' => [
-                        'per_1m_characters' => 30.00,
-                    ],
-                ],
-                'costs_api_url' => 'https://api.openai.com/v1/organization/costs',
-                'usage_api_url' => 'https://api.openai.com/v1/organization/usage',
-            ],
-            'gemini' => [
-                'models' => [
-                    'gemini-2.0-flash' => [
-                        'input_per_1m_tokens' => 0.10,
-                        'output_per_1m_tokens' => 0.40,
-                    ],
-                    'gemini-1.5-flash' => [
-                        'input_per_1m_tokens' => 0.075,
-                        'output_per_1m_tokens' => 0.30,
-                    ],
-                    'gemini-1.5-pro' => [
-                        'input_per_1m_tokens' => 1.25,
-                        'output_per_1m_tokens' => 5.00,
-                    ],
-                ],
-            ],
-            'ahrefs' => [
-                'cost_per_unit' => 0.01,
-                'unit_type' => 'api_units',
-            ],
-            'semrush' => [
-                'cost_per_unit' => 0.00005,
-                'unit_type' => 'api_units',
-            ],
-            'scraperapi' => [
-                'cost_per_unit' => 0.00049,
-                'unit_type' => 'api_credits',
             ],
         ],
     ],

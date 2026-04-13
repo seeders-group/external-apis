@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
-use Illuminate\Support\Facades\Log;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
-use Throwable;
 
 class SemrushUsageTrackerService
 {
@@ -18,14 +16,13 @@ class SemrushUsageTrackerService
     ) {
         $logModel = UsageTracking::$apiUsageLogModel;
 
-        $log = $logModel::create([
+        return $logModel::create([
             'integration' => 'semrush',
             'model' => null,
             'endpoint' => $endpoint,
             'prompt_tokens' => 0,
             'completion_tokens' => 0,
             'total_tokens' => $unitsConsumed,
-            'estimated_cost' => $this->calculateCost($unitsConsumed, $requestType),
             'feature' => $context['feature'] ?? 'semrush',
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
@@ -37,10 +34,6 @@ class SemrushUsageTrackerService
                 'target_count' => $context['target_count'] ?? null,
             ]),
         ]);
-
-        $this->checkBudgetThreshold();
-
-        return $log;
     }
 
     public function logError(
@@ -56,7 +49,6 @@ class SemrushUsageTrackerService
             'model' => null,
             'endpoint' => $endpoint,
             'total_tokens' => 0,
-            'estimated_cost' => 0,
             'feature' => $context['feature'] ?? 'semrush',
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
@@ -71,22 +63,6 @@ class SemrushUsageTrackerService
         ]);
     }
 
-    public function calculateCost(int $unitsConsumed, ?string $requestType = null): float
-    {
-        $pricingModel = UsageTracking::$apiServicePricingModel;
-
-        return $pricingModel::calculateCost('semrush', $unitsConsumed, $requestType);
-    }
-
-    public function getTodaySpend(): float
-    {
-        $logModel = UsageTracking::$apiUsageLogModel;
-
-        return (float) $logModel::byIntegration('semrush')
-            ->today()
-            ->sum('estimated_cost');
-    }
-
     public function getTodayUnitsConsumed(): int
     {
         $logModel = UsageTracking::$apiUsageLogModel;
@@ -96,15 +72,6 @@ class SemrushUsageTrackerService
             ->sum('total_tokens');
     }
 
-    public function getMonthToDateSpend(): float
-    {
-        $logModel = UsageTracking::$apiUsageLogModel;
-
-        return (float) $logModel::byIntegration('semrush')
-            ->thisMonth()
-            ->sum('estimated_cost');
-    }
-
     public function getMonthToDateUnitsConsumed(): int
     {
         $logModel = UsageTracking::$apiUsageLogModel;
@@ -112,14 +79,5 @@ class SemrushUsageTrackerService
         return (int) $logModel::byIntegration('semrush')
             ->thisMonth()
             ->sum('total_tokens');
-    }
-
-    private function checkBudgetThreshold(): void
-    {
-        try {
-            resolve(BudgetAlertService::class)->checkAndAlert('semrush');
-        } catch (Throwable $e) {
-            Log::warning('Failed to check Semrush budget threshold: '.$e->getMessage());
-        }
     }
 }
