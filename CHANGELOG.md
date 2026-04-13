@@ -2,6 +2,18 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.3.0 - 2026-04-13
+
+### What's Changed
+
+* Added support for Prometheus for usage and removed redundant packages by @Jeffrey-H in https://github.com/seeders-group/external-apis/pull/9
+
+### New Contributors
+
+* @Jeffrey-H made their first contribution in https://github.com/seeders-group/external-apis/pull/9
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.2.3...v1.3.0
+
 ## v1.2.2 - 2026-03-25
 
 - Improved ScraperAPI usage tracking.
