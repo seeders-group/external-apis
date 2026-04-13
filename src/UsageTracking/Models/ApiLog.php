@@ -7,6 +7,4 @@ namespace Seeders\ExternalApis\UsageTracking\Models;
 /**
  * @deprecated Use {@see ApiConsumptionLog} instead. This class will be removed in a future release.
  */
-class ApiLog extends ApiConsumptionLog
-{
-}
+class ApiLog extends ApiConsumptionLog {}
