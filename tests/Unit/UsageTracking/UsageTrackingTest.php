@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Seeders\ExternalApis\UsageTracking\Models\ApiLog;
-use Seeders\ExternalApis\UsageTracking\Models\ApiUsageLog;
+use Seeders\ExternalApis\UsageTracking\Models\AiUsageLog;
+use Seeders\ExternalApis\UsageTracking\Models\ApiConsumptionLog;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
 it('has correct default models', function (): void {
-    expect(UsageTracking::$apiUsageLogModel)->toBe(ApiUsageLog::class);
-    expect(UsageTracking::$apiLogModel)->toBe(ApiLog::class);
+    expect(UsageTracking::$apiUsageLogModel)->toBe(AiUsageLog::class);
+    expect(UsageTracking::$apiLogModel)->toBe(ApiConsumptionLog::class);
 });
 
 it('can swap the api usage log model', function (): void {
