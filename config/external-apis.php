@@ -129,16 +129,22 @@ return [
         |----------------------------------------------------------------------
         |
         | Pushes aggregated API usage metrics to Grafana Cloud using the
-        | Prometheus remote-write compatible endpoint. Metrics are sent in
-        | Prometheus text exposition format via the Mimir import API.
+        | Prometheus remote write protocol (protobuf + snappy compression).
+        | The endpoint should be the Mimir /api/prom/push URL.
         | Run `php artisan external-apis:push-metrics` (or schedule it)
         | to trigger a push.
+        |
+        | The namespace is prepended to all metric names (e.g. "seeders_"
+        | produces "seeders_external_apis_requests_total"). Use this to
+        | differentiate environments or projects sharing the same Grafana
+        | Cloud instance.
         */
         'grafana_cloud' => [
             'enabled' => env('GRAFANA_CLOUD_METRICS_ENABLED', false),
             'endpoint' => env('GRAFANA_CLOUD_METRICS_ENDPOINT'),
             'user_id' => env('GRAFANA_CLOUD_USER_ID'),
             'api_token' => env('GRAFANA_CLOUD_API_TOKEN'),
+            'namespace' => env('GRAFANA_CLOUD_METRICS_NAMESPACE', ''),
         ],
 
         'semrush' => [

@@ -37,15 +37,16 @@ beforeEach(function (): void {
 
     config()->set('external-apis.usage_tracking.grafana_cloud', [
         'enabled' => true,
-        'endpoint' => 'https://prometheus-prod-01.grafana.net',
+        'endpoint' => 'https://prometheus-prod-01.grafana.net/api/prom/push',
         'user_id' => '123456',
         'api_token' => 'glc_test_token',
+        'namespace' => '',
     ]);
 });
 
-it('pushes metrics to grafana cloud in prometheus format', function (): void {
+it('pushes metrics to grafana cloud via prometheus remote write', function (): void {
     Http::fake([
-        'prometheus-prod-01.grafana.net/api/v1/import/prometheus' => Http::response('', 200),
+        'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
     ]);
 
     ApiUsageLog::create([
@@ -71,13 +72,12 @@ it('pushes metrics to grafana cloud in prometheus format', function (): void {
     expect($response->successful())->toBeTrue();
 
     Http::assertSent(function ($request) {
-        $body = $request->body();
-
-        return $request->url() === 'https://prometheus-prod-01.grafana.net/api/v1/import/prometheus'
+        return $request->url() === 'https://prometheus-prod-01.grafana.net/api/prom/push'
             && $request->hasHeader('Authorization')
-            && str_contains($body, '# TYPE external_apis_requests_total counter')
-            && str_contains($body, 'external_apis_requests_total{integration="openai",status="success"} 1')
-            && str_contains($body, 'external_apis_total_tokens_total{integration="ahrefs",status="success"} 40');
+            && $request->hasHeader('Content-Type', 'application/x-protobuf')
+            && $request->hasHeader('Content-Encoding', 'snappy')
+            && $request->hasHeader('X-Prometheus-Remote-Write-Version', '0.1.0')
+            && strlen($request->body()) > 0;
     });
 });
 
@@ -106,10 +106,10 @@ it('sends basic auth with user id and api token', function (): void {
 });
 
 it('strips trailing slash from endpoint', function (): void {
-    config()->set('external-apis.usage_tracking.grafana_cloud.endpoint', 'https://prometheus-prod-01.grafana.net/');
+    config()->set('external-apis.usage_tracking.grafana_cloud.endpoint', 'https://prometheus-prod-01.grafana.net/api/prom/push/');
 
     Http::fake([
-        'prometheus-prod-01.grafana.net/api/v1/import/prometheus' => Http::response('', 200),
+        'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
     ]);
 
     ApiUsageLog::create([
@@ -124,5 +124,36 @@ it('strips trailing slash from endpoint', function (): void {
     $pusher = app(GrafanaCloudPusher::class);
     $pusher->push();
 
-    Http::assertSent(fn ($request) => $request->url() === 'https://prometheus-prod-01.grafana.net/api/v1/import/prometheus');
+    Http::assertSent(fn ($request) => $request->url() === 'https://prometheus-prod-01.grafana.net/api/prom/push');
+});
+
+it('prefixes metric names with the configured namespace', function (): void {
+    config()->set('external-apis.usage_tracking.grafana_cloud.namespace', 'seeders');
+
+    Http::fake([
+        'prometheus-prod-01.grafana.net/*' => Http::response('', 200),
+    ]);
+
+    ApiUsageLog::create([
+        'integration' => 'openai',
+        'prompt_tokens' => 100,
+        'completion_tokens' => 50,
+        'total_tokens' => 150,
+        'feature' => 'chat',
+        'status' => 'success',
+    ]);
+
+    $pusher = app(GrafanaCloudPusher::class);
+    $response = $pusher->push();
+
+    expect($response->successful())->toBeTrue();
+
+    Http::assertSent(function ($request) {
+        $body = $request->body();
+
+        // The binary protobuf body should contain the namespaced metric name
+        return str_contains($body, 'seeders_external_apis_requests_total')
+            && str_contains($body, 'seeders_external_apis_total_tokens_total')
+            && ! str_contains($body, '__name__external_apis_requests_total');
+    });
 });
