@@ -45,6 +45,8 @@ beforeEach(function (): void {
         $table->string('endpoint', 100)->nullable();
         $table->integer('status')->nullable();
         $table->decimal('consumption', 12, 6)->default(0);
+        $table->string('consumption_type')->nullable();
+        $table->integer('latency_ms')->nullable();
         $table->json('metadata')->nullable();
         $table->timestamps();
     });
