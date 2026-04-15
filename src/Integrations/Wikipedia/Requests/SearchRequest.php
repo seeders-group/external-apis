@@ -38,9 +38,9 @@ class SearchRequest extends Request
     public function createDtoFromResponse(Response $response): SearchResponseData
     {
         /** @var array<string, mixed> $json */
-        $json = $response->json() ?? [];
+        $json = $response->json();
 
-        /** @var array<int, array{title: string, pageid: int, wordcount: int, snippet: string}> $searchResults */
+        /** @var array<int, array<string, mixed>> $searchResults */
         $searchResults = $json['query']['search'] ?? [];
 
         $results = array_map(
