@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.3.3 - 2026-04-15
+
+### What's Changed
+
+* feature/STD-475-added-usage-tracking by @Jeffrey-H in https://github.com/seeders-group/external-apis/pull/14
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.3.2...v1.3.3
+
 ## v1.3.2 - 2026-04-13
 
 ### What's Changed
