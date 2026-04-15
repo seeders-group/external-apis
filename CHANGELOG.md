@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.4.0 - 2026-04-15
+
+### What's Changed
+
+* Added wikipedia integration by @jessehendriks in https://github.com/seeders-group/external-apis/pull/15
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.3.3...v1.4.0
+
 ## v1.3.3 - 2026-04-15
 
 ### What's Changed
