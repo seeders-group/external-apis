@@ -9,6 +9,7 @@ use Illuminate\Support\ServiceProvider;
 use Override;
 use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
+use Seeders\ExternalApis\Integrations\Wikipedia\WikipediaConnector;
 use Seeders\ExternalApis\UsageTracking\Prometheus\PushMetricsCommand;
 use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
 
@@ -23,6 +24,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/../config/external-apis.php', 'external-apis');
 
         $this->app->bind(SemrushConnector::class);
+        $this->app->bind(WikipediaConnector::class);
 
         if (class_exists(Provider::class)) {
             $this->app->singleton(PrismUsageTrackerService::class);

@@ -5,6 +5,15 @@ declare(strict_types=1);
 return [
     /*
     |--------------------------------------------------------------------------
+    | Global User-Agent
+    |--------------------------------------------------------------------------
+    | Used as the default User-Agent header for connectors that need one.
+    | Some APIs (e.g. Wikipedia) require a descriptive User-Agent.
+    */
+    'user_agent' => env('EXTERNAL_APIS_USER_AGENT', 'SeedersExternalApis/1.0'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Ahrefs API Configuration
     |--------------------------------------------------------------------------
     */
@@ -113,6 +122,18 @@ return [
     */
     'google_pagespeed' => [
         'key' => env('GOOGLE_PAGESPEED_KEY'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Wikipedia API Configuration
+    |--------------------------------------------------------------------------
+    | Free public API. No authentication required.
+    | Requires a descriptive User-Agent header (returns 403 without one).
+    */
+    'wikipedia' => [
+        'base_url' => env('WIKIPEDIA_API_URL', 'https://en.wikipedia.org/w/api.php'),
+        'timeout' => 30,
     ],
 
     /*
