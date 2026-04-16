@@ -128,7 +128,7 @@ it('tracks prism usage across text, embeddings, image, and audio paths', functio
     expect($audio->characters_processed)->toBe(300_000);
     expect($error->status)->toBe('error');
     expect($service->providerToIntegration(Provider::OpenAI))->toBe('openai');
-})->skip(! class_exists(\Prism\Prism\Enums\Provider::class), 'Prism is not installed');
+})->skip(! class_exists(Provider::class), 'Prism is not installed');
 
 it('stores trackable_type and trackable_id from prism context', function (): void {
     $service = new PrismUsageTrackerService;
@@ -161,4 +161,4 @@ it('stores trackable_type and trackable_id from prism context', function (): voi
 
     expect($error->trackable_type)->toBe('App\\Models\\Project');
     expect($error->trackable_id)->toBe(99);
-})->skip(! class_exists(\Prism\Prism\Enums\Provider::class), 'Prism is not installed');
+})->skip(! class_exists(Provider::class), 'Prism is not installed');
