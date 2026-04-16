@@ -152,4 +152,4 @@ it('tracks prism text, structured, embeddings, and error paths', function (): vo
             throw new RuntimeException('prism failed');
         }
     ))->toThrow(RuntimeException::class, 'prism failed');
-});
+})->skip(! class_exists(\Prism\Prism\Enums\Provider::class), 'Prism is not installed');
