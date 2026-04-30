@@ -8,6 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Override;
 use Prism\Prism\Enums\Provider;
+use Seeders\ExternalApis\Integrations\ScraperAPI\ScraperAPIConnector;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\Integrations\Wikipedia\WikipediaConnector;
 use Seeders\ExternalApis\UsageTracking\Prometheus\PushMetricsCommand;
@@ -23,6 +24,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/external-apis.php', 'external-apis');
 
+        $this->app->bind(ScraperAPIConnector::class);
         $this->app->bind(SemrushConnector::class);
         $this->app->bind(WikipediaConnector::class);
 
