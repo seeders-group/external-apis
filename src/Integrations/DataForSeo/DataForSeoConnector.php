@@ -9,11 +9,18 @@ use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Saloon\Traits\Plugins\HasTimeout;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class DataForSeoConnector extends Connector
 {
     use AcceptsJson;
     use HasTimeout;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'dataforseo';
+    }
 
     protected int $connectTimeout = 60;
 
