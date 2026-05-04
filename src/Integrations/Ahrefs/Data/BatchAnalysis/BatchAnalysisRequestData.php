@@ -14,11 +14,12 @@ class BatchAnalysisRequestData extends Data
     /**
      * @param  array<int, string>  $select
      * @param  array<int, BatchAnalysisTargetData>  $targets
+     * @param  array<int, string>|null  $orderBy
      */
     public function __construct(
         public array $select,
         public array $targets,
-        public ?string $orderBy = null,
+        public ?array $orderBy = null,
         public ?string $country = null,
         public ?string $volumeMode = 'monthly',
         public string $output = 'json',
