@@ -10,6 +10,7 @@ use Override;
 use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 use Seeders\ExternalApis\Integrations\ScraperAPI\ScraperAPIConnector;
+use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\Integrations\Wikipedia\WikipediaConnector;
 use Seeders\ExternalApis\UsageTracking\Prometheus\PushMetricsCommand;
@@ -27,6 +28,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
 
         $this->app->bind(DataForSeoConnector::class);
         $this->app->bind(ScraperAPIConnector::class);
+        $this->app->bind(AhrefsConnector::class);
         $this->app->bind(SemrushConnector::class);
         $this->app->bind(WikipediaConnector::class);
 

@@ -24,7 +24,7 @@ class DomainRatingRequest extends Request
         return [
             'target' => $this->domain,
             'date' => $this->date instanceof Carbon ?
-                $this->date->format('Y-m-d') : now()->format('Y-m-d'),
+                $this->date->format('Y-m-d') : now()->subDay()->format('Y-m-d'),
         ];
     }
 }

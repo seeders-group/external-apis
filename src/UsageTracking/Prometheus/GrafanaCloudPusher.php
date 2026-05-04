@@ -46,6 +46,37 @@ final class GrafanaCloudPusher
         return $response;
     }
 
+    /**
+     * Build the time series and encoded payload without sending.
+     *
+     * @return array{
+     *     series: list<array{labels: array<string, string>, value: float, timestamp_ms: int}>,
+     *     encoded_size: int,
+     *     compressed_size: int,
+     *     endpoint: string,
+     * }
+     */
+    public function dryRun(): array
+    {
+        $config = config('external-apis.usage_tracking.grafana_cloud');
+
+        $this->timeSeries = [];
+        $this->buildTimeSeries($config['namespace'] ?? '');
+
+        $writeRequest = $this->encodeWriteRequest();
+        $compressed = $this->snappyEncode($writeRequest);
+
+        $series = $this->timeSeries;
+        $this->timeSeries = [];
+
+        return [
+            'series' => $series,
+            'encoded_size' => strlen($writeRequest),
+            'compressed_size' => strlen($compressed),
+            'endpoint' => rtrim((string) ($config['endpoint'] ?? ''), '/'),
+        ];
+    }
+
     private function buildTimeSeries(string $namespace): void
     {
         $prefix = $namespace !== '' ? rtrim($namespace, '_').'_' : '';
