@@ -84,6 +84,33 @@ it('pushes metrics and reports success', function (): void {
         ->assertSuccessful();
 });
 
+it('prints metrics without sending when --dry-run is passed', function (): void {
+    config()->set('external-apis.usage_tracking.grafana_cloud', [
+        'enabled' => false,
+        'endpoint' => 'https://prometheus-prod-01.grafana.net/api/prom/push',
+        'user_id' => '123456',
+        'api_token' => 'glc_test_token',
+    ]);
+
+    Http::fake();
+
+    AiUsageLog::create([
+        'integration' => 'openai',
+        'prompt_tokens' => 100,
+        'completion_tokens' => 50,
+        'total_tokens' => 150,
+        'feature' => 'chat',
+        'status' => 'success',
+    ]);
+
+    $this->artisan('external-apis:push-metrics', ['--dry-run' => true])
+        ->expectsOutputToContain('[DRY RUN]')
+        ->expectsOutputToContain('Time series:')
+        ->assertSuccessful();
+
+    Http::assertNothingSent();
+});
+
 it('reports failure when grafana cloud returns an error', function (): void {
     config()->set('external-apis.usage_tracking.grafana_cloud', [
         'enabled' => true,
