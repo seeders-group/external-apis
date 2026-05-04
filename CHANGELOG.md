@@ -2,6 +2,19 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.5.0 - 2026-05-04
+
+### What's Changed
+
+* Update orchestra/testbench requirement from ^10.9 to ^11.1 in the composer-updates group across 1 directory by @dependabot[bot] in https://github.com/seeders-group/external-apis/pull/16
+* Bump the action-updates group across 1 directory with 2 updates by @dependabot[bot] in https://github.com/seeders-group/external-apis/pull/7
+* Registered `ScraperAPIConnector` in the service container within `ExternalApisServiceProvider`. by @Jeffrey-H in https://github.com/seeders-group/external-apis/pull/18
+* Added `DataForSeoConnector` integration with API binding and usage tr… by @Jeffrey-H in https://github.com/seeders-group/external-apis/pull/19
+* Bump dependabot/fetch-metadata from 3.0.0 to 3.1.0 in the action-updates group by @dependabot[bot] in https://github.com/seeders-group/external-apis/pull/21
+* Add dry-run support to `PushMetricsCommand` for testing metrics without sending to Grafana. Introduced Ahrefs batch analysis data handling and request integration. by @Jeffrey-H in https://github.com/seeders-group/external-apis/pull/17
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.4.2...v1.5.0
+
 ## v1.4.2 - 2026-04-17
 
 **Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.4.1...v1.4.2
