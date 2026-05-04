@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-use Prism\Prism\Embeddings\Response as EmbeddingsResponse;
-use Prism\Prism\Enums\FinishReason;
-use Prism\Prism\Enums\Provider;
-use Prism\Prism\Structured\Response as StructuredResponse;
-use Prism\Prism\Text\Response;
-use Prism\Prism\Text\Response as TextResponse;
-use Prism\Prism\ValueObjects\Embedding;
-use Prism\Prism\ValueObjects\EmbeddingsUsage;
-use Prism\Prism\ValueObjects\Meta;
-use Prism\Prism\ValueObjects\Usage;
+use Laravel\Ai\Responses\AgentResponse;
+use Laravel\Ai\Responses\Data\Meta;
+use Laravel\Ai\Responses\Data\Usage;
+use Laravel\Ai\Responses\EmbeddingsResponse;
+use Laravel\Ai\Responses\StructuredTextResponse;
+use Laravel\Ai\Responses\TextResponse;
+use Seeders\ExternalApis\UsageTracking\Services\AiUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksAiUsage;
 use Seeders\ExternalApis\UsageTracking\Traits\TracksOpenAIUsage;
-use Seeders\ExternalApis\UsageTracking\Traits\TracksPrismUsage;
 
 afterEach(function (): void {
     Mockery::close();
@@ -86,70 +82,68 @@ it('tracks openai success and error paths', function (): void {
     }))->toThrow(RuntimeException::class, 'failed');
 });
 
-it('tracks prism text, structured, embeddings, and error paths', function (): void {
-    $tracker = Mockery::mock(PrismUsageTrackerService::class);
-    $tracker->shouldReceive('logRequest')->twice();
+it('tracks laravel/ai text, structured, agent, embeddings, and error paths', function (): void {
+    $tracker = Mockery::mock(AiUsageTrackerService::class);
+    $tracker->shouldReceive('logRequest')->times(3);
     $tracker->shouldReceive('logEmbeddingsRequest')->once();
     $tracker->shouldReceive('logError')->once()->withArgs(
-        fn (Provider $provider, string $model, string $errorMessage): bool => $provider === Provider::OpenAI
-            && $model === 'gpt-prism'
-            && $errorMessage === 'prism failed'
+        fn (string $provider, string $model, string $errorMessage): bool => $provider === 'openai'
+            && $model === 'gpt-ai'
+            && $errorMessage === 'ai failed'
     );
 
-    app()->instance(PrismUsageTrackerService::class, $tracker);
+    app()->instance(AiUsageTrackerService::class, $tracker);
 
     $client = new class
     {
-        use TracksPrismUsage;
+        use TracksAiUsage;
 
-        public function runTrackPrismUsage(Provider $provider, array $context, callable $callback): mixed
+        public function runTrackAiUsage(string $provider, array $context, callable $callback): mixed
         {
-            return $this->trackPrismUsage($provider, $context, $callback);
+            return $this->trackAiUsage($provider, $context, $callback);
         }
     };
 
-    $usage = new Usage(promptTokens: 100, completionTokens: 20, cacheReadInputTokens: 10, thoughtTokens: 5);
-    $meta = new Meta(id: 'req-1', model: 'gpt-prism');
+    $usage = new Usage(promptTokens: 100, completionTokens: 20, cacheReadInputTokens: 10, reasoningTokens: 5);
+    $meta = new Meta(provider: 'openai', model: 'gpt-ai');
 
-    $textResponse = new TextResponse(
-        steps: collect(),
-        text: 'hello',
-        finishReason: FinishReason::Stop,
-        toolCalls: [],
-        toolResults: [],
+    $textResponse = new TextResponse(text: 'hello', usage: $usage, meta: $meta);
+
+    $structuredResponse = new StructuredTextResponse(
+        structured: ['ok' => true],
+        text: 'structured',
         usage: $usage,
         meta: $meta,
-        messages: collect(),
     );
 
-    $structuredResponse = new StructuredResponse(
-        steps: collect(),
-        text: 'structured',
-        structured: ['ok' => true],
-        finishReason: FinishReason::Stop,
+    $agentResponse = new AgentResponse(
+        invocationId: 'inv-1',
+        text: 'agent',
         usage: $usage,
         meta: $meta,
     );
 
     $embeddingsResponse = new EmbeddingsResponse(
-        embeddings: [new Embedding([0.1, 0.2])],
-        usage: new EmbeddingsUsage(tokens: 200),
-        meta: new Meta(id: 'req-2', model: 'embed-prism')
+        embeddings: [[0.1, 0.2]],
+        tokens: 200,
+        meta: new Meta(provider: 'openai', model: 'embed-ai'),
     );
 
-    $textResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): Response => $textResponse);
-    $structuredResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): StructuredResponse => $structuredResponse);
-    $embeddingsResult = $client->runTrackPrismUsage(Provider::OpenAI, ['feature' => 'assistant'], fn (): EmbeddingsResponse => $embeddingsResponse);
+    $textResult = $client->runTrackAiUsage('openai', ['feature' => 'assistant'], fn (): TextResponse => $textResponse);
+    $structuredResult = $client->runTrackAiUsage('openai', ['feature' => 'assistant'], fn (): StructuredTextResponse => $structuredResponse);
+    $agentResult = $client->runTrackAiUsage('openai', ['feature' => 'assistant'], fn (): AgentResponse => $agentResponse);
+    $embeddingsResult = $client->runTrackAiUsage('openai', ['feature' => 'assistant'], fn (): EmbeddingsResponse => $embeddingsResponse);
 
     expect($textResult)->toBe($textResponse);
     expect($structuredResult)->toBe($structuredResponse);
+    expect($agentResult)->toBe($agentResponse);
     expect($embeddingsResult)->toBe($embeddingsResponse);
 
-    expect(fn (): mixed => $client->runTrackPrismUsage(
-        Provider::OpenAI,
-        ['feature' => 'assistant', 'model' => 'gpt-prism'],
+    expect(fn (): mixed => $client->runTrackAiUsage(
+        'openai',
+        ['feature' => 'assistant', 'model' => 'gpt-ai'],
         function (): never {
-            throw new RuntimeException('prism failed');
+            throw new RuntimeException('ai failed');
         }
-    ))->toThrow(RuntimeException::class, 'prism failed');
-})->skip(! class_exists(Provider::class), 'Prism is not installed');
+    ))->toThrow(RuntimeException::class, 'ai failed');
+})->skip(! class_exists(AgentResponse::class), 'laravel/ai is not installed');

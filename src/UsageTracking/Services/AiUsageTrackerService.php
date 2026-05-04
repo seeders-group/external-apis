@@ -4,39 +4,38 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
-use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
-class PrismUsageTrackerService
+class AiUsageTrackerService
 {
     /**
-     * Log a Prism text/structured generation request.
+     * Log a laravel/ai text/structured/agent generation request.
+     *
+     * @param  array<string, mixed>  $context
      */
     public function logRequest(
-        Provider $provider,
+        string $provider,
         string $model,
         int $promptTokens,
         int $completionTokens,
         array $context,
         int $cachedTokens = 0,
-        ?int $thoughtTokens = null,
+        ?int $reasoningTokens = null,
         ?string $requestId = null,
         string $endpoint = 'text'
     ) {
-        $integration = $this->providerToIntegration($provider);
-
         $metadata = $context['metadata'] ?? [];
-        if ($thoughtTokens !== null && $thoughtTokens > 0) {
-            $metadata['thought_tokens'] = $thoughtTokens;
+        if ($reasoningTokens !== null && $reasoningTokens > 0) {
+            $metadata['reasoning_tokens'] = $reasoningTokens;
         }
 
         $logModel = UsageTracking::$apiUsageLogModel;
 
         return $logModel::create([
-            'integration' => $integration,
+            'integration' => $this->normalizeProvider($provider),
             'request_id' => $requestId,
             'model' => $model,
-            'endpoint' => "prism.{$endpoint}",
+            'endpoint' => "ai.{$endpoint}",
             'prompt_tokens' => $promptTokens,
             'completion_tokens' => $completionTokens,
             'total_tokens' => $promptTokens + $completionTokens,
@@ -53,24 +52,24 @@ class PrismUsageTrackerService
     }
 
     /**
-     * Log a Prism embeddings request.
+     * Log a laravel/ai embeddings request.
+     *
+     * @param  array<string, mixed>  $context
      */
     public function logEmbeddingsRequest(
-        Provider $provider,
+        string $provider,
         string $model,
         int $tokensUsed,
         array $context,
         ?string $requestId = null
     ) {
-        $integration = $this->providerToIntegration($provider);
-
         $logModel = UsageTracking::$apiUsageLogModel;
 
         return $logModel::create([
-            'integration' => $integration,
+            'integration' => $this->normalizeProvider($provider),
             'request_id' => $requestId,
             'model' => $model,
-            'endpoint' => 'prism.embeddings',
+            'endpoint' => 'ai.embeddings',
             'prompt_tokens' => $tokensUsed,
             'completion_tokens' => 0,
             'total_tokens' => $tokensUsed,
@@ -86,24 +85,24 @@ class PrismUsageTrackerService
     }
 
     /**
-     * Log a Prism image generation request.
+     * Log a laravel/ai image generation request.
+     *
+     * @param  array<string, mixed>  $context
      */
     public function logImageGeneration(
-        Provider $provider,
+        string $provider,
         string $model,
         int $imagesGenerated,
         array $context,
         ?string $size = null,
         ?string $quality = null
     ) {
-        $integration = $this->providerToIntegration($provider);
-
         $logModel = UsageTracking::$apiUsageLogModel;
 
         return $logModel::create([
-            'integration' => $integration,
+            'integration' => $this->normalizeProvider($provider),
             'model' => $model,
-            'endpoint' => 'prism.images',
+            'endpoint' => 'ai.images',
             'images_generated' => $imagesGenerated,
             'feature' => $context['feature'] ?? 'unknown',
             'sub_feature' => $context['sub_feature'] ?? null,
@@ -121,25 +120,25 @@ class PrismUsageTrackerService
     }
 
     /**
-     * Log a Prism audio request (TTS or STT).
+     * Log a laravel/ai audio request (TTS or STT).
+     *
+     * @param  array<string, mixed>  $context
      */
     public function logAudioRequest(
-        Provider $provider,
+        string $provider,
         string $model,
         array $context,
         ?int $charactersProcessed = null,
         ?int $secondsProcessed = null,
         ?string $requestId = null
     ) {
-        $integration = $this->providerToIntegration($provider);
-
         $logModel = UsageTracking::$apiUsageLogModel;
 
         return $logModel::create([
-            'integration' => $integration,
+            'integration' => $this->normalizeProvider($provider),
             'request_id' => $requestId,
             'model' => $model,
-            'endpoint' => 'prism.audio',
+            'endpoint' => 'ai.audio',
             'characters_processed' => $charactersProcessed,
             'seconds_processed' => $secondsProcessed,
             'feature' => $context['feature'] ?? 'unknown',
@@ -154,10 +153,12 @@ class PrismUsageTrackerService
     }
 
     /**
-     * Log a Prism error.
+     * Log a laravel/ai error.
+     *
+     * @param  array<string, mixed>  $context
      */
     public function logError(
-        Provider $provider,
+        string $provider,
         string $model,
         string $errorMessage,
         array $context
@@ -165,7 +166,7 @@ class PrismUsageTrackerService
         $logModel = UsageTracking::$apiUsageLogModel;
 
         return $logModel::create([
-            'integration' => $this->providerToIntegration($provider),
+            'integration' => $this->normalizeProvider($provider),
             'model' => $model,
             'feature' => $context['feature'] ?? 'unknown',
             'sub_feature' => $context['sub_feature'] ?? null,
@@ -179,11 +180,8 @@ class PrismUsageTrackerService
         ]);
     }
 
-    /**
-     * Convert Prism Provider enum to integration string.
-     */
-    public function providerToIntegration(Provider $provider): string
+    public function normalizeProvider(string $provider): string
     {
-        return $provider->value;
+        return strtolower($provider);
     }
 }
