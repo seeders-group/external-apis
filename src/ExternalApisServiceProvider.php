@@ -8,7 +8,6 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Ai\Responses\AgentResponse;
 use Override;
-use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 use Seeders\ExternalApis\Integrations\ScraperAPI\ScraperAPIConnector;
