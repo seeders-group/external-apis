@@ -20,7 +20,7 @@ it('builds get index item info request correctly', function (): void {
 });
 
 it('strips protocol from domain in query', function (): void {
-    $connector = new MajesticConnector;
+    $connector = MajesticConnector::forScope('test');
     $mockClient = new MockClient([
         GetIndexItemInfo::class => MockResponse::make([], 200),
     ]);
