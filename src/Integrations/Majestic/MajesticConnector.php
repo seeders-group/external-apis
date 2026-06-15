@@ -6,10 +6,17 @@ namespace Seeders\ExternalApis\Integrations\Majestic;
 
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class MajesticConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'majestic';
+    }
 
     /**
      * The Base URL of the API
