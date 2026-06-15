@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.6.1 - 2026-06-15
+
+### What's Changed
+
+* STD-563 - Add usage tracking to SeRanking integration by @beauseeders in https://github.com/seeders-group/external-apis/pull/24
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.6.0...v1.6.1
+
 ## v1.6.0 - 2026-06-15
 
 ### What's Changed
