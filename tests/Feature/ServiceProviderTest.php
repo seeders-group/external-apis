@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
+use Seeders\ExternalApis\Integrations\Majestic\MajesticConnector;
 use Seeders\ExternalApis\Integrations\Moz\MozLinksConnector;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 
@@ -24,6 +25,12 @@ it('registers the hunter connector', function (): void {
     $connector = resolve(HunterConnector::class);
 
     expect($connector)->toBeInstanceOf(HunterConnector::class);
+});
+
+it('registers the majestic connector', function (): void {
+    $connector = resolve(MajesticConnector::class);
+
+    expect($connector)->toBeInstanceOf(MajesticConnector::class);
 });
 
 it('registers the moz connector', function (): void {

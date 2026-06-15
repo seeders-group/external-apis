@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v1.6.0 - 2026-06-15
+
+### What's Changed
+
+* STD-561 - Add usage tracking to Majestic connector and register it by @beauseeders in https://github.com/seeders-group/external-apis/pull/23
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.5.0...v1.6.0
+
 ## v1.5.0 - 2026-05-04
 
 ### What's Changed
