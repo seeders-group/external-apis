@@ -9,8 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Prompts\AgentPrompt;
 use Laravel\Ai\Responses\AgentResponse;
-use Prism\Prism\Enums\Provider;
-use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\AiUsageTrackerService;
 use Throwable;
 
 class TrackAiUsage
@@ -29,9 +28,7 @@ class TrackAiUsage
     {
         return $next($prompt)->then(function (AgentResponse $response): void {
             try {
-                $tracker = resolve(PrismUsageTrackerService::class);
-
-                $provider = Provider::tryFrom($response->meta->provider ?? '') ?? Provider::Gemini;
+                $tracker = resolve(AiUsageTrackerService::class);
 
                 $context = [
                     'feature' => $this->feature,
@@ -45,13 +42,14 @@ class TrackAiUsage
                 }
 
                 $tracker->logRequest(
-                    provider: $provider,
+                    provider: $response->meta->provider ?? 'unknown',
                     model: $response->meta->model ?? 'unknown',
                     promptTokens: $response->usage->promptTokens,
                     completionTokens: $response->usage->completionTokens,
                     context: $context,
                     cachedTokens: $response->usage->cacheReadInputTokens,
-                    thoughtTokens: $response->usage->reasoningTokens > 0 ? $response->usage->reasoningTokens : null,
+                    reasoningTokens: $response->usage->reasoningTokens > 0 ? $response->usage->reasoningTokens : null,
+                    requestId: $response->invocationId,
                     endpoint: 'agent',
                 );
             } catch (Throwable $e) {

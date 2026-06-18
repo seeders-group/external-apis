@@ -6,8 +6,8 @@ namespace Seeders\ExternalApis;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Ai\Responses\AgentResponse;
 use Override;
-use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
 use Seeders\ExternalApis\Integrations\Majestic\MajesticConnector;
@@ -16,7 +16,7 @@ use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\Integrations\SeRanking\SeRankingConnector;
 use Seeders\ExternalApis\Integrations\Wikipedia\WikipediaConnector;
 use Seeders\ExternalApis\UsageTracking\Prometheus\PushMetricsCommand;
-use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\AiUsageTrackerService;
 
 final class ExternalApisServiceProvider extends ServiceProvider
 {
@@ -36,8 +36,8 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->bind(SemrushConnector::class);
         $this->app->bind(WikipediaConnector::class);
 
-        if (class_exists(Provider::class)) {
-            $this->app->singleton(PrismUsageTrackerService::class);
+        if (class_exists(AgentResponse::class)) {
+            $this->app->singleton(AiUsageTrackerService::class);
         }
     }
 

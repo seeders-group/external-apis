@@ -27,12 +27,13 @@
         "spatie/laravel-data": "^4.0"
     },
     "suggest": {
-        "prism-php/prism": "Required for PrismUsageTrackerService multi-provider tracking"
+        "laravel/ai": "Required for AiUsageTrackerService and the TrackAiUsage middleware that integrate with Laravel's AI SDK"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.1",
         "saloonphp/laravel-plugin": "^3.5",
         "larastan/larastan": "^3.9",
+        "laravel/ai": "^0.6",
         "laravel/pint": "^1.13",
         "nunomaduro/collision": "^8.8",
         "orchestra/testbench": "^11.1",

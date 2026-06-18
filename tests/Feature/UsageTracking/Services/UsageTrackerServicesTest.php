@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Prism\Prism\Enums\Provider;
+use Laravel\Ai\Responses\AgentResponse;
 use Seeders\ExternalApis\UsageTracking\Services\AhrefsUsageTrackerService;
+use Seeders\ExternalApis\UsageTracking\Services\AiUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\DataForSeoUsageTrackerService;
 use Seeders\ExternalApis\UsageTracking\Services\OpenAIUsageTrackerService;
-use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
 
 beforeEach(function (): void {
     Schema::dropIfExists('api_usage_logs');
@@ -78,23 +78,23 @@ it('tracks dataforseo usage with endpoint-derived features', function (): void {
     expect($service->getMonthToDateRequests())->toBe(3);
 });
 
-it('tracks prism usage across text, embeddings, image, and audio paths', function (): void {
-    $service = new PrismUsageTrackerService;
+it('tracks laravel/ai usage across text, embeddings, image, and audio paths', function (): void {
+    $service = new AiUsageTrackerService;
 
     $text = $service->logRequest(
-        Provider::OpenAI,
-        'gpt-prism',
+        'openai',
+        'gpt-ai',
         200_000,
         100_000,
         ['feature' => 'assistant'],
         50_000,
         100,
-        'req-prism',
+        'req-ai',
         'structured'
     );
 
     $embedding = $service->logEmbeddingsRequest(
-        Provider::OpenAI,
+        'openai',
         'embed-test',
         500_000,
         ['feature' => 'embeddings'],
@@ -102,7 +102,7 @@ it('tracks prism usage across text, embeddings, image, and audio paths', functio
     );
 
     $image = $service->logImageGeneration(
-        Provider::OpenAI,
+        'openai',
         'image-test',
         2,
         ['feature' => 'images'],
@@ -111,7 +111,7 @@ it('tracks prism usage across text, embeddings, image, and audio paths', functio
     );
 
     $audio = $service->logAudioRequest(
-        Provider::OpenAI,
+        'openai',
         'tts-test',
         ['feature' => 'audio'],
         300_000,
@@ -119,22 +119,23 @@ it('tracks prism usage across text, embeddings, image, and audio paths', functio
         'req-audio'
     );
 
-    $error = $service->logError(Provider::OpenAI, 'gpt-prism', 'bad response', ['feature' => 'assistant']);
+    $error = $service->logError('openai', 'gpt-ai', 'bad response', ['feature' => 'assistant']);
 
     expect($text->integration)->toBe('openai');
-    expect($text->metadata['thought_tokens'])->toBe(100);
+    expect($text->endpoint)->toBe('ai.structured');
+    expect($text->metadata['reasoning_tokens'])->toBe(100);
     expect($embedding->total_tokens)->toBe(500_000);
     expect($image->images_generated)->toBe(2);
     expect($audio->characters_processed)->toBe(300_000);
     expect($error->status)->toBe('error');
-    expect($service->providerToIntegration(Provider::OpenAI))->toBe('openai');
-})->skip(! class_exists(Provider::class), 'Prism is not installed');
+    expect($service->normalizeProvider('OpenAI'))->toBe('openai');
+})->skip(! class_exists(AgentResponse::class), 'laravel/ai is not installed');
 
-it('stores trackable_type and trackable_id from prism context', function (): void {
-    $service = new PrismUsageTrackerService;
+it('stores trackable_type and trackable_id from laravel/ai context', function (): void {
+    $service = new AiUsageTrackerService;
 
     $log = $service->logRequest(
-        Provider::OpenAI,
+        'openai',
         'gpt-trackable',
         1000,
         500,
@@ -149,7 +150,7 @@ it('stores trackable_type and trackable_id from prism context', function (): voi
     expect($log->trackable_id)->toBe(99);
 
     $error = $service->logError(
-        Provider::OpenAI,
+        'openai',
         'gpt-trackable',
         'test error',
         [
@@ -161,4 +162,4 @@ it('stores trackable_type and trackable_id from prism context', function (): voi
 
     expect($error->trackable_type)->toBe('App\\Models\\Project');
     expect($error->trackable_id)->toBe(99);
-})->skip(! class_exists(Provider::class), 'Prism is not installed');
+})->skip(! class_exists(AgentResponse::class), 'laravel/ai is not installed');

@@ -41,9 +41,9 @@ To use a connector: `app(AhrefsConnector::class)->send(new SomeRequest(...))` or
 
 - **Contracts** — Interfaces (`UsageTrackerInterface`, `ApiUsageLogInterface`, etc.)
 - **Models** — `ApiUsageLog`, `AiModelPricing`, `ApiServicePricing`, `ApiBudgetConfig`
-- **Services** — Per-integration trackers (`OpenAIUsageTrackerService`, `AhrefsUsageTrackerService`, `DataForSeoUsageTrackerService`) that calculate costs from pricing config
-- **Traits** — `TracksOpenAIUsage`, `TracksApiUsage`, `TracksPrismUsage` — mix into clients for automatic tracking
-- **Middleware** — `RecordApiUsage` Saloon middleware for automatic response logging
+- **Services** — Per-integration trackers (`OpenAIUsageTrackerService`, `AhrefsUsageTrackerService`, `DataForSeoUsageTrackerService`, `AiUsageTrackerService`) that calculate costs from pricing config
+- **Traits** — `TracksOpenAIUsage`, `TracksApiUsage`, `TracksAiUsage` — mix into clients for automatic tracking
+- **Middleware** — `RecordApiUsage` Saloon middleware for automatic response logging; `TrackAiUsage` middleware for laravel/ai agent prompts
 - Models are swappable via `UsageTracking::useApiUsageLogModel()` static methods
 
 ### Service Provider
@@ -69,7 +69,7 @@ Tests use Pest with Orchestra TestBench (`tests/TestCase.php` sets up the packag
 - **openai-php/client ^0.16** — OpenAI SDK
 - **google-gemini-php/client ^1.0** — Gemini SDK
 - **google/apiclient ^2.15** — Google APIs (Search Console)
-- **prismphp/prism** — Optional, for multi-provider LLM usage tracking
+- **laravel/ai** — Optional, for multi-provider LLM usage tracking via `AiUsageTrackerService` and the `TrackAiUsage` middleware
 
 ## Conventions
 
