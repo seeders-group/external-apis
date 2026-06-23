@@ -8,10 +8,17 @@ use Saloon\Http\Auth\BasicAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class MozLinksConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'moz';
+    }
 
     protected function defaultAuth(): BasicAuthenticator
     {
