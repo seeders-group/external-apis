@@ -21,17 +21,20 @@
     "require": {
         "php": "^8.4",
         "guzzlehttp/guzzle": "^7.8",
-        "illuminate/contracts": "^11.0|^12.0|^13.0",
-        "illuminate/support": "^11.0|^12.0|^13.0",
-        "saloonphp/saloon": "^3.0",
+        "illuminate/contracts": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0",
+        "saloonphp/saloon": "^4.0",
         "spatie/laravel-data": "^4.0"
     },
     "suggest": {
-        "prism-php/prism": "Required for PrismUsageTrackerService multi-provider tracking"
+        "prism-php/prism": "Required for PrismUsageTrackerService multi-provider tracking",
+        "laravel/ai": "Required for the TrackAiUsage middleware"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.1",
-        "saloonphp/laravel-plugin": "^3.5",
+        "laravel/ai": "^0.8",
+        "prism-php/prism": "^0.99.19",
+        "saloonphp/laravel-plugin": "^4.0",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.13",
         "nunomaduro/collision": "^8.8",

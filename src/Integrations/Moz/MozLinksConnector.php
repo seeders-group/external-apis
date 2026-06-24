@@ -36,27 +36,8 @@ class MozLinksConnector extends Connector
         return new BasicAuthenticator($clientId, $clientSecret);
     }
 
-    /**
-     * The Base URL of the API
-     */
     public function resolveBaseUrl(): string
     {
         return 'https://lsapi.seomoz.com/v2';
-    }
-
-    /**
-     * Default headers for every request
-     */
-    protected function defaultHeaders(): array
-    {
-        return [];
-    }
-
-    /**
-     * Default HTTP client options
-     */
-    protected function defaultConfig(): array
-    {
-        return [];
     }
 }

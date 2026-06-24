@@ -6,7 +6,7 @@ namespace Seeders\ExternalApis\Integrations\Moz\Data\Responses;
 
 use Spatie\LaravelData\Data;
 
-class LinkinRootDomainResultResponseData extends Data
+class LinkingRootDomainResultResponseData extends Data
 {
     public function __construct(
         public string $rootDomain,
