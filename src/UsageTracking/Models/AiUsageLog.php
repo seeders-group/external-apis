@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -73,42 +75,47 @@ class AiUsageLog extends Model
         'characters_processed' => 'integer',
         'seconds_processed' => 'integer',
         'metadata' => 'array',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
     ];
 
-    public function scopeToday($query)
+    #[Scope]
+    protected function today(Builder $query): Builder
     {
         return $query->whereDate('created_at', today());
     }
 
-    public function scopeThisMonth($query)
+    #[Scope]
+    protected function thisMonth(Builder $query): Builder
     {
         return $query->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month);
     }
 
-    public function scopeByIntegration($query, string $integration)
+    #[Scope]
+    protected function byIntegration(Builder $query, string $integration): Builder
     {
         return $query->where('integration', $integration);
     }
 
-    public function scopeByFeature($query, string $feature)
+    #[Scope]
+    protected function byFeature(Builder $query, string $feature): Builder
     {
         return $query->where('feature', $feature);
     }
 
-    public function scopeByModel($query, string $model)
+    #[Scope]
+    protected function byModel(Builder $query, string $model): Builder
     {
         return $query->where('model', $model);
     }
 
-    public function scopeSuccessful($query)
+    #[Scope]
+    protected function successful(Builder $query): Builder
     {
         return $query->where('status', 'success');
     }
 
-    public function scopeFailed($query)
+    #[Scope]
+    protected function failed(Builder $query): Builder
     {
         return $query->where('status', 'error');
     }

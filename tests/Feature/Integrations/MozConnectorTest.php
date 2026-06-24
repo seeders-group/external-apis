@@ -14,6 +14,10 @@ it('resolves the correct base url', function (): void {
     expect($connector->resolveBaseUrl())->toBe('https://lsapi.seomoz.com/v2');
 });
 
+it('reports moz as its integration name for usage tracking', function (): void {
+    expect((new MozLinksConnector)->getIntegrationName())->toBe('moz');
+});
+
 it('builds url metrics request correctly', function (): void {
     $data = new UrlMetricsRequestData(
         targets: ['example.com', 'test.com'],

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Carbon;
@@ -39,37 +41,43 @@ class ApiConsumptionLog extends Model
         return $this->morphTo();
     }
 
-    public function scopeForIntegration($query, string $integration)
+    #[Scope]
+    protected function forIntegration(Builder $query, string $integration): Builder
     {
         return $query->where('integration', $integration);
     }
 
-    public function scopeForScope($query, string $scope)
+    #[Scope]
+    protected function forScope(Builder $query, string $scope): Builder
     {
         return $query->where('scope', $scope);
     }
 
-    public function scopeToday($query)
+    #[Scope]
+    protected function today(Builder $query): Builder
     {
         return $query->whereDate('created_at', today());
     }
 
-    public function scopeThisMonth($query)
+    #[Scope]
+    protected function thisMonth(Builder $query): Builder
     {
         return $query->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year);
     }
 
-    public function scopeSuccessful($query)
+    #[Scope]
+    protected function successful(Builder $query): Builder
     {
         return $query->where('status', '>=', 200)
             ->where('status', '<', 300);
     }
 
-    public function scopeFailed($query)
+    #[Scope]
+    protected function failed(Builder $query): Builder
     {
-        return $query->where(function ($q): void {
-            $q->where('status', '<', 200)
+        return $query->where(function (Builder $query): void {
+            $query->where('status', '<', 200)
                 ->orWhere('status', '>=', 400);
         });
     }
