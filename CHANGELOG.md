@@ -2,6 +2,23 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.0.0 - 2026-06-24
+
+### ⚠️ Breaking changes
+
+* **Dropped Laravel 11 support.** Minimum is now Laravel 12 (`illuminate/* ^12.0|^13.0`).
+* **Upgraded to Saloon v4** (`saloonphp/saloon ^4.0`, `saloonphp/laravel-plugin ^4.0`), resolving three v3 security advisories (SSRF/credential-leakage via absolute endpoint URLs, insecure OAuth token deserialization, fixture path traversal). Consumers must upgrade their own Saloon usage accordingly.
+
+### What's Changed
+
+* STD-837 — Add API usage tracking to the Moz connector, bringing it in line with Ahrefs, Majestic, and Semrush.
+* Migrated `ApiConsumptionLog` and `AiUsageLog` Eloquent scopes to the Laravel 12 `#[Scope]` attribute with typed `Builder` signatures (builder call names unchanged).
+* `ApiUnitsBalanceRequest` opts in to `allowBaseUrlOverride` for its absolute endpoint URL under Saloon v4.
+* Removed dead Saloon default overrides in `MozLinksConnector`; fixed the misspelled `LinkinRootDomain` Moz response data class names.
+* CI matrix now tests Laravel 12 and 13.
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v1.6.1...v2.0.0
+
 ## v1.6.1 - 2026-06-15
 
 ### What's Changed
