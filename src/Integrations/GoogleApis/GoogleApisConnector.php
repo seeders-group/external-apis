@@ -6,10 +6,17 @@ namespace Seeders\ExternalApis\Integrations\GoogleApis;
 
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class GoogleApisConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'google_apis';
+    }
 
     /**
      * The Base URL of the API
