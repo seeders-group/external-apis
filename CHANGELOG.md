@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.1.0 - 2026-06-26
+
+### What's Changed
+
+* STD-803: GEO audit integrations — Trustpilot, Bing, backlinks, Places, YouTube, Reddit by @jessehendriks in https://github.com/seeders-group/external-apis/pull/28
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.0.0...v2.1.0
+
 ## v2.0.0 - 2026-06-24
 
 ### ⚠️ Breaking changes
