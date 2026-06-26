@@ -33,6 +33,7 @@ dataset('integration connector classes', function (): array {
 it('can resolve connector defaults', function (string $connectorClass): void {
     config()->set('external-apis.google_search.key', 'test-google-search-key');
     config()->set('external-apis.google_search.cx', 'test-google-search-cx');
+    config()->set('external-apis.google.places_key', 'test-places-key');
     config()->set('external-apis.dataforseo.username', 'test-user');
     config()->set('external-apis.dataforseo.password', 'test-pass');
 
