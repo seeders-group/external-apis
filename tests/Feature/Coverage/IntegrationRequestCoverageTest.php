@@ -46,6 +46,7 @@ dataset('integration request classes', function (): array {
 
 it('can instantiate and resolve integration requests', function (string $requestClass): void {
     config()->set('external-apis.google_pagespeed.key', 'test-pagespeed-key');
+    config()->set('external-apis.youtube.key', 'test-youtube-key');
 
     $request = instantiateClass($requestClass);
 
