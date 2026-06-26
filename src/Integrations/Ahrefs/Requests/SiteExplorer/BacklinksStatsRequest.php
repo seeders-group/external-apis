@@ -8,28 +8,23 @@ use Carbon\CarbonInterface;
 use Saloon\Enums\Method;
 use Saloon\Http\Request;
 
-class DomainRatingRequest extends Request
+class BacklinksStatsRequest extends Request
 {
     protected Method $method = Method::GET;
 
-    public function __construct(
-        public string $domain,
-        public ?CarbonInterface $date = null,
-        public ?string $select = null,
-    ) {}
+    public function __construct(public string $domain, public ?CarbonInterface $date = null) {}
 
     public function resolveEndpoint(): string
     {
-        return '/site-explorer/domain-rating';
+        return '/site-explorer/backlinks-stats';
     }
 
     protected function defaultQuery(): array
     {
-        return array_filter([
+        return [
             'target' => $this->domain,
             'date' => $this->date instanceof CarbonInterface ?
                 $this->date->format('Y-m-d') : now()->subDay()->format('Y-m-d'),
-            'select' => $this->select,
-        ], static fn (mixed $value): bool => $value !== null);
+        ];
     }
 }
