@@ -258,7 +258,7 @@ $authenticator = $connector->refreshAccessToken($authenticator);
 
 ## Usage Tracking
 
-The package includes a built-in usage tracking system for monitoring API costs. Run migrations to get started:
+The package includes a built-in usage tracking system for logging API requests. Run migrations to get started:
 
 ```bash
 php artisan migrate
@@ -292,7 +292,6 @@ You can swap the default models with your own implementations:
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
 
 UsageTracking::useApiUsageLogModel(YourApiUsageLog::class);
-UsageTracking::useAiModelPricingModel(YourAiModelPricing::class);
 ```
 
 ## Development

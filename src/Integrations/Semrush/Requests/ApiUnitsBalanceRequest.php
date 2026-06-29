@@ -15,6 +15,8 @@ class ApiUnitsBalanceRequest extends Request
 {
     protected Method $method = Method::GET;
 
+    public ?bool $allowBaseUrlOverride = true;
+
     public function resolveEndpoint(): string
     {
         return 'https://www.semrush.com/users/countapiunits.html';

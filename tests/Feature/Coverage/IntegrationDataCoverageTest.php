@@ -10,7 +10,7 @@ dataset('integration data classes', function (): array {
     $classes = [];
 
     $iterator = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($root.'/src/Integrations')
+        new RecursiveDirectoryIterator($root.'/src/Integrations', RecursiveDirectoryIterator::SKIP_DOTS)
     );
 
     foreach ($iterator as $fileInfo) {
@@ -18,26 +18,26 @@ dataset('integration data classes', function (): array {
             continue;
         }
 
-        $file = $fileInfo->getPathname();
-        if (! str_contains((string) $file, '/Data/')) {
+        $file = str_replace(DIRECTORY_SEPARATOR, '/', $fileInfo->getPathname());
+        if (! str_contains($file, '/Data/')) {
             continue;
         }
-        if (! str_ends_with((string) $file, '.php')) {
+        if (! str_ends_with($file, '.php')) {
             continue;
         }
 
-        $relativePath = substr((string) $file, strlen($root.'/src/'));
+        $relativePath = substr($file, strlen($root.'/src/'));
         $class = 'Seeders\\ExternalApis\\'.str_replace(['/', '.php'], ['\\', ''], $relativePath);
 
         if (! class_exists($class)) {
-            require_once $file;
+            require_once $fileInfo->getPathname();
         }
 
         if (! class_exists($class)) {
             continue;
         }
 
-        if (is_subclass_of($class, Data::class) && ! new ReflectionClass($class)->isAbstract()) {
+        if (is_subclass_of($class, Data::class) && ! (new ReflectionClass($class))->isAbstract()) {
             $classes[$class] = [$class];
         }
     }

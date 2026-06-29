@@ -4,58 +4,33 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis\UsageTracking\Services;
 
-use Illuminate\Support\Facades\Log;
 use Seeders\ExternalApis\UsageTracking\UsageTracking;
-use Throwable;
 
 class DataForSeoUsageTrackerService
 {
     /**
      * Log a DataForSEO API request.
-     * DataForSEO returns cost in USD directly in the response.
      */
     public function logRequest(
         string $endpoint,
-        float $cost,
         array $context = []
     ): mixed {
         $logModel = UsageTracking::$apiUsageLogModel;
 
-        $log = $logModel::create([
+        return $logModel::create([
             'integration' => 'dataforseo',
             'model' => null,
             'endpoint' => $endpoint,
             'prompt_tokens' => 0,
             'completion_tokens' => 0,
             'total_tokens' => 1,
-            'estimated_cost' => $cost,
-            'actual_cost' => $cost,
             'feature' => $context['feature'] ?? $this->extractFeatureFromEndpoint($endpoint),
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
             'user_id' => $context['user_id'] ?? auth()->id(),
             'status' => 'success',
-            'metadata' => array_merge($context['metadata'] ?? [], [
-                'cost_usd' => $cost,
-            ]),
-            'reconciled_at' => now(),
+            'metadata' => $context['metadata'] ?? null,
         ]);
-
-        $this->checkBudgetThreshold();
-
-        return $log;
-    }
-
-    /**
-     * Check if budget threshold has been reached and send alert.
-     */
-    private function checkBudgetThreshold(): void
-    {
-        try {
-            resolve(BudgetAlertService::class)->checkAndAlert('dataforseo');
-        } catch (Throwable $e) {
-            Log::warning('Failed to check DataForSEO budget threshold: '.$e->getMessage());
-        }
     }
 
     /**
@@ -72,7 +47,6 @@ class DataForSeoUsageTrackerService
             'integration' => 'dataforseo',
             'model' => null,
             'endpoint' => $endpoint,
-            'estimated_cost' => 0,
             'feature' => $context['feature'] ?? $this->extractFeatureFromEndpoint($endpoint),
             'sub_feature' => $context['sub_feature'] ?? null,
             'project_id' => $context['project_id'] ?? null,
@@ -110,18 +84,6 @@ class DataForSeoUsageTrackerService
     }
 
     /**
-     * Get today's DataForSEO spend.
-     */
-    public function getTodaySpend(): float
-    {
-        $logModel = UsageTracking::$apiUsageLogModel;
-
-        return (float) $logModel::byIntegration('dataforseo')
-            ->today()
-            ->sum('actual_cost');
-    }
-
-    /**
      * Get today's request count.
      */
     public function getTodayRequests(): int
@@ -134,18 +96,6 @@ class DataForSeoUsageTrackerService
     }
 
     /**
-     * Get month-to-date spend.
-     */
-    public function getMonthToDateSpend(): float
-    {
-        $logModel = UsageTracking::$apiUsageLogModel;
-
-        return (float) $logModel::byIntegration('dataforseo')
-            ->thisMonth()
-            ->sum('actual_cost');
-    }
-
-    /**
      * Get month-to-date request count.
      */
     public function getMonthToDateRequests(): int
@@ -155,20 +105,5 @@ class DataForSeoUsageTrackerService
         return (int) $logModel::byIntegration('dataforseo')
             ->thisMonth()
             ->count();
-    }
-
-    /**
-     * Get spend by feature for current month.
-     */
-    public function getMonthSpendByFeature(): array
-    {
-        $logModel = UsageTracking::$apiUsageLogModel;
-
-        return $logModel::byIntegration('dataforseo')
-            ->thisMonth()
-            ->selectRaw('feature, SUM(actual_cost) as total_cost, COUNT(*) as request_count')
-            ->groupBy('feature')
-            ->get()
-            ->toArray();
     }
 }

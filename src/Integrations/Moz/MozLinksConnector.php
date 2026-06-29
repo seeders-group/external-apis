@@ -8,10 +8,17 @@ use Saloon\Http\Auth\BasicAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class MozLinksConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'moz';
+    }
 
     protected function defaultAuth(): BasicAuthenticator
     {
@@ -29,27 +36,8 @@ class MozLinksConnector extends Connector
         return new BasicAuthenticator($clientId, $clientSecret);
     }
 
-    /**
-     * The Base URL of the API
-     */
     public function resolveBaseUrl(): string
     {
         return 'https://lsapi.seomoz.com/v2';
-    }
-
-    /**
-     * Default headers for every request
-     */
-    protected function defaultHeaders(): array
-    {
-        return [];
-    }
-
-    /**
-     * Default HTTP client options
-     */
-    protected function defaultConfig(): array
-    {
-        return [];
     }
 }

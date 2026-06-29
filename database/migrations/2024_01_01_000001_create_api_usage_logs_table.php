@@ -31,10 +31,6 @@ return new class extends Migration
             $table->integer('characters_processed')->nullable(); // For TTS
             $table->integer('seconds_processed')->nullable(); // For transcription
 
-            // Cost tracking
-            $table->decimal('estimated_cost', 10, 6); // Calculated from pricing table
-            $table->decimal('actual_cost', 10, 6)->nullable(); // From provider's API (reconciled)
-
             // Context
             $table->string('feature', 100)->index();
             $table->string('sub_feature', 100)->nullable();
@@ -47,7 +43,6 @@ return new class extends Migration
             $table->json('metadata')->nullable();
 
             // Timestamps
-            $table->timestamp('reconciled_at')->nullable();
             $table->timestamps();
 
             // Indexes

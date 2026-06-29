@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace Seeders\ExternalApis;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Override;
 use Prism\Prism\Enums\Provider;
+use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
+use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
+use Seeders\ExternalApis\Integrations\Majestic\MajesticConnector;
+use Seeders\ExternalApis\Integrations\ScraperAPI\ScraperAPIConnector;
+use Seeders\ExternalApis\Integrations\SeRanking\SeRankingConnector;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitConnector;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitService;
+use Seeders\ExternalApis\Integrations\Wikipedia\WikipediaConnector;
+use Seeders\ExternalApis\UsageTracking\Prometheus\PushMetricsCommand;
 use Seeders\ExternalApis\UsageTracking\Services\PrismUsageTrackerService;
 
 final class ExternalApisServiceProvider extends ServiceProvider
@@ -22,9 +30,15 @@ final class ExternalApisServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/external-apis.php', 'external-apis');
 
+        $this->app->bind(DataForSeoConnector::class);
+        $this->app->bind(ScraperAPIConnector::class);
+        $this->app->bind(AhrefsConnector::class);
+        $this->app->bind(SeRankingConnector::class);
+        $this->app->bind(MajesticConnector::class);
         $this->app->bind(SemrushConnector::class);
         $this->app->bind(TeamleaderOrbitConnector::class);
         $this->app->bind(TeamleaderOrbitService::class);
+        $this->app->bind(WikipediaConnector::class);
 
         if (class_exists(Provider::class)) {
             $this->app->singleton(PrismUsageTrackerService::class);
@@ -36,6 +50,14 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         if ($this->app->runningInConsole()) {
+            $this->commands([PushMetricsCommand::class]);
+
+            $this->app->afterResolving(Schedule::class, function (Schedule $schedule): void {
+                if (config('external-apis.usage_tracking.grafana_cloud.enabled')) {
+                    $schedule->command('external-apis:push-metrics')->everyFiveMinutes();
+                }
+            });
+
             $this->publishes([
                 __DIR__.'/../config/external-apis.php' => config_path('external-apis.php'),
             ], 'external-apis-config');

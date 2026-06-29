@@ -8,10 +8,12 @@ use Saloon\Http\Auth\HeaderAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class SeRankingConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
 
     protected function defaultAuth(): HeaderAuthenticator
     {
@@ -22,6 +24,11 @@ class SeRankingConnector extends Connector
         }
 
         return new HeaderAuthenticator($token, 'Authorization');
+    }
+
+    public function getIntegrationName(): string
+    {
+        return 'se-ranking';
     }
 
     public function resolveBaseUrl(): string

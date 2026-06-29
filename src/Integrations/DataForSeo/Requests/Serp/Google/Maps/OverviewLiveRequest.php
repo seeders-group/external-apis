@@ -25,8 +25,10 @@ class OverviewLiveRequest extends Request implements HasBody
 
     protected function defaultBody(): array
     {
+        // Drop null fields so an unused location_name/location_code is not sent
+        // (DataForSEO accepts either, but rejects a null location_name).
         return [
-            $this->data->toArray(),
+            array_filter($this->data->toArray(), static fn (mixed $value): bool => $value !== null),
         ];
     }
 }

@@ -41,5 +41,7 @@ abstract class TestCase extends Orchestra
         $app->make(Repository::class)->set('external-apis.scraperapi.key', 'test-scraperapi-key');
         $app->make(Repository::class)->set('external-apis.google_search.key', 'test-google-search-key');
         $app->make(Repository::class)->set('external-apis.google_search.cx', 'test-google-search-cx');
+        $app->make(Repository::class)->set('external-apis.usage_tracking.prometheus.middleware', []);
+        $app->make(Repository::class)->set('external-apis.usage_tracking.prometheus.token', null);
     }
 }

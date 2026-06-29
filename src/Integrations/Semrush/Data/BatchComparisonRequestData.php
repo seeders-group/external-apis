@@ -10,7 +10,7 @@ use Spatie\LaravelData\Data;
 class BatchComparisonRequestData extends Data
 {
     /**
-     * @param  array<int, BatchComparisonTargetData>  $targets
+     * @param  array<int, BatchComparisonTargetData|string>  $targets
      */
     public function __construct(
         #[DataCollectionOf(BatchComparisonTargetData::class)]
