@@ -42,7 +42,10 @@ class TeamleaderOrbitConnector extends Connector
             ->setClientSecret(config('external-apis.teamleader_orbit.client_secret'))
             ->setRedirectUri(config('external-apis.teamleader_orbit.redirect_uri'))
             ->setAuthorizeEndpoint(config('external-apis.teamleader_orbit.authorize_url'))
-            ->setTokenEndpoint(config('external-apis.teamleader_orbit.token_url'));
+            ->setTokenEndpoint(config('external-apis.teamleader_orbit.token_url'))
+            // The OAuth endpoints are absolute URLs; Saloon v4 blocks absolute
+            // endpoints unless base-URL override is explicitly allowed.
+            ->setAllowBaseUrlOverride(true);
     }
 
     protected function defaultHeaders(): array

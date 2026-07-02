@@ -176,8 +176,8 @@ Teamleader Orbit uses OAuth 2.0 authentication. The `TeamleaderOrbit` facade pro
 TEAMLEADER_ORBIT_CLIENT_ID=your-client-id
 TEAMLEADER_ORBIT_CLIENT_SECRET=your-client-secret
 TEAMLEADER_ORBIT_REDIRECT_URI=https://your-app.com/callback
-TEAMLEADER_ORBIT_AUTHORIZE_URL=https://app.teamleader.eu/oauth2/authorize
-TEAMLEADER_ORBIT_TOKEN_URL=https://app.teamleader.eu/oauth2/token
+TEAMLEADER_ORBIT_AUTHORIZE_URL=https://api.orbit.teamleader.eu/oauth2/authorize
+TEAMLEADER_ORBIT_TOKEN_URL=https://api.orbit.teamleader.eu/oauth2/access_token
 ```
 
 #### Authenticating

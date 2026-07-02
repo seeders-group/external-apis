@@ -134,8 +134,8 @@ return [
         'client_id' => env('TEAMLEADER_ORBIT_CLIENT_ID'),
         'client_secret' => env('TEAMLEADER_ORBIT_CLIENT_SECRET'),
         'redirect_uri' => env('TEAMLEADER_ORBIT_REDIRECT_URI'),
-        'authorize_url' => env('TEAMLEADER_ORBIT_AUTHORIZE_URL'),
-        'token_url' => env('TEAMLEADER_ORBIT_TOKEN_URL'),
+        'authorize_url' => env('TEAMLEADER_ORBIT_AUTHORIZE_URL', 'https://api.orbit.teamleader.eu/oauth2/authorize'),
+        'token_url' => env('TEAMLEADER_ORBIT_TOKEN_URL', 'https://api.orbit.teamleader.eu/oauth2/access_token'),
     ],
 
     /*
