@@ -2,6 +2,15 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.2.0 - 2026-07-02
+
+### What's Changed
+
+* Update prism-php/prism requirement from ^0.99.19 to ^0.100.1 in the composer-updates group by @dependabot[bot] in https://github.com/seeders-group/external-apis/pull/29
+* Setup TLO integration by @jessehendriks in https://github.com/seeders-group/external-apis/pull/25
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.1.0...v2.2.0
+
 ## v2.1.0 - 2026-06-26
 
 ### What's Changed
