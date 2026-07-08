@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.3.0 - 2026-07-08
+
+### What's Changed
+
+* STD-491: Add extended fields to Ahrefs keyword overview response by @jessehendriks in https://github.com/seeders-group/external-apis/pull/30
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.2.0...v2.3.0
+
 ## v2.2.0 - 2026-07-02
 
 ### What's Changed
