@@ -20,5 +20,10 @@ class CompaniesSetRequestData extends TeamleaderOrbitData
         public ?string $country = null,
         public ?string $phone = null,
         public ?string $website = null,
+        public ?string $vatcode = null,
+        public ?string $email = null,
+        public ?string $iban = null,
+        public ?string $bic = null,
+        public ?array $custfields = null,
     ) {}
 }
