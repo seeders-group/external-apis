@@ -2,6 +2,17 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.4.0 - 2026-07-22
+
+### Teamleader Orbit
+
+- companies.set: added `vatcode`, `email`, `iban`, `bic` and `custfields` to `CompaniesSetRequestData` (null fields stay omitted, partial updates keep existing values)
+- New `CompanyResponseData` response DTO for companies.get / companies.list (`vatcode` -> `vatNumber` mapping, structured `emails` collection, `emailAddresses()` helper)
+- New `Common\EmailData`
+- `CompaniesGetRequest` and `CompaniesListRequest` now implement `createDtoFromResponse`
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.3.0...v2.4.0
+
 ## v2.3.0 - 2026-07-08
 
 ### What's Changed
