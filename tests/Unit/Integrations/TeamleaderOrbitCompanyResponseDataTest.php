@@ -17,6 +17,13 @@ it('maps the flat Teamleader Orbit company payload into typed properties', funct
         'email' => 'Koen@WeTalkSEO.nl',
         'iban' => 'NL91ABNA0417164300',
         'bic' => 'ABNANL2A',
+        'street' => 'Hoofdstraat',
+        'housenumber' => '12a',
+        'zipcode' => '1234 AB',
+        'city' => 'Amsterdam',
+        'country' => 'The Netherlands',
+        'phone' => '+31612345678',
+        'custfields' => ['SEEDERS_STUDIO_SUPPLIER_ID' => '42'],
     ]);
 
     expect($company->id)->toBe('CP93E1SD5FPSBYK')
@@ -24,6 +31,13 @@ it('maps the flat Teamleader Orbit company payload into typed properties', funct
         ->and($company->website)->toBe('wetalkseo.nl')
         ->and($company->iban)->toBe('NL91ABNA0417164300')
         ->and($company->bic)->toBe('ABNANL2A')
+        ->and($company->street)->toBe('Hoofdstraat')
+        ->and($company->housenumber)->toBe('12a')
+        ->and($company->zipcode)->toBe('1234 AB')
+        ->and($company->city)->toBe('Amsterdam')
+        ->and($company->country)->toBe('The Netherlands')
+        ->and($company->phone)->toBe('+31612345678')
+        ->and($company->custfields)->toBe(['SEEDERS_STUDIO_SUPPLIER_ID' => '42'])
         ->and($company->emailAddresses())->toBe(['koen@wetalkseo.nl']);
 });
 
