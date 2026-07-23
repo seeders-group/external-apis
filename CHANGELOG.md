@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.5.0 - 2026-07-23
+
+### Teamleader Orbit
+
+- `CompanyResponseData`: added `street`, `housenumber`, `zipcode`, `city`, `country`, `phone` and `custfields` — the DTO now covers the full flat companies.get / companies.list payload
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.4.0...v2.5.0
+
 ## v2.4.0 - 2026-07-22
 
 ### Teamleader Orbit
