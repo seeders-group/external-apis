@@ -28,6 +28,9 @@ class CompanyResponseData extends Data
     /**
      * @param  array<int, EmailData>  $emails
      */
+    /**
+     * @param  array<string, mixed>|null  $custfields
+     */
     public function __construct(
         public string $id,
         public ?string $name = null,
@@ -38,6 +41,13 @@ class CompanyResponseData extends Data
         public ?string $type = null,
         public ?string $iban = null,
         public ?string $bic = null,
+        public ?string $street = null,
+        public ?string $housenumber = null,
+        public ?string $zipcode = null,
+        public ?string $city = null,
+        public ?string $country = null,
+        public ?string $phone = null,
+        public ?array $custfields = null,
         #[DataCollectionOf(EmailData::class)]
         public array $emails = [],
     ) {}
