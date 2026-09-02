@@ -2,17 +2,6 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
-## Unreleased
-
-### Teamleader Orbit
-
-- New `PosResource::context()` for the undocumented pos.context endpoint (currencies, legalentities, finaccounts, folders)
-- New `ProjectsResource` with projects.get / projects.list (`ProjectResponseData`; projects.get on subscription projects returns `periods`)
-- New `ProjectsResource::getPeriod()` for the undocumented projectperiod.get endpoint (requires both `projectid` and `projectperiodid`); `ProjectPeriodResponseData` exposes the period's material lines (`costs`, with the encrypted PC... projectcost ids that pos.set lines need) and `chapters`
-- `PosLineData` rewritten to the documented pos.set line fields: `finaccountid`, `projectcostid`, `contractcostid`, `periodid`, `price`, `value` (previous speculative fields had no consumers)
-- `PosSetRequestData`: added `close_dt`
-- `TeamleaderOrbitData::toArray()` now strips null values recursively so nested payloads (pos.set lines) stay partial updates
-
 ## v2.4.0 - 2026-07-22
 
 ### Teamleader Orbit
