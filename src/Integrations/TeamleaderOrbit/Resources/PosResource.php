@@ -7,6 +7,7 @@ namespace Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources;
 use Saloon\Http\Response;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Data\Pos\PosGetRequestData;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Data\Pos\PosSetRequestData;
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Requests\Pos\PosContextRequest;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Requests\Pos\PosGetRequest;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Requests\Pos\PosSetRequest;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitConnector;
@@ -14,6 +15,11 @@ use Seeders\ExternalApis\Integrations\TeamleaderOrbit\TeamleaderOrbitConnector;
 class PosResource
 {
     public function __construct(private readonly TeamleaderOrbitConnector $connector) {}
+
+    public function context(): Response
+    {
+        return $this->connector->send(new PosContextRequest);
+    }
 
     public function get(PosGetRequestData $data): Response
     {

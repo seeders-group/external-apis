@@ -6,6 +6,8 @@ namespace Seeders\ExternalApis\Integrations\TeamleaderOrbit;
 
 use RuntimeException;
 use Saloon\Contracts\OAuthAuthenticator;
+use Saloon\Http\Response;
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Requests\Common\RawJsonRequest;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\AssetsResource;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\CompaniesResource;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\ContactsResource;
@@ -15,6 +17,7 @@ use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\EntitiesResource
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\ExpensesResource;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\OffersResource;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\PosResource;
+use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\ProjectsResource;
 use Seeders\ExternalApis\Integrations\TeamleaderOrbit\Resources\UsersResource;
 
 class TeamleaderOrbitService
@@ -74,9 +77,24 @@ class TeamleaderOrbitService
         return new PosResource($this->resolveConnector());
     }
 
+    public function projects(): ProjectsResource
+    {
+        return new ProjectsResource($this->resolveConnector());
+    }
+
     public function users(): UsersResource
     {
         return new UsersResource($this->resolveConnector());
+    }
+
+    /**
+     * Send a free-form JSON POST to any endpoint (exploration/debugging).
+     *
+     * @param  array<string, mixed>  $payload
+     */
+    public function raw(string $endpoint, array $payload = []): Response
+    {
+        return $this->resolveConnector()->send(new RawJsonRequest($endpoint, $payload));
     }
 
     private function resolveConnector(): TeamleaderOrbitConnector
