@@ -2,6 +2,19 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.7.0 - 2026-09-08
+
+### ⚠️ Breaking changes
+
+* **`GoogleSearchConnector` now requires tracking context.** Sending from a plain `new GoogleSearchConnector` throws a `RuntimeException`; use `forModel()`, `forScope()`, `withTracking()` or `withScope()`, as with the other tracked connectors.
+
+### Google Search
+
+* Added API usage tracking to `GoogleSearchConnector`, bringing it in line with Ahrefs, Majestic, Moz and Semrush. Requests are logged to `api_logs` under the `google_search` integration, so search query volume can be monitored against the daily quota.
+* `CustomSearchRequest` now sends its `$gl` constructor argument as the `gl` query parameter; it was previously accepted and silently dropped.
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.6.0...v2.7.0
+
 ## v2.6.0 - 2026-09-02
 
 ### Teamleader Orbit
