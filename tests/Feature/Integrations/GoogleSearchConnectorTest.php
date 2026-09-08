@@ -16,3 +16,18 @@ it('builds custom search request correctly', function (): void {
 
     expect($request->resolveEndpoint())->toBe('/customsearch/v1');
 });
+
+it('sends the search query without a country when none is given', function (): void {
+    $request = new CustomSearchRequest('laravel framework');
+
+    expect($request->query()->all())->toBe(['q' => 'laravel framework']);
+});
+
+it('sends the country as the gl parameter when given', function (): void {
+    $request = new CustomSearchRequest('laravel framework', 'nl');
+
+    expect($request->query()->all())->toBe([
+        'q' => 'laravel framework',
+        'gl' => 'nl',
+    ]);
+});

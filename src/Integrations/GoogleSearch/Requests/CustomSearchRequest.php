@@ -23,8 +23,9 @@ class CustomSearchRequest extends Request
 
     protected function defaultQuery(): array
     {
-        return [
+        return array_filter([
             'q' => $this->searchQuery,
-        ];
+            'gl' => $this->gl,
+        ], static fn (?string $value): bool => $value !== null);
     }
 }
