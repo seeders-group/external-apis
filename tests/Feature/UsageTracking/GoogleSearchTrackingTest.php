@@ -55,7 +55,7 @@ it('records an api_log for a custom search request', function (): void {
     $apiLog = ApiConsumptionLog::query()->first();
 
     expect($apiLog)->not->toBeNull();
-    expect($apiLog->integration)->toBe('google-search');
+    expect($apiLog->integration)->toBe('google_search');
     expect($apiLog->scope)->toBe('google_search_tracking_test');
     expect($apiLog->endpoint)->toBe('/customsearch/v1');
 });

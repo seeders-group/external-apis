@@ -16,7 +16,7 @@ class GoogleSearchConnector extends Connector
 
     public function getIntegrationName(): string
     {
-        return 'google-search';
+        return 'google_search';
     }
 
     /**
