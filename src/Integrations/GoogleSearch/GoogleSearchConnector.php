@@ -7,10 +7,17 @@ namespace Seeders\ExternalApis\Integrations\GoogleSearch;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class GoogleSearchConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'google-search';
+    }
 
     /**
      * The Base URL of the API

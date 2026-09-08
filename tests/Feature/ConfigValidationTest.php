@@ -62,7 +62,7 @@ it('throws when hunter api key is missing', function (): void {
 it('throws when google search key is missing', function (): void {
     config()->set('external-apis.google_search.key', null);
 
-    $connector = new GoogleSearchConnector;
+    $connector = GoogleSearchConnector::forScope('config-validation');
     $connector->withMockClient(new MockClient([MockResponse::make([], 200)]));
 
     $connector->send(new ConfigValidationDummyRequest);

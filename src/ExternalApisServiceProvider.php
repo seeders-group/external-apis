@@ -10,6 +10,7 @@ use Override;
 use Prism\Prism\Enums\Provider;
 use Seeders\ExternalApis\Integrations\Ahrefs\AhrefsConnector;
 use Seeders\ExternalApis\Integrations\DataForSeo\DataForSeoConnector;
+use Seeders\ExternalApis\Integrations\GoogleSearch\GoogleSearchConnector;
 use Seeders\ExternalApis\Integrations\Majestic\MajesticConnector;
 use Seeders\ExternalApis\Integrations\ScraperAPI\ScraperAPIConnector;
 use Seeders\ExternalApis\Integrations\Semrush\SemrushConnector;
@@ -39,6 +40,7 @@ final class ExternalApisServiceProvider extends ServiceProvider
         $this->app->bind(TeamleaderOrbitConnector::class);
         $this->app->bind(TeamleaderOrbitService::class);
         $this->app->bind(WikipediaConnector::class);
+        $this->app->bind(GoogleSearchConnector::class);
 
         if (class_exists(Provider::class)) {
             $this->app->singleton(PrismUsageTrackerService::class);
