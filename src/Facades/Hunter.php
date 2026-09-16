@@ -24,6 +24,13 @@ use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
  */
 final class Hunter extends Facade
 {
+    /**
+     * Resolve a fresh connector per call. A cached root would keep the tracking
+     * context set by an earlier withScope(), so a later unscoped call would be
+     * attributed to that scope instead of throwing.
+     */
+    protected static $cached = false;
+
     protected static function getFacadeAccessor(): string
     {
         return HunterConnector::class;
