@@ -7,6 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
+use Saloon\Http\PendingRequest;
 use Saloon\Http\Response;
 use Seeders\ExternalApis\Facades\Hunter;
 use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
@@ -117,19 +118,64 @@ it('logs hunter requests that exhaust the monthly quota', function (): void {
 });
 
 it('tracks hunter requests sent through the facade', function (): void {
-    Hunter::withScope('hunter_facade_test');
+    // The documented form: withScope() returns the connector the call chains on.
+    $connector = Hunter::withScope('hunter_facade_test');
 
-    Hunter::getFacadeRoot()->withMockClient(new MockClient([
+    $connector->withMockClient(new MockClient([
         DomainSearchRequest::class => MockResponse::make([], 200),
     ]));
 
-    Hunter::send(new DomainSearchRequest('example.com'));
+    $connector->send(new DomainSearchRequest('example.com'));
 
     $apiLog = ApiConsumptionLog::query()->latest()->first();
 
     expect($apiLog)->not->toBeNull();
     expect($apiLog->integration)->toBe('hunter');
     expect($apiLog->scope)->toBe('hunter_facade_test');
+});
+
+it('boots tracking for every request a reused connector sends', function (): void {
+    // PHP reuses an object id once the previous pending request is freed, which
+    // a real send does as soon as the caller drops the Response. Keying the
+    // double-boot guard on the id therefore matched a stale entry and skipped
+    // tracking on every send after the first.
+    $connector = HunterConnector::forScope('hunter_reuse_test');
+
+    $bootRan = [];
+
+    for ($i = 0; $i < 5; $i++) {
+        // Constructing a PendingRequest is what boots Saloon's plugins.
+        $pendingRequest = new PendingRequest($connector, new DomainSearchRequest("site{$i}.com"));
+
+        // The scope header is only added when boot does not return early.
+        $bootRan[] = $pendingRequest->headers()->get('X-Seeders-Scope') === 'hunter_reuse_test';
+
+        unset($pendingRequest);
+    }
+
+    expect($bootRan)->toBe([true, true, true, true, true]);
+});
+
+it('still boots a single pending request only once', function (): void {
+    $connector = HunterConnector::forScope('hunter_double_boot_test');
+
+    // Construction already boots the plugin and attaches the recording middleware.
+    $pendingRequest = new PendingRequest($connector, new DomainSearchRequest('example.com'));
+
+    expect($pendingRequest->middleware()->getResponsePipeline()->getPipes())->toHaveCount(1);
+
+    // Booting the same pending request again must not attach it a second time.
+    $connector->bootTracksApiUsage($pendingRequest);
+
+    expect($pendingRequest->middleware()->getResponsePipeline()->getPipes())->toHaveCount(1);
+});
+
+it('does not leak tracking context between facade calls', function (): void {
+    Hunter::withScope('first_feature');
+
+    // A cached facade root would hand the next caller the scope above.
+    expect(fn (): Response => Hunter::send(new DomainSearchRequest('example.com')))
+        ->toThrow(RuntimeException::class, 'requires tracking context');
 });
 
 class HunterTrackableModel extends Model
