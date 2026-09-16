@@ -7,10 +7,17 @@ namespace Seeders\ExternalApis\Integrations\Hunter;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\AcceptsJson;
 use Seeders\ExternalApis\Exceptions\MissingConfigurationException;
+use Seeders\ExternalApis\UsageTracking\Traits\TracksApiUsage;
 
 class HunterConnector extends Connector
 {
     use AcceptsJson;
+    use TracksApiUsage;
+
+    public function getIntegrationName(): string
+    {
+        return 'hunter';
+    }
 
     /**
      * The Base URL of the API

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Saloon\Http\Faking\MockClient;
-use Saloon\Http\Faking\MockResponse;
 use Seeders\ExternalApis\Integrations\Hunter\HunterConnector;
 use Seeders\ExternalApis\Integrations\Hunter\Requests\DomainSearchRequest;
 
@@ -20,12 +18,6 @@ it('builds domain search request with required params', function (): void {
 });
 
 it('builds domain search query with all optional params', function (): void {
-    $connector = new HunterConnector;
-    $mockClient = new MockClient([
-        DomainSearchRequest::class => MockResponse::make([], 200),
-    ]);
-    $connector->withMockClient($mockClient);
-
     $request = new DomainSearchRequest(
         domain: 'example.com',
         limit: 10,
@@ -34,10 +26,7 @@ it('builds domain search query with all optional params', function (): void {
         sentry: false,
     );
 
-    $connector->send($request);
-
-    $lastRequest = $mockClient->getLastPendingRequest();
-    $query = $lastRequest->query()->all();
+    $query = $request->query()->all();
 
     expect($query)->toHaveKey('domain', 'example.com')
         ->toHaveKey('limit', 10)
@@ -47,20 +36,18 @@ it('builds domain search query with all optional params', function (): void {
 });
 
 it('excludes optional params when not set', function (): void {
-    $connector = new HunterConnector;
-    $mockClient = new MockClient([
-        DomainSearchRequest::class => MockResponse::make([], 200),
-    ]);
-    $connector->withMockClient($mockClient);
-
     $request = new DomainSearchRequest('example.com');
-    $connector->send($request);
 
-    $lastRequest = $mockClient->getLastPendingRequest();
-    $query = $lastRequest->query()->all();
+    $query = $request->query()->all();
 
     expect($query)->not->toHaveKey('limit')
         ->not->toHaveKey('offset')
         ->not->toHaveKey('type');
     expect($query)->toHaveKey('sentry', 'true');
+});
+
+it('sends the api key from config as a default query parameter', function (): void {
+    $connector = new HunterConnector;
+
+    expect($connector->query()->all())->toHaveKey('api_key', 'test-hunter-key');
 });

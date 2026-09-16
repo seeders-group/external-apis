@@ -53,7 +53,7 @@ it('throws when seranking token is missing', function (): void {
 it('throws when hunter api key is missing', function (): void {
     config()->set('external-apis.hunter.api_key', null);
 
-    $connector = new HunterConnector;
+    $connector = HunterConnector::forScope('config-validation');
     $connector->withMockClient(new MockClient([MockResponse::make([], 200)]));
 
     $connector->send(new ConfigValidationDummyRequest);

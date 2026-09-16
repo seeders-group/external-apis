@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use RuntimeException;
 use Saloon\Http\PendingRequest;
 use Seeders\ExternalApis\UsageTracking\Middleware\RecordApiUsage;
+use WeakMap;
 
 /** @phpstan-consistent-constructor */
 trait TracksApiUsage
@@ -18,8 +19,8 @@ trait TracksApiUsage
 
     protected bool $trackingEnabled = false;
 
-    /** @var array<int, true> */
-    private array $trackingBootedRequestIds = [];
+    /** @var WeakMap<PendingRequest, true>|null */
+    private ?WeakMap $trackingBootedRequests = null;
 
     /**
      * Create a connector instance with model tracking context.
@@ -80,11 +81,16 @@ trait TracksApiUsage
             return;
         }
 
-        $requestId = spl_object_id($pendingRequest);
-
         // Guard against double-booting when a wrapper trait uses this trait
-        // (Saloon's class_uses_recursive finds both traits with the same base name)
-        if (isset($this->trackingBootedRequestIds[$requestId])) {
+        // (Saloon's class_uses_recursive finds both traits with the same base name).
+        //
+        // Keyed on the pending request itself rather than spl_object_id(): PHP
+        // reuses an object id once the previous request is freed, so a connector
+        // instance that sends more than once saw the second request match the
+        // first one's stale id and silently skipped tracking altogether.
+        $bootedRequests = $this->trackingBootedRequests ??= new WeakMap;
+
+        if (isset($bootedRequests[$pendingRequest])) {
             return;
         }
 
@@ -100,7 +106,7 @@ trait TracksApiUsage
             );
         }
 
-        $this->trackingBootedRequestIds[$requestId] = true;
+        $bootedRequests[$pendingRequest] = true;
 
         if ($this->trackableModel !== null) {
             $pendingRequest->headers()->add('X-Seeders-Model-Type', $this->trackableModel->getMorphClass());
