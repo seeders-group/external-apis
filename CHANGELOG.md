@@ -2,6 +2,24 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.8.0 - 2026-09-16
+
+### ⚠️ Breaking changes
+
+* **`HunterConnector` now requires tracking context.** Sending from a plain `new HunterConnector`, or straight off the `Hunter` facade, throws a `RuntimeException`; use `forModel()`, `forScope()`, `withTracking()` or `withScope()`, as with the other tracked connectors.
+
+### Usage tracking (affects every integration)
+
+* Fixed a guard in `TracksApiUsage` that silently skipped tracking for every send after the first from a reused connector instance. It remembered booted requests by `spl_object_id()`, and PHP reuses an object id once the previous request is freed, so later requests matched a stale entry and were recorded nowhere. Now keyed on a `WeakMap` of the requests themselves.
+* **Expect recorded usage to rise** for integrations that reuse one connector across many sends — Ahrefs in particular. The earlier figures were under-reported, not the new ones inflated.
+
+### Hunter
+
+* Added API usage tracking to `HunterConnector`, bringing it in line with Ahrefs, Google Search, Majestic, Moz and Semrush. Calls are logged to `api_logs` under the `hunter` integration, so email lookup volume can be tracked against the monthly search allowance.
+* The `Hunter` facade now resolves a fresh connector per call, so tracking context set by `withScope()` no longer leaks into a later unscoped call.
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.7.0...v2.8.0
+
 ## v2.7.0 - 2026-09-08
 
 ### ⚠️ Breaking changes
