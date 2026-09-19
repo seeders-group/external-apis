@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": "^8.4",
-        "guzzlehttp/guzzle": "^7.8",
+        "guzzlehttp/guzzle": "^8.2",
         "illuminate/contracts": "^12.0|^13.0",
         "illuminate/support": "^12.0|^13.0",
         "saloonphp/saloon": "^4.0",
@@ -34,7 +34,7 @@
         "driftingly/rector-laravel": "^2.1",
         "laravel/ai": "^0.11",
         "prism-php/prism": "^0.100.1",
-        "saloonphp/laravel-plugin": "^4.0",
+        "saloonphp/laravel-plugin": "^5.0",
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.13",
         "nunomaduro/collision": "^8.8",
