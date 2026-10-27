@@ -93,6 +93,36 @@ it('extracts metadata units with zero value and error payloads', function (): vo
     ]);
 });
 
+it('strips NUL characters from error metadata', function (mixed $errorJson, string $body, mixed $expected): void {
+    $middleware = new TestRecordApiUsageMiddleware;
+
+    $metadata = $middleware->runExtractMetadata(mockFailedApiUsageResponse($errorJson, $body));
+
+    expect($metadata['error'])->toBe($expected)
+        ->and(json_encode($metadata))->not->toContain('\u0000');
+})->with([
+    'raw body' => [null, "<script>{i:\"__root__\0\"}</script>", '<script>{i:"__root__"}</script>'],
+    'structured error' => [['message' => "fail\0ed", "co\0de" => 1], '', ['message' => 'failed', 'code' => 1]],
+]);
+
+it('replaces invalid UTF-8 in the error body', function (): void {
+    $middleware = new TestRecordApiUsageMiddleware;
+
+    $metadata = $middleware->runExtractMetadata(mockFailedApiUsageResponse(null, "caf\xE9"));
+
+    expect($metadata['error'])->toBe('caf?')
+        ->and(json_encode($metadata))->not->toBeFalse();
+});
+
+it('truncates long error bodies without splitting characters', function (): void {
+    $middleware = new TestRecordApiUsageMiddleware;
+
+    $metadata = $middleware->runExtractMetadata(mockFailedApiUsageResponse(null, str_repeat('é', 5000)));
+
+    expect(mb_strlen((string) $metadata['error']))->toBe(2000)
+        ->and(mb_check_encoding($metadata['error'], 'UTF-8'))->toBeTrue();
+});
+
 it('falls back to request counting when no consumption signals are present', function (): void {
     $middleware = new TestRecordApiUsageMiddleware;
 
@@ -111,6 +141,18 @@ it('falls back to request counting when no consumption signals are present', fun
         'type' => 'requests',
     ]);
 });
+
+function mockFailedApiUsageResponse(mixed $errorJson, string $body): Response
+{
+    $response = Mockery::mock(Response::class);
+    $response->shouldReceive('json')->with('usage')->andReturn(null);
+    $response->shouldReceive('header')->with('x-api-units-cost-total-actual')->andReturn(null);
+    $response->shouldReceive('successful')->andReturn(false);
+    $response->shouldReceive('json')->with('error')->andReturn($errorJson);
+    $response->shouldReceive('body')->andReturn($body);
+
+    return $response;
+}
 
 class TestRecordApiUsageMiddleware extends RecordApiUsage
 {
