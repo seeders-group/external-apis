@@ -11,6 +11,11 @@ use Throwable;
 
 class RecordApiUsage
 {
+    /**
+     * Error bodies are often whole HTML pages; the start is enough to diagnose the failure.
+     */
+    protected const ERROR_BODY_LIMIT = 2000;
+
     public function __invoke(Response $response): void
     {
         if (! config('external-apis.usage_tracking.enabled', true)) {
@@ -93,10 +98,35 @@ class RecordApiUsage
         }
 
         if (! $response->successful()) {
-            $metadata['error'] = $this->safeJson($response, 'error') ?? $response->body();
+            $error = $this->safeJson($response, 'error') ?? $response->body();
+
+            $metadata['error'] = is_string($error) ? mb_substr($error, 0, self::ERROR_BODY_LIMIT) : $error;
         }
 
-        return $metadata === [] ? null : $metadata;
+        return $metadata === [] ? null : $this->sanitize($metadata);
+    }
+
+    /**
+     * Make metadata storable: PostgreSQL jsonb rejects \u0000 and json_encode rejects
+     * invalid UTF-8, and either one in a response body would lose the whole log row.
+     */
+    protected function sanitize(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            return str_replace("\0", '', mb_scrub($value, 'UTF-8'));
+        }
+
+        if (! is_array($value)) {
+            return $value;
+        }
+
+        $sanitized = [];
+
+        foreach ($value as $key => $item) {
+            $sanitized[is_string($key) ? $this->sanitize($key) : $key] = $this->sanitize($item);
+        }
+
+        return $sanitized;
     }
 
     protected function safeJson(Response $response, ?string $key = null): mixed
