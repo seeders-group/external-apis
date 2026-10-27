@@ -2,6 +2,14 @@
 
 All notable changes to `seeders-group/external-apis` will be documented in this file.
 
+## v2.9.0 - 2026-10-27
+
+### What's Changed
+
+* Strip NUL characters and cap error bodies in API usage logs by @MikeCVermeer in https://github.com/seeders-group/external-apis/pull/43
+
+**Full Changelog**: https://github.com/seeders-group/external-apis/compare/v2.8.0...v2.9.0
+
 ## v2.8.0 - 2026-09-16
 
 ### ⚠️ Breaking changes
